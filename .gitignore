@@ -1,0 +1,28 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.vercel/
+
+# Local data dumps
+/data/raw/
+/data/cache/
+*.sqlite
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
