@@ -4,7 +4,7 @@
  * pages fast without showing stale data for long.
  */
 import { cacheLife } from "next/cache";
-import { select } from "./supabase";
+import { select, UpstreamError } from "./supabase";
 
 export const SOURCES = ["play_store", "app_store", "reddit_post", "reddit_comment"] as const;
 export type Source = (typeof SOURCES)[number];
@@ -97,10 +97,22 @@ export const PAGE_SIZE = 25;
 export async function searchEvidence(f: EvidenceFilters) {
   "use cache";
   cacheLife("minutes");
-  const page = Math.max(1, f.page ?? 1);
+  const page = Math.min(Math.max(1, Math.floor(f.page ?? 1)), 10_000);
   // Whole-word match (Postgres regex \m…\M) allowing a plural: "pet" finds pet/pets, not "petty".
   // Regex metacharacters are escaped; commas/parens would break PostgREST's filter syntax.
-  const q = (f.q ?? "").replace(/[,()]/g, " ").trim().replace(/[.*+?^${}|[\]\\]/g, "\\$&");
+  // Capped at 100 chars: bounds the regex work any single request can ask the database to do.
+  const q = (f.q ?? "").slice(0, 100).replace(/[,()]/g, " ").trim().replace(/[.*+?^${}|[\]\\]/g, "\\$&");
+  try {
+    return { ...(await runSearch(q, f, page)), blocked: false };
+  } catch (e) {
+    // A search the upstream firewall refuses (e.g. SQL-injection-looking text) gets a calm
+    // "couldn't run that search" instead of the whole page failing.
+    if (e instanceof UpstreamError && e.status === 403) return { rows: [] as Evidence[], total: 0, blocked: true };
+    throw e;
+  }
+}
+
+function runSearch(q: string, f: EvidenceFilters, page: number) {
   return select<Evidence>(
     "v_evidence",
     {

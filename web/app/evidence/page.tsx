@@ -35,7 +35,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
     rating: one(sp.rating),
     page: Number(one(sp.page)) || 1,
   };
-  const { rows, total } = await searchEvidence(filters);
+  const { rows, total, blocked } = await searchEvidence(filters);
   const pages = total ? Math.ceil(total / PAGE_SIZE) : 1;
   const page = filters.page ?? 1;
 
@@ -54,7 +54,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
       <form action="/evidence" className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-surface p-4">
         <label className="flex min-w-60 flex-1 flex-col gap-1 text-sm">
           <span className="text-muted">Search text</span>
-          <input name="q" defaultValue={filters.q} placeholder="e.g. pet food, expiry, refund"
+          <input name="q" defaultValue={filters.q} placeholder="e.g. pet food, expiry, refund" maxLength={100}
                  className="rounded-md border border-border bg-bg px-3 py-2 text-base" />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -71,7 +71,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
             {[1, 2, 3, 4, 5].map((r) => <option key={r} value={r}>{r}★</option>)}
           </select>
         </label>
-        <button className="rounded-md bg-accent px-4 py-2 font-medium text-white">Apply</button>
+        <button className="rounded-md bg-accent px-4 py-2 font-medium text-accent-ink">Apply</button>
         {(filters.q || filters.source || filters.rating) && (
           <Link href="/evidence" className="px-2 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>
         )}
@@ -79,10 +79,24 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
 
       <p className="text-sm text-muted" aria-live="polite">
         {fmtInt(total ?? rows.length)} matching item{total === 1 ? "" : "s"}
-        {pages > 1 && ` · page ${page} of ${fmtInt(pages)}`}
+        {pages > 1 && page <= pages && ` · page ${page} of ${fmtInt(pages)}`}
       </p>
 
-      {rows.length === 0 ? (
+      {blocked ? (
+        <Card>
+          <p className="text-muted">
+            That search couldn&rsquo;t be run: it looks like code rather than words, so the database&rsquo;s
+            firewall refused it. Try plain words such as <em>refund</em> or <em>expiry</em>.
+          </p>
+        </Card>
+      ) : rows.length === 0 && total && page > pages ? (
+        <Card>
+          <p className="text-muted">
+            There are only {fmtInt(pages)} pages of results.{" "}
+            <Link className="text-accent underline underline-offset-2" href={href(pages)}>Go to the last page</Link>
+          </p>
+        </Card>
+      ) : rows.length === 0 ? (
         <Card><p className="text-muted">Nothing matches. Try a broader search.</p></Card>
       ) : (
         <ul className="space-y-3">

@@ -28,7 +28,8 @@ export function RatingBars({ mix }: { mix: RatingMix[] }) {
                   <div key={star} className="flex items-center justify-center overflow-hidden whitespace-nowrap text-sm font-medium"
                        style={{ width: `${Math.max(w, 0.5)}%`, background: `var(--star-${star})`, color: `var(--star-ink-${star})` }}
                        title={`${star}★: ${fmtInt(n)} (${w}%)`}>
-                    {w >= 12 ? `${star}★ ${w}%` : w >= 6 ? `${w}%` : ""}
+                    {/* Full label only where it fits even on a phone; the legend below names colours. */}
+                    {w >= 20 ? `${star}★ ${w}%` : w >= 8 ? `${w}%` : ""}
                   </div>
                 );
               })}

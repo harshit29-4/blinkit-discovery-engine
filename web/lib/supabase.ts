@@ -21,6 +21,19 @@ function key(): string {
 
 export type Query = Record<string, string | number | undefined>;
 
+/** A non-OK answer from Supabase, kept typed so callers can handle known cases calmly. */
+export class UpstreamError extends Error {
+  constructor(public status: number, public view: string, detail: string) {
+    super(`Supabase ${view}: HTTP ${status} ${detail}`);
+  }
+}
+
+function totalFrom(range: string | null): number | null {
+  // Content-Range is "0-24/1234", or "*/1234" when the requested range is past the end.
+  const n = range ? Number(range.split("/")[1]) : NaN;
+  return Number.isFinite(n) ? n : null;
+}
+
 /** GET /rest/v1/<view>?<query>. With `count`, also returns the exact total row count. */
 export async function select<T>(
   view: string,
@@ -36,12 +49,16 @@ export async function select<T>(
   if (opts.count) headers.Prefer = "count=exact";
 
   const res = await fetch(url, { headers });
+  // 416 = asked for a page past the last row (e.g. ?page=999999): not an error, just empty.
+  if (res.status === 416) {
+    return { rows: [], total: totalFrom(res.headers.get("content-range")) };
+  }
   if (!res.ok) {
-    throw new Error(`Supabase ${view}: HTTP ${res.status} ${(await res.text()).slice(0, 200)}`);
+    const body = await res.text();
+    // Supabase's web firewall answers SQL-injection-looking queries with an HTML 403 page.
+    const detail = body.trimStart().startsWith("<") ? "(blocked by upstream firewall)" : body.slice(0, 200);
+    throw new UpstreamError(res.status, view, detail);
   }
   const rows = (await res.json()) as T[];
-  // Content-Range: "0-24/1234"
-  const range = res.headers.get("content-range");
-  const total = opts.count && range ? Number(range.split("/")[1]) : null;
-  return { rows, total: Number.isFinite(total) ? total : null };
+  return { rows, total: opts.count ? totalFrom(res.headers.get("content-range")) : null };
 }

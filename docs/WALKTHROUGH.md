@@ -123,7 +123,23 @@ Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `n
 
 **Caching (this Next.js version is different):** with `cacheComponents` on, every data read must either be cached (`'use cache'` + `cacheLife`) or sit inside `<Suspense>`. All reads in `web/lib/data.ts` use `cacheLife('minutes')`: fresh within ~1 minute, which suits a pipeline that writes hourly. Even "today's date" for the 90-day chart is computed inside the cached function, because reading the clock during rendering is flagged by the framework. The production build prerenders Overview and Health (revalidated every minute) and streams Evidence results per search.
 
-**Design choices:** colours come from the Okabe–Ito palette (colour-blind safe) and every chart also states its numbers in text; light and dark mode; no text under 14px; tested with no sideways scrolling at 375px phone width (the runs list is stacked rather than a wide table for that reason). The site says it's an independent project, not affiliated with Blinkit.
+**Brand colours:** the frame (yellow header, black/yellow active tab, green buttons and links) uses Blinkit's widely cited colours: yellow `#F8CB46`, green `#0C831F`, near-black `#1C1C1C`. These are third-party values; Blinkit publishes no official codes. Every pairing was chosen by measured contrast: black on yellow 11:1, green on white 4.9:1, a lightened green `#4CC962` in dark mode. Green text never goes on yellow (only 3.2:1). There's no Blinkit logo, and the header itself says the project isn't affiliated with Blinkit, because brand colours make a site look official.
+
+**Design choices:** chart colours stay on the Okabe–Ito palette (colour-blind safe, unlike yellow/green) and every chart also states its numbers in text; light and dark mode; no text under 14px; tested with no sideways scrolling at 375px phone width (the runs list is stacked rather than a wide table for that reason). The site says it's an independent project, not affiliated with Blinkit.
+
+**Production hardening (2026-11-23), tested against `next build` + `next start`, 42/42 checks passing:**
+
+| Area | What's in place | How it was verified |
+|---|---|---|
+| Security headers | CSP (static-friendly, no nonces), `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options: DENY`, `Permissions-Policy`, HSTS; `x-powered-by` removed (`web/next.config.ts`) | Response headers checked; no CSP errors in the browser console; client navigation still works |
+| Secrets | Only `SUPABASE_URL` + publishable key on the web side, read server-side only | Scanned built JS + HTML for every `.env` secret and the publishable key: none present |
+| Hostile input | Search capped at 100 chars, regex-escaped, page clamped; firewall-blocked queries show a calm message; pages past the end offer "Go to the last page" | 14 edge cases (SQL-ish, `<script>`, regex chars, 5k chars, Hindi, emoji, bad page/source/rating…) render normally, never the error page |
+| Database down | `app/error.tsx` shows "couldn't load its data" + Try again (HTTP 500); prerendered pages keep serving their last good copy | Ran a second production server pointed at a non-existent database |
+| 404 | `app/not-found.tsx` with links back | `/definitely-not-a-page` → 404 |
+| Accessibility | WCAG contrast fixed (dark-mode button was 2.2:1, now 7:1; chart colours ≥ 3:1), skip-to-content link, labelled charts, landmarks | Contrast computed for 22 colour pairs × 2 themes; accessibility tree inspected |
+| Sharing / SEO | Title/description, Open Graph + generated preview card (`app/opengraph-image.tsx`), `robots.txt` (search-result URLs not crawled), absolute `metadataBase` from Vercel's production URL | Checked in HTML |
+| Performance | Warm pages 2–30 ms; first-load JS 174 KB gzipped (React/Next runtime; our own client code is just the nav); DB queries 0.3–30 ms at ~14k rows | Timed 5× per page; `EXPLAIN ANALYZE` on Supabase |
+| Freshness | Pages are cached and refresh in the background: new pipeline data appears within a few minutes | Watched run #3 appear on Health without a redeploy |
 
 **Search detail:** search is whole-word with an optional plural (`pet` finds pet/pets, not "petty"), using a Postgres regex (`\m…\M`) backed by a trigram index.
 

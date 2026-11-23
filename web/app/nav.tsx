@@ -20,8 +20,10 @@ export function Nav() {
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors sm:px-3 ${
-              active ? "bg-accent-soft text-accent" : "text-muted hover:text-text"
+            className={`rounded-md px-2 py-1.5 text-sm font-semibold transition-colors sm:px-3 ${
+              active
+                ? "bg-brand-ink text-brand-yellow"
+                : "text-brand-ink underline-offset-4 hover:underline"
             }`}
           >
             {label}
