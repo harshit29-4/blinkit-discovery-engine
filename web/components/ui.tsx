@@ -59,7 +59,17 @@ export function StatusPill({ status }: { status: string }) {
     failed: "bg-bad-soft text-bad",
     running: "bg-border text-text",
   };
-  return <span className={`rounded-full px-2 py-0.5 text-sm font-medium ${style[status] ?? style.running}`}>{status}</span>;
+  const label: Record<string, string> = {
+    ok: "Completed",
+    partial: "Partially completed",
+    failed: "Failed",
+    running: "In progress",
+  };
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-sm font-medium ${style[status] ?? style.running}`}>
+      {label[status] ?? status}
+    </span>
+  );
 }
 
 export function Skeleton({ h = "h-40" }: { h?: string }) {

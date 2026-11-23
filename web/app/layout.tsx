@@ -36,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <p className="text-lg font-bold tracking-tight">Category Discovery Engine</p>
               {/* Said in the header itself: the brand colours make the site look official. */}
               <p className="text-sm text-brand-ink-muted">
-                What public feedback says about Blinkit · independent project, not affiliated with Blinkit
+                Analysis of public customer feedback on Blinkit · Independent research project, not affiliated with Blinkit
               </p>
             </div>
             <Nav />
@@ -45,8 +45,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
         <footer className="border-t border-border">
           <p className="mx-auto max-w-6xl px-4 py-4 text-sm text-muted">
-            Independent research project, not affiliated with or endorsed by Blinkit. Colours echo the
-            Blinkit brand for context only. Built from public reviews and posts; usernames are never stored.
+            Independent research project; not affiliated with or endorsed by Blinkit. Brand colours are used for
+            reference only. Based on publicly available feedback; no personal information is stored.
           </p>
         </footer>
       </body>

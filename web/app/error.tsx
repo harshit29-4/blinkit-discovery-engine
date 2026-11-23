@@ -13,10 +13,10 @@ export default function ErrorPage({ error, retry }: { error: unknown; retry: () 
 
   return (
     <div className="mx-auto max-w-xl rounded-xl border border-border bg-surface p-6">
-      <h1 className="text-xl font-semibold tracking-tight">This page couldn&rsquo;t load its data</h1>
+      <h1 className="text-xl font-semibold tracking-tight">Data temporarily unavailable</h1>
       <p className="mt-2 text-muted">
-        The database behind this site didn&rsquo;t respond. That&rsquo;s usually temporary. Try again in a
-        moment; if it keeps happening, the collection pipeline&rsquo;s Health page will show why once it loads.
+        The database could not be reached. This is usually temporary; please try again shortly. If the problem
+        persists, the Health page records the status of each collection run.
       </p>
       <button onClick={() => retry()} className="mt-4 rounded-md bg-accent px-4 py-2 font-medium text-accent-ink">
         Try again

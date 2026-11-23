@@ -6,7 +6,7 @@ import { SOURCE_COLOR } from "./ui";
 /** One horizontal 100% bar per source showing the 1★–5★ split, with the % written on each segment. */
 export function RatingBars({ mix }: { mix: RatingMix[] }) {
   const sources = [...new Set(mix.map((m) => m.source))];
-  if (!sources.length) return <p className="text-sm text-muted">No ratings yet.</p>;
+  if (!sources.length) return <p className="text-sm text-muted">No ratings have been collected yet.</p>;
   return (
     <div className="space-y-4">
       {sources.map((s) => {
@@ -51,7 +51,7 @@ export function RatingBars({ mix }: { mix: RatingMix[] }) {
 /** Daily item counts, one small bar chart per source (small multiples read better than stacking). */
 export function VolumeChart({ data, dayList }: { data: DailyVolume[]; dayList: string[] }) {
   const sources = [...new Set(data.map((d) => d.source))];
-  if (!sources.length) return <p className="text-sm text-muted">Nothing collected in this period yet.</p>;
+  if (!sources.length) return <p className="text-sm text-muted">No entries have been collected in this period yet.</p>;
   const days = dayList.length;
   const W = 600;
   const H = 70;
@@ -66,7 +66,7 @@ export function VolumeChart({ data, dayList }: { data: DailyVolume[]; dayList: s
           <figure key={s}>
             <figcaption className="mb-1 flex justify-between text-sm">
               <span>{SOURCE_LABEL[s] ?? s}</span>
-              <span className="tabular-nums text-muted">{fmtInt(total)} items · peak {fmtInt(max)}/day</span>
+              <span className="tabular-nums text-muted">{fmtInt(total)} entries · peak {fmtInt(max)} per day</span>
             </figcaption>
             <svg viewBox={`0 0 ${W} ${H}`} className="h-16 w-full" preserveAspectRatio="none" role="img"
                  aria-label={`${SOURCE_LABEL[s] ?? s}: ${fmtInt(total)} items over ${days} days`}>
@@ -86,7 +86,7 @@ export function VolumeChart({ data, dayList }: { data: DailyVolume[]; dayList: s
           </figure>
         );
       })}
-      <p className="text-sm text-muted">Last {days} days, by posting date (IST). Hover a bar for the exact count.</p>
+      <p className="text-sm text-muted">Last {days} days, by posting date (IST). Hover over a bar to see the exact count.</p>
     </div>
   );
 }
