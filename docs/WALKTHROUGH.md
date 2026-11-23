@@ -143,6 +143,19 @@ Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `n
 
 **Search detail:** search is whole-word with an optional plural (`pet` finds pet/pets, not "petty"), using a Postgres regex (`\m…\M`) backed by a trigram index.
 
+## 8b. Deployment (Vercel)
+
+- Project `blinkit-discovery-engine` on the Hobby (free) plan, connected to the GitHub repo. **Every push to `main` deploys automatically**; nothing to run by hand.
+- Settings (set with the Vercel CLI): Root Directory `web`, framework Next.js, Node `24.x`.
+- Environment variables (Production + Preview): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`. They were piped from `.env` by the CLI and are stored as hidden secrets. The secret key and Groq key are **not** on Vercel; the website doesn't need them.
+- Data freshness doesn't need redeploys: pages re-read Supabase in the background (about every minute, visible within a few minutes).
+- Useful commands (from `web/`, after `npx vercel login`):
+  ```powershell
+  npx vercel@66.6.0 ls                       # recent deployments
+  npx vercel@66.6.0 env ls                   # configured variables (values hidden)
+  npx vercel@66.6.0 project inspect blinkit-discovery-engine
+  ```
+
 ## 9. Running it yourself
 
 From the `pipeline/` folder (one-time setup: `python -m venv .venv` then `.venv\Scripts\python -m pip install -r requirements-dev.txt`):
