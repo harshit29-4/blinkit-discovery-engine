@@ -99,9 +99,46 @@ Every run reports `skipped_threads`, `reused_threads`, `failed_threads` and `fai
 
 **Storage** (`pipeline/engine/store/`): `local` is a SQLite file in `data/` for development, with no accounts needed. `supabase` writes the same tables to Supabase through its REST API. The schema is in `supabase/migrations/` (`0001_collection.sql`: raw items, cursors, run log; `0002_short_reviews.sql`: rating-only rows).
 
-## 3. How data is cleaned and translated _(not built yet)_
+## 3. How the AI stages work (phase A)
 
-## 4. How tagging works _(not built yet)_
+Code: `pipeline/engine/ai/`. Run: `python -m engine analyse --stages screen,relevance,tag,translation --minutes 45`.
+On GitHub, `.github/workflows/analyse.yml` runs this hourly at minute 40, time-boxed so runs never overlap.
+
+| Stage | What | How | File |
+|---|---|---|---|
+| S1 Pre-filter | Language (en/hi/hinglish) + keyword screen; 5% control sample | Deterministic, free | `prefilter.py` |
+| S2 Relevance gate | Is the entry about what/why people buy, categories, discovery, trust, habit, info needs, returns? | gpt-oss-20b, batches of 20 | `stages.py`, `prompts.py` |
+| S3 Tagging + translation | Fixed-taxonomy tags, verbatim supporting quote, English translation | gpt-oss-120b, batches of 8 | `stages.py`, `prompts.py` |
+| V8 Translation check | Does the English keep the meaning? | qwen3.8-27b (different family) | `stages.py` |
+
+**Taxonomy:** `web/lib/taxonomy.json` is the single source of truth, read by both the pipeline and the website. Change a key → bump `PROMPT_VERSION`.
+
+**Work queues:** Postgres functions (`ai_queue_*` in `supabase/migrations/0004_ai_tagging.sql`) hand out unfinished work in md5 order, which spreads it across months and sources, so a partial run is still representative. A failing item is retired after 3 attempts.
+
+**Checks built in:**
+- **V3 grounding:** the supporting quote must appear verbatim in the original (case, whitespace and curly quotes ignored). Ungrounded answers get one retry; quotes that still fail are never shown.
+- **V4 schema:** values outside the taxonomy are discarded and counted (`schema_drops`).
+- **V6 keyword recall:** the 5% control sample goes through the relevance gate too, so the How-it-works page can estimate how much relevant feedback the keyword screen misses.
+- **V8 translation:** translations that fail the second model's check are kept for counts but never shown or quoted. In testing it correctly failed "fat bhi gaya" → "the fat is gone"; it actually means the packet tore.
+
+**Groq free-tier lessons (all handled in `engine/ai/groq.py`):**
+
+| Limit | How we found it | Handling |
+|---|---|---|
+| 8,000 tokens/minute per model | Response headers | Waits for the announced reset before a call that wouldn't fit |
+| 1,000 requests/day per model | Response headers | Stops the stage cleanly near the end; next run continues |
+| **qwen: 1,000 *output* tokens/minute** (not in headers) | A 429 saying "Request too large … OTPM" | Raised immediately (`RequestTooLarge`), no pointless waiting. Tagging moved to gpt-oss-120b (~1,400 entries/hour vs ~300); qwen does the low-output checks |
+| Daily token cap | Shows up as a 429 "per day" | `BudgetExhausted`: the stage stops; others continue |
+
+**Prompt iterations (documented because they changed results):**
+- `rel-v2`: v1 rejected product return/exchange complaints as "support only". Return policy is part of the risk of trying a new category, so it now counts as relevant (14 of 15 such entries flipped).
+- `tag-v2`: v1 guessed a funnel stage from generic praise ("good products" → repeat). Now "none" unless the text describes the stage.
+
+## 4. How tagging is used on the website
+
+- **Evidence:** filter by AI-assigned barrier, category or funnel stage, or tagged entries only. Each tagged entry shows its AI analysis: sentiment, funnel stage, behaviour, barriers, categories, information needs, unmet need, the verified supporting quote, and a verified English translation for Hindi/Hinglish entries.
+- **How it works:** the pipeline with live counts per stage, quality-check results and model usage (calls, entries, tokens; no prompt or response text is stored).
+- **Health:** AI runs appear as "AI analysis" with per-stage results (e.g. "stopped: daily model limit reached").
 
 ## 5. How themes are found _(not built yet)_
 

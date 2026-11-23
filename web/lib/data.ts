@@ -5,6 +5,7 @@
  */
 import { cacheLife } from "next/cache";
 import { select, UpstreamError } from "./supabase";
+import { isKey } from "./taxonomy";
 
 export const SOURCES = ["play_store", "app_store", "reddit_post", "reddit_comment"] as const;
 export type Source = (typeof SOURCES)[number];
@@ -26,7 +27,7 @@ export type Run = {
   status: "running" | "ok" | "partial" | "failed";
   started_at: string;
   finished_at: string | null;
-  stats: { mode?: string; sources?: Record<string, SourceStats> };
+  stats: { mode?: string; sources?: Record<string, SourceStats>; stages?: Record<string, Record<string, number | string>> };
   error: string | null;
 };
 export type SourceStats = {
@@ -52,7 +53,40 @@ export type Evidence = {
   lang_hint: string | null;
   subreddit: string | null;
   post_title: string | null;
+  // AI tags (null until the entry has been tagged)
+  sentiment: string | null;
+  categories: string[] | null;
+  category_behavior: string | null;
+  barriers: string[] | null;
+  funnel_stage: string | null;
+  discovery_channels: string[] | null;
+  info_needs: string[] | null;
+  unmet_need: string | null;
+  evidence_span: string | null; // only when verified verbatim (V3)
+  translation: string | null;   // only when the second model passed it (V8)
+  ai_tagged: boolean;
 };
+
+export type Funnel = {
+  collected: number; screened: number; candidates: number; control_sample: number; excluded: number;
+  candidates_checked: number; candidates_relevant: number; control_checked: number; control_relevant: number;
+  tagged: number; grounded: number; translated: number; translation_checked: number; translation_passed: number;
+  non_english: number;
+};
+export type AiUsage = { day: string; stage: string; model: string; calls: number; items: number;
+  tokens_in: number; tokens_out: number; failed_calls: number };
+
+export async function getFunnel() {
+  "use cache";
+  cacheLife("minutes");
+  return (await select<Funnel>("v_ai_funnel", { select: "*" })).rows[0];
+}
+
+export async function getAiUsage() {
+  "use cache";
+  cacheLife("minutes");
+  return (await select<AiUsage>("v_ai_usage", { select: "*", order: "day.desc", limit: 200 })).rows;
+}
 
 export async function getSourceCounts() {
   "use cache";
@@ -91,7 +125,10 @@ export async function getCursors() {
   return (await select<Cursor>("v_cursors", { select: "*", order: "key.asc" })).rows;
 }
 
-export type EvidenceFilters = { q?: string; source?: string; rating?: string; page?: number };
+export type EvidenceFilters = {
+  q?: string; source?: string; rating?: string; page?: number;
+  barrier?: string; category?: string; stage?: string; tagged?: string;
+};
 export const PAGE_SIZE = 25;
 
 export async function searchEvidence(f: EvidenceFilters) {
@@ -123,6 +160,12 @@ function runSearch(q: string, f: EvidenceFilters, page: number) {
       text: q ? `imatch.\\m${q}(s|es)?\\M` : undefined,
       source: f.source && SOURCES.includes(f.source as Source) ? `eq.${f.source}` : undefined,
       rating: f.rating && /^[1-5]$/.test(f.rating) ? `eq.${f.rating}` : undefined,
+      // AI tag filters: only values from the shared taxonomy are ever sent to the database.
+      barriers: isKey("barriers", f.barrier) ? `cs.{${f.barrier}}` : undefined,
+      categories: isKey("categories", f.category) ? `cs.{${f.category}}` : undefined,
+      funnel_stage: isKey("funnel_stage", f.stage) ? `eq.${f.stage}` : undefined,
+      ai_tagged: f.tagged === "1" || isKey("barriers", f.barrier) || isKey("categories", f.category) || isKey("funnel_stage", f.stage)
+        ? "is.true" : undefined,
     },
     { count: true },
   );

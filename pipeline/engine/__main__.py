@@ -37,6 +37,12 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("check-supabase", help="verify Supabase keys and tables work")
 
+    a = sub.add_parser("analyse", help="run AI phase A stages (screen, relevance, tag, translation)")
+    a.add_argument("--stages", default="screen,relevance,tag,translation",
+                   help="comma-separated subset of: screen,relevance,tag,translation")
+    a.add_argument("--minutes", type=float, default=45, help="time budget for the whole run")
+    a.add_argument("--trigger", default="manual", choices=["schedule", "manual", "button"])
+
     args = parser.parse_args(argv)
     # Windows consoles default to cp1252, which can't print ✓/→ or Hindi review text.
     for stream in (sys.stdout, sys.stderr):
@@ -54,6 +60,26 @@ def main(argv: list[str] | None = None) -> int:
         from .migrate import run
 
         return run(status_only=args.status)
+
+    if args.command == "analyse":
+        from .ai.db import AIStore
+        from .ai.groq import GroqClient
+        from .ai.stages import STAGES, run_phase_a
+        from .config import SETTINGS
+
+        stages = [s.strip() for s in args.stages.split(",") if s.strip()]
+        unknown = [s for s in stages if s not in STAGES]
+        if unknown:
+            parser.error(f"unknown stage(s): {', '.join(unknown)}")
+        store = AIStore()
+        groq = GroqClient(SETTINGS.groq_api_key, log_call=store.log_call) if SETTINGS.groq_api_key else None
+        run_id = store.start_run(args.trigger)
+        results = run_phase_a(store, groq, stages, args.minutes)
+        errors = [s for s, r in results.items() if isinstance(r, dict) and r.get("error")]
+        status = "ok" if not errors else ("failed" if len(errors) == len(stages) else "partial")
+        store.finish_run(run_id, status, {"mode": "analyse", "stages": results})
+        print(json.dumps({"run_id": run_id, "status": status, "stages": results}, indent=2, default=str))
+        return 0 if status != "failed" else 1
 
     if args.command == "check-supabase":
         from .store.supabase import check

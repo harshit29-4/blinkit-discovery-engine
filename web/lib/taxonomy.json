@@ -1,0 +1,90 @@
+{
+  "_comment": "Single source of truth for AI tag values. Read by the pipeline (pipeline/engine/ai/taxonomy.py) and the website. Changing a key requires bumping PROMPT_VERSION in the pipeline.",
+  "sentiment": {
+    "positive": "Positive",
+    "neutral": "Neutral",
+    "negative": "Negative",
+    "mixed": "Mixed"
+  },
+  "categories": {
+    "staples": "Staples (atta, rice, dal, oil)",
+    "fruits_veg": "Fruits & vegetables",
+    "dairy_bakery": "Dairy, bread & eggs",
+    "meat_fish": "Meat & fish",
+    "snacks": "Snacks & sweets",
+    "beverages": "Beverages",
+    "household": "Household & cleaning",
+    "personal_care": "Personal care",
+    "beauty": "Beauty & cosmetics",
+    "baby": "Baby care",
+    "pet": "Pet care",
+    "pharmacy_wellness": "Pharmacy & wellness",
+    "electronics": "Electronics & accessories",
+    "home_kitchen": "Home & kitchen",
+    "stationery": "Stationery",
+    "toys_gifting": "Toys & gifting",
+    "other": "Other"
+  },
+  "category_behavior": {
+    "repeat": "Repeats the same purchases",
+    "explored": "Tried a new category",
+    "tried_then_abandoned": "Tried, then stopped",
+    "wants_but_hesitant": "Interested but hesitant",
+    "none": "No category behaviour stated"
+  },
+  "barriers": {
+    "quality_trust": "Doubts about quality",
+    "authenticity": "Fear of fake products",
+    "expiry_freshness": "Expiry or freshness concerns",
+    "price_fees": "Price or fees",
+    "unaware_available": "Unaware it is sold",
+    "search_irrelevant": "Search does not find it",
+    "assortment_gap": "Limited range or brands",
+    "stockout": "Out of stock",
+    "return_refund_friction": "Hard to return or get a refund",
+    "habit_default": "Habit or default ordering",
+    "time_pressure": "No time to browse",
+    "missing_product_info": "Missing product information"
+  },
+  "funnel_stage": {
+    "awareness": "Awareness",
+    "consideration": "Consideration",
+    "trust": "Trust",
+    "trial": "First purchase",
+    "repeat": "Repeat purchase",
+    "none": "Not stated"
+  },
+  "discovery_channels": {
+    "search": "Search",
+    "home_banners": "Home page and banners",
+    "reorder_buy_again": "Reorder / buy again",
+    "notifications": "Notifications",
+    "cart_suggestions": "Cart suggestions",
+    "category_browsing": "Browsing categories",
+    "word_of_mouth_social": "Word of mouth or social media",
+    "offline_store": "Seen in a physical shop"
+  },
+  "info_needs": {
+    "reviews_ratings": "Reviews and ratings",
+    "ingredients_specs": "Ingredients or specifications",
+    "size_quantity": "Size or quantity",
+    "brand_authenticity": "Proof the brand is genuine",
+    "expiry_date": "Expiry date",
+    "price_comparison": "Price comparison",
+    "return_policy": "Return policy",
+    "images_demo": "Better images or demonstrations"
+  },
+  "segment_signals": {
+    "student": "Student",
+    "working_professional": "Working professional",
+    "parent": "Parent",
+    "pet_owner": "Pet owner",
+    "elderly_family": "Elderly family member",
+    "family_household": "Family household",
+    "single_living": "Lives alone or with flatmates",
+    "frequent_user": "Frequent user",
+    "occasional_user": "Occasional user",
+    "metro_city": "Metro city",
+    "smaller_city": "Smaller city"
+  }
+}
