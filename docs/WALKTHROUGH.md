@@ -109,7 +109,23 @@ Every run reports `skipped_threads`, `reused_threads`, `failed_threads` and `fai
 
 ## 7. How quality is validated _(not built yet)_
 
-## 8. The website _(not built yet)_
+## 8. The website
+
+Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `npm --prefix web run dev` → http://localhost:3000. It needs `web/.env.local` with `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`; Vercel will get the same two.
+
+| Page | What it shows | Data (public views, `supabase/migrations/0003_public_views.sql`) |
+|---|---|---|
+| Overview `/` | Totals, source table, star-rating mix (incl. short reviews), the **written-reviews-skew-negative bias note**, daily volume (last 90 days) | `v_source_counts`, `v_rating_mix`, `v_daily_volume`, `pipeline_runs` |
+| Evidence `/evidence` | Every analysable item: whole-word search, source/rating filters, link to the original, 25 per page | `v_evidence` (no author info) |
+| Health `/health` | Every run with per-source results and recorded gaps; how far each source / subreddit has collected | `pipeline_runs`, `v_cursors` |
+
+**How it reads data:** server-side only, via Supabase's REST API with the *publishable* key (`web/lib/supabase.ts`). That key maps to the `anon` role, which can read only the public views and the run log. Raw rows and author hashes stay locked by Row Level Security.
+
+**Caching (this Next.js version is different):** with `cacheComponents` on, every data read must either be cached (`'use cache'` + `cacheLife`) or sit inside `<Suspense>`. All reads in `web/lib/data.ts` use `cacheLife('minutes')`: fresh within ~1 minute, which suits a pipeline that writes hourly. Even "today's date" for the 90-day chart is computed inside the cached function, because reading the clock during rendering is flagged by the framework. The production build prerenders Overview and Health (revalidated every minute) and streams Evidence results per search.
+
+**Design choices:** colours come from the Okabe–Ito palette (colour-blind safe) and every chart also states its numbers in text; light and dark mode; no text under 14px; tested with no sideways scrolling at 375px phone width (the runs list is stacked rather than a wide table for that reason). The site says it's an independent project, not affiliated with Blinkit.
+
+**Search detail:** search is whole-word with an optional plural (`pet` finds pet/pets, not "petty"), using a Postgres regex (`\m…\M`) backed by a trigram index.
 
 ## 9. Running it yourself
 
@@ -123,6 +139,14 @@ From the `pipeline/` folder (one-time setup: `python -m venv .venv` then `.venv\
 ```
 
 `--store supabase` writes to Supabase instead of the local SQLite file (needs the Supabase keys in `.env`).
+
+**On GitHub (automatic):** `.github/workflows/collect.yml` runs hourly (minute 17) with `--store supabase`, using the repo secrets `SUPABASE_URL`, `SUPABASE_SECRET_KEY` and `AUTHOR_HASH_SALT`. Start a one-off run (e.g. a backfill) from the repo's **Actions → collect → Run workflow**, or:
+
+```powershell
+gh workflow run collect.yml -f mode=backfill -f source=all
+```
+
+`tests.yml` runs the unit tests on every push that touches `pipeline/`.
 
 ## 10. Common problems and fixes
 
