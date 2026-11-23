@@ -146,7 +146,9 @@ Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `n
 ## 8b. Deployment (Vercel)
 
 - Project `blinkit-discovery-engine` on the Hobby (free) plan, connected to the GitHub repo. **Every push to `main` deploys automatically**; nothing to run by hand.
+- **Live URL: https://blinkit-discovery-engine-six.vercel.app**. The plain `blinkit-discovery-engine.vercel.app` belongs to someone else's project, so Vercel added `-six`.
 - Settings (set with the Vercel CLI): Root Directory `web`, framework Next.js, Node `24.x`.
+- **Function region `hnd1` (Tokyo)**, set in `web/vercel.json`. Vercel's default is Washington DC (`iad1`), but the database is in Tokyo, so every search crossed the Pacific twice. The search page took ~1.1 s live versus 30 ms locally. Running functions next to the database is Vercel's own recommendation; static parts are still served from the Mumbai edge.
 - Environment variables (Production + Preview): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`. They were piped from `.env` by the CLI and are stored as hidden secrets. The secret key and Groq key are **not** on Vercel; the website doesn't need them.
 - Data freshness doesn't need redeploys: pages re-read Supabase in the background (about every minute, visible within a few minutes).
 - Useful commands (from `web/`, after `npx vercel login`):
