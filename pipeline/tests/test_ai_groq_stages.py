@@ -253,3 +253,26 @@ def test_no_key_skips_ai_stages_but_screens():
     store = FakeStore(RAW)
     res = run_phase_a(store, None, ["screen", "relevance"], minutes=1)
     assert res["screen"]["screened"] == 3 and res["relevance"] == {"skipped": "GROQ_API_KEY not set"}
+
+
+def test_lane_gives_every_stage_turns_while_upstream_runs(monkeypatch):
+    """Regression: the translation check (waiting on tagging) used to starve the cross-check."""
+    import time as _t
+
+    from engine.ai import stages
+
+    calls = []
+
+    def fake_run_one(stage, store, groq, deadline):
+        calls.append(stage)
+        if stage == "tag":  # upstream keeps working for a while
+            _t.sleep(0.3)
+            return {"tagged": 1}
+        if stage == "crosscheck" and calls.count("crosscheck") <= 2:
+            return {"crosschecked": 1}
+        return {}
+
+    monkeypatch.setattr(stages, "_run_one", fake_run_one)
+    res = stages.run_phase_a(object(), object(), ["tag", "translation", "crosscheck"], minutes=0.02)
+    assert "crosscheck" in calls and res["crosscheck"]["crosschecked"] == 2
+    assert calls.index("crosscheck") < len(calls) - 1  # reached early, not only at the very end

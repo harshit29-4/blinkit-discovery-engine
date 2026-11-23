@@ -133,7 +133,10 @@ class GroqClient:
                     raise RequestTooLarge(model)
                 if "per day" in msg.lower() or retry_after > 300:
                     s.exhausted = True
-                    self._log(stage, model, items, 0, 0, False, "daily limit reached")
+                    # Keep Groq's own wording (e.g. "tokens per day (TPD): Limit 200000, Used ..."), minus ids.
+                    detail = re.sub(r"org_\w+", "org", msg)
+                    detail = detail[detail.find("on "):][:160] if "on " in detail else detail[:160]
+                    self._log(stage, model, items, 0, 0, False, f"daily limit reached: {detail}")
                     raise BudgetExhausted(model)
                 rate_waits += 1
                 if rate_waits > MAX_RATE_WAITS:

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { Card, Skeleton, SourceBadge, Stars } from "@/components/ui";
-import { PAGE_SIZE, SOURCE_LABEL, getSourceCounts, searchEvidence, type Evidence, type EvidenceFilters } from "@/lib/data";
+import { PAGE_SIZE, SOURCE_LABEL, getSourceCounts, getThemes, searchEvidence, type Evidence, type EvidenceFilters } from "@/lib/data";
 import { fmtDate, fmtInt } from "@/lib/format";
 import { TAXONOMY, label } from "@/lib/taxonomy";
 
@@ -39,9 +39,13 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
     category: one(sp.category),
     stage: one(sp.stage),
     tagged: one(sp.tagged),
+    theme: one(sp.theme),
   };
   // Only sources that actually hold data are offered as filters.
-  const [{ rows, total, blocked }, counts] = await Promise.all([searchEvidence(filters), getSourceCounts()]);
+  const [{ rows, total, blocked }, counts, { themes }] = await Promise.all([
+    searchEvidence(filters), getSourceCounts(), getThemes(),
+  ]);
+  const themeName = new Map(themes.map((t) => [t.theme_id, t.name]));
   const available = counts.filter((c) => c.items > 0).sort((a, b) => b.items - a.items);
   const pages = total ? Math.ceil(total / PAGE_SIZE) : 1;
   const page = filters.page ?? 1;
@@ -51,7 +55,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
     if (filters.q) u.set("q", filters.q);
     if (filters.source) u.set("source", filters.source);
     if (filters.rating) u.set("rating", filters.rating);
-    for (const k of ["barrier", "category", "stage", "tagged"] as const) if (filters[k]) u.set(k, filters[k]!);
+    for (const k of ["barrier", "category", "stage", "tagged", "theme"] as const) if (filters[k]) u.set(k, filters[k]!);
     if (p > 1) u.set("page", String(p));
     const s = u.toString();
     return s ? `/evidence?${s}` : "/evidence";
@@ -81,6 +85,15 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
             {[5, 4, 3, 2, 1].map((r) => <option key={r} value={r}>{r} star{r > 1 ? "s" : ""}</option>)}
           </select>
         </label>
+        {themes.length > 0 && (
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-muted">Theme (AI)</span>
+            <select name="theme" defaultValue={filters.theme} className="max-w-64 rounded-md border border-border bg-bg px-3 py-2 text-base">
+              <option value="">Any</option>
+              {themes.map((t) => <option key={t.theme_id} value={t.theme_id}>{t.name}</option>)}
+            </select>
+          </label>
+        )}
         <TagSelect name="barrier" label="Barrier (AI)" field="barriers" value={filters.barrier} />
         <TagSelect name="category" label="Category (AI)" field="categories" value={filters.category} />
         <TagSelect name="stage" label="Funnel stage (AI)" field="funnel_stage" value={filters.stage} />
@@ -89,7 +102,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
           AI-tagged only
         </label>
         <button className="rounded-md bg-accent px-4 py-2 font-medium text-accent-ink">Apply filters</button>
-        {(filters.q || filters.source || filters.rating || filters.barrier || filters.category || filters.stage || filters.tagged) && (
+        {(filters.q || filters.source || filters.rating || filters.barrier || filters.category || filters.stage || filters.tagged || filters.theme) && (
           <Link href="/evidence" className="px-2 py-2 text-sm text-muted underline underline-offset-2">Reset</Link>
         )}
       </form>
@@ -140,7 +153,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
               {r.translation && (
                 <p className="mt-2 text-sm text-muted"><span className="font-medium">English (AI translation, verified):</span> {r.translation}</p>
               )}
-              {r.ai_tagged && <AiTags r={r} />}
+              {r.ai_tagged && <AiTags r={r} theme={r.theme_id !== null ? themeName.get(r.theme_id) : undefined} />}
             </li>
           ))}
         </ul>
@@ -175,7 +188,7 @@ function Chip({ children }: { children: ReactNode }) {
 }
 
 /** The AI's reading of an entry. Only tags from the shared taxonomy are stored, so labels always resolve. */
-function AiTags({ r }: { r: Evidence }) {
+function AiTags({ r, theme }: { r: Evidence; theme?: string }) {
   const groups: [string, string[]][] = [
     ["Barriers", (r.barriers ?? []).map((k) => label("barriers", k))],
     ["Categories", (r.categories ?? []).map((k) => label("categories", k))],
@@ -191,6 +204,7 @@ function AiTags({ r }: { r: Evidence }) {
         {r.sentiment && <span><span className="text-muted">Sentiment:</span> {label("sentiment", r.sentiment)}</span>}
         {stage && <span><span className="text-muted">Funnel stage:</span> {stage}</span>}
         {behaviour && <span><span className="text-muted">Behaviour:</span> {behaviour}</span>}
+        {theme && <span><span className="text-muted">Theme:</span> {theme}</span>}
       </div>
       {groups.filter(([, v]) => v.length).map(([name, vals]) => (
         <div key={name} className="mt-2 flex flex-wrap items-center gap-1.5">

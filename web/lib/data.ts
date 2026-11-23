@@ -65,6 +65,7 @@ export type Evidence = {
   evidence_span: string | null; // only when verified verbatim (V3)
   translation: string | null;   // only when the second model passed it (V8)
   ai_tagged: boolean;
+  theme_id: number | null;      // theme in the current published snapshot
 };
 
 export type Funnel = {
@@ -75,6 +76,36 @@ export type Funnel = {
 };
 export type AiUsage = { day: string; stage: string; model: string; calls: number; items: number;
   tokens_in: number; tokens_out: number; failed_calls: number };
+
+export type Theme = {
+  theme_id: number; name: string; description: string; kind: string; questions: number[];
+  size: number; share: number; avg_rating: number | null; pct_negative: number | null;
+  top_barriers: [string, number][]; top_categories: [string, number][];
+  sources: Record<string, number>; monthly: Record<string, number>;
+};
+export type ThemeQuote = {
+  theme_id: number; ord: number; source: string; source_id: string; url: string | null;
+  rating: number | null; posted_at: string; quote: string; translation: string | null;
+};
+export type ThemeSnapshot = { id: number; created_at: string; items: number; noise: number; model: string };
+export type Metric = { metric: string; value: number | null; n: number; details: Record<string, unknown>; computed_at: string };
+
+export async function getThemes() {
+  "use cache";
+  cacheLife("minutes");
+  const [themes, quotes, snap] = await Promise.all([
+    select<Theme>("v_themes", { select: "*", order: "size.desc" }),
+    select<ThemeQuote>("v_theme_quotes", { select: "*", order: "theme_id.asc,ord.asc" }),
+    select<ThemeSnapshot>("v_theme_snapshot", { select: "*" }),
+  ]);
+  return { themes: themes.rows, quotes: quotes.rows, snapshot: snap.rows[0] ?? null };
+}
+
+export async function getValidation() {
+  "use cache";
+  cacheLife("minutes");
+  return (await select<Metric>("v_validation", { select: "*" })).rows;
+}
 
 export async function getFunnel() {
   "use cache";
@@ -127,7 +158,7 @@ export async function getCursors() {
 
 export type EvidenceFilters = {
   q?: string; source?: string; rating?: string; page?: number;
-  barrier?: string; category?: string; stage?: string; tagged?: string;
+  barrier?: string; category?: string; stage?: string; tagged?: string; theme?: string;
 };
 export const PAGE_SIZE = 25;
 
@@ -164,6 +195,7 @@ function runSearch(q: string, f: EvidenceFilters, page: number) {
       barriers: isKey("barriers", f.barrier) ? `cs.{${f.barrier}}` : undefined,
       categories: isKey("categories", f.category) ? `cs.{${f.category}}` : undefined,
       funnel_stage: isKey("funnel_stage", f.stage) ? `eq.${f.stage}` : undefined,
+      theme_id: f.theme && /^\d{1,4}$/.test(f.theme) ? `eq.${f.theme}` : undefined,
       ai_tagged: f.tagged === "1" || isKey("barriers", f.barrier) || isKey("categories", f.category) || isKey("funnel_stage", f.stage)
         ? "is.true" : undefined,
     },

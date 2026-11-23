@@ -18,8 +18,10 @@ from .validate import clean_tags, is_grounded
 
 log = logging.getLogger("engine.ai")
 
-RELEVANCE_BATCH = 20
-TAG_BATCH = 8
+# Larger batches amortise the fixed instructions over more entries: Groq's free tier caps each model
+# at roughly 200k tokens/day, so tokens per entry decide daily throughput.
+RELEVANCE_BATCH = 30
+TAG_BATCH = 12
 CHECK_BATCH = 10  # qwen: keeps one check request well under its 1,000 output tokens/minute
 TRANSLATION_PASS = 0.7
 
@@ -51,6 +53,32 @@ def _by_id(data: dict, n: int) -> dict[int, dict]:
             continue
         if 1 <= i <= n and i not in out:
             out[i] = obj
+    return out
+
+
+# Lanes run in parallel, so a downstream stage can find its queue empty only because the upstream
+# stage hasn't produced work *yet*. Such a stage waits (polling) while its upstream is still running.
+POLL_S = 20.0
+_RUNNING: set[str] = set()
+UPSTREAM = {"tag": "relevance", "translation": "tag", "crosscheck": "tag", "stability": "tag"}
+
+
+def _fetch(stage: str, fetch, n: int, deadline: float) -> list[dict]:
+    """Queue read. Waiting for upstream work is handled by the lane loop (see run_phase_a)."""
+    return fetch(n)
+
+
+SLICE_S = 300.0  # a lane gives each of its stages up to 5 minutes per turn
+# Keys whose counts mean "this stage did work" (as opposed to flags like stopped_daily_limit).
+_PROGRESS = {"tagged", "candidate_relevant", "candidate_not_relevant", "control_relevant", "control_not_relevant",
+             "passed", "failed_check", "crosschecked", "retagged", "failed_items", "unanswered"}
+_TERMINAL = {"stopped_daily_limit", "paused_rate_limit", "error", "skipped"}
+
+
+def _merge(a: dict, b: dict) -> dict:
+    out = dict(a)
+    for k, v in b.items():
+        out[k] = out.get(k, 0) + v if isinstance(v, (int, float)) and isinstance(out.get(k, 0), (int, float)) else v
     return out
 
 
@@ -89,7 +117,7 @@ def run_relevance(store: Store, groq: GroqClient, deadline: float) -> dict:
             try:
                 res = groq.chat_json(model=prompts.MODEL_RELEVANCE, system=prompts.RELEVANCE_SYSTEM,
                                      user=prompts.entries_payload(batch), stage="relevance",
-                                     items=len(batch), max_tokens=120 * len(batch) + 400)
+                                     items=len(batch), max_tokens=60 * len(batch) + 700)
             except BudgetExhausted:
                 stats["stopped_daily_limit"] = 1
                 return dict(stats)
@@ -154,7 +182,7 @@ def run_tagging(store: Store, groq: GroqClient, deadline: float) -> dict:
     stats = Counter()
     system = prompts.tagging_system()
     while time.time() < deadline:
-        queue = store.queue_tagging(TAG_BATCH * 10)
+        queue = _fetch("tag", store.queue_tagging, TAG_BATCH * 10, deadline)
         if not queue:
             break
         for i in range(0, len(queue), TAG_BATCH):
@@ -163,7 +191,7 @@ def run_tagging(store: Store, groq: GroqClient, deadline: float) -> dict:
             batch = queue[i:i + TAG_BATCH]
             try:
                 res = groq.chat_json(model=prompts.MODEL_TAGGING, system=system, user=prompts.entries_payload(batch),
-                                     stage="tagging", items=len(batch), max_tokens=260 * len(batch) + 300)
+                                     stage="tagging", items=len(batch), max_tokens=200 * len(batch) + 800)
             except BudgetExhausted:
                 stats["stopped_daily_limit"] = 1
                 return dict(stats)
@@ -214,7 +242,7 @@ def run_tagging(store: Store, groq: GroqClient, deadline: float) -> dict:
 def run_translation_check(store: Store, groq: GroqClient, deadline: float) -> dict:
     stats = Counter()
     while time.time() < deadline:
-        queue = store.queue_translation_check(CHECK_BATCH * 5)
+        queue = _fetch("translation", store.queue_translation_check, CHECK_BATCH * 5, deadline)
         if not queue:
             break
         for i in range(0, len(queue), CHECK_BATCH):
@@ -258,31 +286,123 @@ def run_translation_check(store: Store, groq: GroqClient, deadline: float) -> di
 
 # ---------------------------------------------------------------- runner
 
-STAGES = ("screen", "relevance", "tag", "translation")
+STAGES = ("screen", "relevance", "tag", "translation",           # phase A
+          "embed", "crosscheck", "stability", "themes", "metrics")  # phase B
+
+
+# Which model each Groq stage uses. Stages on different models run in parallel lanes, because Groq's
+# free-tier limits are per model: running them one after another left later stages starved (the first
+# hourly run spent all 45 minutes on the relevance gate and never reached tagging).
+LANE = {
+    "relevance": prompts.MODEL_RELEVANCE,
+    "tag": prompts.MODEL_TAGGING, "stability": prompts.MODEL_TAGGING,
+    "translation": prompts.MODEL_CHECK, "crosscheck": prompts.MODEL_CHECK,
+}
+PRE = ("screen",)                      # before the lanes: decides what the AI stages see
+POST = ("embed", "themes", "metrics")  # after the lanes, in reserved time: need the new tags
+
+
+def _run_one(stage: str, store: Any, groq: GroqClient | None, deadline: float) -> dict:
+    try:
+        if stage == "screen":
+            return run_screen(store, deadline)
+        if stage == "embed":  # local model: no Groq needed
+            from .embed import Embedder, run_embedding
+
+            return run_embedding(store, Embedder(), deadline)
+        if stage == "metrics":  # computed in code from stored data
+            from .validation import compute_metrics
+
+            return compute_metrics(store)
+        if groq is None:
+            return {"skipped": "GROQ_API_KEY not set"}
+        if stage == "relevance":
+            return run_relevance(store, groq, deadline)
+        if stage == "tag":
+            return run_tagging(store, groq, deadline)
+        if stage == "translation":
+            return run_translation_check(store, groq, deadline)
+        if stage == "crosscheck":
+            from .validation import run_crosscheck
+
+            return run_crosscheck(store, groq, deadline)
+        if stage == "stability":
+            from .validation import run_stability
+
+            return run_stability(store, groq, deadline)
+        if stage == "themes":
+            from .themes import run_themes
+
+            return run_themes(store, groq)
+        return {"skipped": "unknown stage"}
+    except Exception as exc:  # one stage failing shouldn't stop the others
+        log.exception("stage %s failed", stage)
+        return {"error": f"{type(exc).__name__}: {exc}"}
 
 
 def run_phase_a(store: Any, groq: GroqClient | None, stages: list[str], minutes: float) -> dict[str, Any]:
-    """Runs the requested stages in order within `minutes`. Later stages get whatever time is left;
-    a stage that hits its model's daily limit stops, and the others carry on."""
-    deadline = time.time() + minutes * 60
+    """Runs the requested stages within `minutes`:
+    1. pre-filter;
+    2. Groq stages in parallel lanes, one per model (within a lane, in the order given);
+    3. embeddings, themes and metrics in time reserved at the end.
+    A stage that hits its model's daily limit stops; the others carry on."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    start = time.time()
+    deadline = start + minutes * 60
+    post = [s for s in stages if s in POST]
+    reserve = min(minutes * 60 * 0.3, (10 if "themes" in post else 4) * 60) if post else 0
+    lane_deadline = deadline - reserve
     results: dict[str, Any] = {}
-    for stage in stages:
-        if time.time() >= deadline:
-            results[stage] = {"skipped": "time budget used"}
-            continue
+
+    for s in (s for s in stages if s in PRE):
+        results[s] = _run_one(s, store, groq, lane_deadline)
+        log.info("%s: %s", s, results[s])
+
+    lanes: dict[str, list[str]] = {}
+    for s in stages:
+        if s in LANE:
+            lanes.setdefault(LANE[s], []).append(s)
+
+    def run_lane(lane_stages: list[str]) -> dict[str, dict]:
+        """Cycles through the lane's stages in time slices until the deadline, so no stage starves
+        another (e.g. a translation check waiting on tagging used to leave no time for the
+        cross-check). Stops early once a full cycle does no work and nothing upstream is running."""
+        out: dict[str, dict] = {s: {} for s in lane_stages}
+        finished: set[str] = set()
         try:
-            if stage == "screen":
-                results[stage] = run_screen(store, deadline)
-            elif groq is None:
-                results[stage] = {"skipped": "GROQ_API_KEY not set"}
-            elif stage == "relevance":
-                results[stage] = run_relevance(store, groq, deadline)
-            elif stage == "tag":
-                results[stage] = run_tagging(store, groq, deadline)
-            elif stage == "translation":
-                results[stage] = run_translation_check(store, groq, deadline)
-        except Exception as exc:  # one stage failing shouldn't stop the others
-            log.exception("stage %s failed", stage)
-            results[stage] = {"error": f"{type(exc).__name__}: {exc}"}
-        log.info("%s: %s", stage, results[stage])
-    return results
+            while time.time() < lane_deadline and len(finished) < len(lane_stages):
+                progressed = False
+                for s in lane_stages:
+                    if s in finished or time.time() >= lane_deadline:
+                        continue
+                    r = _run_one(s, store, groq, min(lane_deadline, time.time() + SLICE_S))
+                    out[s] = _merge(out[s], r)
+                    if any(k in r for k in _TERMINAL):
+                        finished.add(s)
+                    if any(r.get(k) for k in _PROGRESS):
+                        progressed = True
+                if not progressed:
+                    upstream_busy = any(UPSTREAM.get(s) in _RUNNING for s in lane_stages if s not in finished)
+                    if not upstream_busy:
+                        break
+                    time.sleep(min(POLL_S, max(0.0, lane_deadline - time.time())))
+        finally:
+            _RUNNING.difference_update(lane_stages)
+        for s in lane_stages:
+            out[s] = out[s] or {"note": "no work pending"}
+            log.info("%s: %s", s, out[s])
+        return out
+
+    if lanes:
+        # Every lane stage counts as "running" until it finishes, so downstream stages wait for it.
+        _RUNNING.update(s for group in lanes.values() for s in group)
+        with ThreadPoolExecutor(max_workers=len(lanes)) as pool:
+            for out in pool.map(run_lane, lanes.values()):
+                results.update(out)
+
+    for s in post:
+        results[s] = _run_one(s, store, groq, deadline) if time.time() < deadline else {"skipped": "time budget used"}
+        log.info("%s: %s", s, results[s])
+    # Report in the order requested.
+    return {s: results.get(s, {"skipped": "not run"}) for s in stages}

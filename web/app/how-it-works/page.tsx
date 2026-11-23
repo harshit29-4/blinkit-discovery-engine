@@ -112,8 +112,8 @@ async function Pipeline() {
         </div>
       </Stage>
 
-      <Stage n={6} title="Theme discovery" status="planned" method="Embeddings (gte-small) and clustering group similar feedback; a model names each group from its most representative quotes. Themes are reported with size, intensity and trend.">
-        <p className="text-muted">Builds on the tagged entries from stage 4.</p>
+      <Stage n={6} title="Embeddings and theme discovery" method="Each tagged entry is embedded with gte-small (run locally, no API). UMAP and HDBSCAN group similar entries; gpt-oss-120b names each group from its most representative verified quotes. Size, ratings, sentiment and trends are computed in code.">
+        <p><Link href="/themes" className="text-accent underline underline-offset-2">See the current themes</Link></p>
       </Stage>
       <Stage n={7} title="Insights for the eight research questions" status="planned" method="Statistics are computed in code; a model writes each finding with at least three cited entries. Findings are published only if grounding and faithfulness checks pass.">
         <p className="text-muted">Builds on stages 4 and 6.</p>
@@ -123,8 +123,8 @@ async function Pipeline() {
       </Stage>
 
       <li>
-        <Card title="Quality checks so far"
-              subtitle="Automated checks run alongside the pipeline. Further checks (cross-model agreement, rating consistency, faithfulness, stability) arrive with stages 6 and 7.">
+        <Card title="Quality checks"
+              subtitle={<>Automated checks run alongside the pipeline. Full results, including cross-model agreement, rating consistency and stability, are on the <Link href="/validation" className="text-accent underline underline-offset-2">Validation</Link> page.</>}>
           <ul className="space-y-2 text-sm">
             <li><span className="font-medium">Grounding:</span> {pct(f.grounded, f.tagged)}% of tagged entries carry a supporting quote found verbatim in the original text. Entries that fail are retried once; quotes that still fail are never displayed.</li>
             <li><span className="font-medium">Schema conformance:</span> every tag is validated against the fixed taxonomy; values outside it are discarded and counted in the run log.</li>

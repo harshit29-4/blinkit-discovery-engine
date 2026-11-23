@@ -140,11 +140,46 @@ On GitHub, `.github/workflows/analyse.yml` runs this hourly at minute 40, time-b
 - **How it works:** the pipeline with live counts per stage, quality-check results and model usage (calls, entries, tokens; no prompt or response text is stored).
 - **Health:** AI runs appear as "AI analysis" with per-stage results (e.g. "stopped: daily model limit reached").
 
-## 5. How themes are found _(not built yet)_
+## 5. How themes are found (phase B)
 
-## 6. How insights are generated _(not built yet)_
+Code: `pipeline/engine/ai/embed.py`, `themes.py`. Daily workflow: `.github/workflows/themes.yml` (02:35 IST).
 
-## 7. How quality is validated _(not built yet)_
+1. **Embeddings.** Every tagged entry is turned into a 384-number vector with **gte-small**, run locally with ONNX Runtime (free, CPU, ~1 ms per entry). Hindi/Hinglish entries use their verified English translation. Stored in pgvector (`item_embeddings`). `Supabase/gte-small` is the same model Supabase's edge runtime serves, so the phase D agent can embed questions identically.
+2. **Clustering.** UMAP (8 dimensions, cosine, fixed seed) then HDBSCAN (min cluster ≈1% of entries). HDBSCAN leaves entries that fit no group as *unassigned* instead of forcing them into a theme; the Themes page reports how many.
+3. **Statistics in code:** size, share, average rating, % negative, top barriers and categories, sources, monthly counts.
+4. **AI naming:** gpt-oss-120b gets the statistics plus the 12 most central *verified* quotes and returns a name, a description, a kind (exploration barrier, habit, discovery, information need, general friction, positive experience) and which research questions the theme informs. The output is validated (kind and question ids must be valid).
+5. **Snapshot + publish gate:** each run writes a new snapshot and publishes it only after every theme is named and every row is written, so the site never shows a half-built set. Old snapshots are kept.
+
+## 6. How insights are generated _(phase C, not built yet)_
+
+## 7. How quality is validated (phases A + B)
+
+Code: `pipeline/engine/ai/validation.py`. Metrics are computed **in code** from stored data and appended to `validation_metrics` (history kept); the Validation page shows the latest of each.
+
+| Check | Method | Shown as |
+|---|---|---|
+| V1 Cross-model agreement | qwen3.8-27b independently re-tags a deterministic 10% sample (sentiment, behaviour, funnel stage, categories, barriers) | Cohen's κ per field with the Landis–Koch reading; κ < 0.6 flagged "lower reliability"; raw agreement / Jaccard |
+| V2 Stars | AI sentiment vs the reviewer's own stars (1–2 = negative, 4–5 = positive; 3-star, Reddit, neutral/mixed excluded) | % agreement + confusion counts |
+| V3 Grounding | Supporting quote must be verbatim | % verified |
+| V4 Schema | Raw model output re-validated against the taxonomy | % needing no correction |
+| V6 Keyword recall | Control-sample relevance rate vs candidate relevance rate | Estimated % of relevant feedback the keyword screen captures |
+| V7 Stability | Weekly: production tagger re-tags a fixed 100-entry panel | Exact agreement (sentiment, funnel stage), barrier overlap |
+| V8 Translation | Second model family scores each translation | % passed |
+| V9 Human | Part 2 interviews | Planned |
+
+**Cohen's κ in one line:** how much two raters agree beyond what they'd agree by chance (1 = perfect, 0 = chance). For list fields it's computed per label (present/absent) and averaged over labels with enough examples.
+
+### How the hourly run is organised (and why)
+
+The first hourly run spent all 45 minutes on the relevance gate and never reached tagging, because stages ran one after another and the relevance queue was long. Groq's limits are **per model**, so stages now run in **parallel lanes, one per model**:
+
+| Lane | Stages (in order) |
+|---|---|
+| gpt-oss-20b | relevance |
+| gpt-oss-120b | tagging → stability |
+| qwen3.8-27b | translation check → cross-check |
+
+The pre-filter runs first. Embeddings, themes and metrics run last in reserved time. A downstream stage whose queue is empty waits (polling every 20 s) while its upstream stage is still producing work, instead of giving up.
 
 ## 8. The website
 

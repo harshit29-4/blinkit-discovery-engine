@@ -1,0 +1,8 @@
+# Embeddings + theme discovery (phase B). Installed only in workflows that need them.
+-r requirements.txt
+onnxruntime==1.32.0
+tokenizers==0.23.3
+huggingface-hub==2.4.0
+numpy==2.5.5
+scikit-learn==1.9.1
+umap-learn==0.6.0

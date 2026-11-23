@@ -37,9 +37,9 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("check-supabase", help="verify Supabase keys and tables work")
 
-    a = sub.add_parser("analyse", help="run AI phase A stages (screen, relevance, tag, translation)")
+    a = sub.add_parser("analyse", help="run AI stages (see --stages)")
     a.add_argument("--stages", default="screen,relevance,tag,translation",
-                   help="comma-separated subset of: screen,relevance,tag,translation")
+                   help="comma-separated subset of: screen,relevance,tag,translation,embed,crosscheck,stability,themes,metrics")
     a.add_argument("--minutes", type=float, default=45, help="time budget for the whole run")
     a.add_argument("--trigger", default="manual", choices=["schedule", "manual", "button"])
 
