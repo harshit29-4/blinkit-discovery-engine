@@ -16,9 +16,8 @@ node_modules/
 out/
 .vercel/
 
-# Local data dumps
-/data/raw/
-/data/cache/
+# Local data (SQLite dev store, logs, dumps)
+/data/
 *.sqlite
 
 # OS / editors

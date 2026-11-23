@@ -4,24 +4,100 @@ Your reference guide to how this project works and why it's built this way. It's
 
 ## 0. The project in one minute
 
-Blinkit wants more monthly active customers to buy from at least one **new category** each month. Before proposing anything, we built an engine that reads thousands of public user conversations (Play Store, App Store, Reddit, YouTube, forums). It tags them with an LLM (Groq), finds recurring themes, and answers 8 research questions with cited evidence. It also measures how trustworthy those answers are.
+Blinkit wants more monthly active customers to buy from at least one **new category** each month. Before proposing anything, we built an engine that reads public user conversations (Play Store, App Store, Reddit). It tags them with an LLM (Groq), finds recurring themes, and answers 8 research questions with cited evidence. It also measures how trustworthy those answers are, automatically, with no human in the loop.
 
 - Architecture and decisions: [part1-architecture.md](part1-architecture.md)
+- What we learned from other projects: [reference-review.md](reference-review.md)
 - Repo: https://github.com/harshit29-4/blinkit-discovery-engine
 
-## 1. Accounts and keys _(partly set up)_
+## 1. Accounts and keys
 
 | Service | Used for | Status |
 |---|---|---|
 | GitHub | Code, scheduled pipeline (Actions), secrets | ✅ repo created |
-| Groq | All LLM calls | ⏳ key pending |
-| Supabase | Database, vector search, realtime | ⏳ login reminder at build step 1 |
-| Vercel | Hosting the website | ⏳ login reminder at build step 6 |
-| YouTube Data API | YouTube comments | ⏳ key pending |
+| Groq | All LLM calls | ✅ key in `.env`, tested |
+| Supabase | Database, vector search, realtime | ✅ project `yauybsgfepcaakhcpugf` (Tokyo), migrations 0001–0002 applied, checks pass |
+| Vercel | Hosting the website | ⏳ needed at deploy |
 
-Keys go in `.env` (local, never committed) and in GitHub/Vercel secrets. `.env.example` lists every variable.
+Keys go in `.env` at the project root (local, never committed) and later in GitHub/Vercel secrets. `.env.example` lists every variable.
 
-## 2. How data is collected _(not built yet)_
+### Setting up Supabase (~10 minutes, free)
+
+1. **Create the project.** Sign in at https://supabase.com/dashboard (GitHub login is easiest) → **New project**.
+   - Organization: your personal one, Free plan.
+   - Name: `blinkit-discovery`.
+   - Database password: click **Generate a password**, then **save it in your password manager** (you need it in step 4).
+   - Region: **South Asia (Mumbai)**.
+   - Leave the security options at their defaults (Data API on). → **Create new project**, then wait ~2 minutes.
+2. **Project URL.** Click **Connect** at the top of the project (or **Project Settings → Data API**). Copy the URL that looks like `https://abcdefgh.supabase.co` into `.env` as `SUPABASE_URL=`.
+3. **API keys.** **Project Settings → API Keys**.
+   - Copy the **publishable** key (`sb_publishable_...`) into `SUPABASE_PUBLISHABLE_KEY=`. This one is safe in a browser.
+   - Under **Secret keys**, reveal/copy the `default` secret key (`sb_secret_...`) into `SUPABASE_SECRET_KEY=`. It bypasses all security rules: never put it in the website or in chat.
+   - If you only see "Legacy API keys" (anon / service_role), those work too: anon → publishable, service_role → secret.
+4. **Database connection string** (only used to create tables from this computer). Click **Connect** → **Direct** tab → choose **Session pooler** (works on normal home internet, which is IPv4). Copy the URI. It looks like `postgresql://postgres.abcdefgh:[YOUR-PASSWORD]@aws-1-ap-south-1.pooler.supabase.com:5432/postgres`. Replace `[YOUR-PASSWORD]` with the password from step 1 and paste it into `SUPABASE_DB_URL=`.
+5. **Save `.env`** and tell Claude. It then runs (from `pipeline/`):
+   ```powershell
+   .venv\Scripts\python -m engine migrate           # creates the tables
+   .venv\Scripts\python -m engine check-supabase    # verifies keys + security rules
+   ```
+   `check-supabase` confirms the secret key can write, the publishable key can read the public summary view, and the publishable key **cannot** read raw review rows. None of the checks print your keys.
+
+If the password contains `@`, `:` or `/`, the connection string breaks. Reset it (**Project Settings → Database → Reset database password**) to one with only letters and numbers.
+
+## 2. How data is collected
+
+Code: `pipeline/engine/collectors/`. Every collector turns its source into the same `RawItem` shape (`pipeline/engine/models.py`): source, id, text, title, rating, date (always UTC), link, anonymised author, plus source-specific extras in `meta`.
+
+| Source | File | How | Gotchas we hit |
+|---|---|---|---|
+| Play Store | `play_store.py` | `google-play-scraper`, newest first, for both the English and Hindi feeds | The library returns *local* time without a timezone, so we convert to UTC. See "Play Store: the 40-character rule" below |
+| App Store | `app_store.py` | Apple's public RSS feed, 10 pages × 50 | Only the latest ~500 reviews exist, so frequent runs build up history. Times come with a US offset and are normalised to UTC |
+| Reddit | `reddit.py` | Arctic Shift archive: search posts for "blinkit" in 16 Indian subreddits, then pull the comments of threads *about* Blinkit | See "Reddit: how we made it fast enough" below |
+
+### Play Store: the 40-character rule
+
+Blinkit gets about **2,000 English Play Store reviews a day**, roughly 745,000 a year, and about 80% are one-liners like "good" or "nice". Storing all of that text would use a big share of Supabase's free 500 MB and add nothing to the analysis. So (decision 2026-11-23):
+
+- Reviews of **40+ characters** are stored in full (`raw_items`) and analysed.
+- Shorter ones become **rating-only rows** (`short_reviews`): a 63-bit hash of the review ID, the day and the star rating. No text. Rating statistics stay complete, and re-runs never double-count because the hashed ID is the primary key.
+- If a review is later edited across the 40-character line, it moves tables, so it's never counted twice.
+
+First live pull: 200 kept reviews against 1,025 short ones, and **76% of the short ones are 5★**. The written reviews we analyse lean much more negative than the overall user base. That's a bias the dashboard's bias panel must show ("reviews shout, they don't vote").
+
+### Reddit: how we made it fast enough
+
+The first full backfill was on track to take 3+ hours: after 32 minutes it had reached only the 3rd of 16 subreddits. The causes were measured from the run log:
+
+| Problem (measured) | Fix |
+|---|---|
+| Every subreddit was searched in 13 fixed monthly windows, even small ones | **Adaptive windows**: search the whole 12 months in one request; only if the server says it's overloaded, split the window in half and try again (recursively, down to ~a week). Small subreddits now take 1 request |
+| 72 overload retries, each waiting 5–75 s | A long window gets only one try before splitting (splitting is cheaper than waiting). Only short windows get the full retry-with-backoff budget |
+| 60 of 162 threads only mentioned Blinkit in passing (title not about Blinkit). Fetching their comments cost 60 requests for 29 useful comments | Comments are fetched only for threads whose **title** mentions Blinkit. Passing-mention posts are still stored |
+| Comment searches scanned from 2005 | They start at the thread's own creation time |
+| A re-run re-fetched comments for threads it already had | Threads already stored and older than 7 days are skipped. A post is saved *after* its comments, so "post is stored" reliably means "its comments are stored" |
+
+Every run reports `skipped_threads`, `reused_threads`, `failed_threads` and `failed_windows`. The cursor doesn't advance if anything failed, so gaps get retried.
+
+**Second debugging round (2026-11-23): it's a per-IP rate limit.** Even with the fixes, searches started failing in under a second, even for tiny windows and even after waiting. Reading the response headers showed `x-ratelimit-reset` (seconds until the limit window resets). Cheap ID lookups still worked while searches didn't, so our IP had used up its search budget after the earlier heavy runs. You can't out-wait that inside one run, so the collector now works *across* runs:
+
+- **Per-subreddit frontier**: each subreddit remembers how far back-to-front it has been fully searched (`reddit_sub:<name>` in `source_cursors`). The next run resumes there.
+- **Saved as you go**: after each subreddit, the collector emits a `CursorAdvance` marker. The runner stores all buffered items *first*, then saves the frontier, so even a killed run keeps its progress.
+- **Honours the server's reset time** (`x-ratelimit-reset`, capped at 65 s) instead of guessing with exponential backoff.
+- **Stops early**: if 3 subreddits in a row make no progress, the run ends (`stopped_early`) instead of grinding for hours. The next hourly run, ideally from GitHub's IP, continues.
+- A thread whose comments fail caps that subreddit's frontier before the thread, so it's found again next time.
+
+**Two run modes** (`pipeline/engine/collect.py`):
+- `backfill`: walk back to the start of the 12-month window. Done once.
+- `incremental`: start from where the last run stopped (the per-source **cursor**, minus a 2-day overlap) and fetch only newer items. Runs hourly.
+
+**Safety rules built in:**
+- Re-running never duplicates anything: items are upserted on `(source, source_id)`.
+- Progress is saved every 100 items, so an interrupted run keeps what it fetched.
+- The cursor only moves forward after items are stored, and *not at all* if any search window failed. The next run retries that gap instead of skipping it.
+- Each run is logged (`pipeline_runs`), including failed windows, which the Health page will show.
+- Usernames are never stored, only a salted hash (`AUTHOR_HASH_SALT`).
+
+**Storage** (`pipeline/engine/store/`): `local` is a SQLite file in `data/` for development, with no accounts needed. `supabase` writes the same tables to Supabase through its REST API. The schema is in `supabase/migrations/` (`0001_collection.sql`: raw items, cursors, run log; `0002_short_reviews.sql`: rating-only rows).
 
 ## 3. How data is cleaned and translated _(not built yet)_
 
@@ -35,14 +111,37 @@ Keys go in `.env` (local, never committed) and in GitHub/Vercel secrets. `.env.e
 
 ## 8. The website _(not built yet)_
 
-## 9. Running it yourself _(not built yet)_
+## 9. Running it yourself
 
-## 10. Common problems and fixes _(not built yet)_
+From the `pipeline/` folder (one-time setup: `python -m venv .venv` then `.venv\Scripts\python -m pip install -r requirements-dev.txt`):
+
+```powershell
+.venv\Scripts\python -m pytest                                              # unit tests (no network)
+.venv\Scripts\python -m engine collect --source all --mode backfill --max 200   # small test pull
+.venv\Scripts\python -m engine collect --source all --mode incremental          # only new items
+.venv\Scripts\python -m engine summary                                      # counts per source
+```
+
+`--store supabase` writes to Supabase instead of the local SQLite file (needs the Supabase keys in `.env`).
+
+## 10. Common problems and fixes
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Reddit `Timeout. Maybe slow down a bit` (HTTP 422) | Arctic Shift is a free, volunteer-run service under load | Long windows are split; short ones retried with backoff. Persistent gaps show as `failed_windows` and are retried next run |
+| Reddit backfill very slow | Server load varies a lot by time of day | Check `skipped_threads`/`reused_threads` in the run stats; re-running is cheap because stored threads are reused |
+| Reddit `'after' must be a valid date` | ISO dates with fractional seconds are rejected | We send epoch seconds |
+| Supabase `PGRST125 Invalid path` | `SUPABASE_URL` was pasted with `/rest/v1/` on the end, doubling the path | The code now strips that suffix automatically |
+| `password authentication failed` although the password is right | The password contains `%`. Inside a connection *URL*, `%xx` is decoded as an escaped character, so a different password was sent | `migrate` splits the URL and passes the password exactly as written. Write passwords in `.env` as-is, never URL-encoded |
+| `(ECIRCUITBREAKER) too many authentication failures` | Supabase's pooler locks out logins for a while after repeated failures, even correct ones | Don't retry logins in a loop (`migrate` tries once). Wait ~10 minutes |
+| Login works on one try and fails on the next, right after a password reset | The new password reaches the pooler's servers one by one | Wait a few minutes; try once |
 
 ## Glossary
 
 - **RAG**: retrieval-augmented generation. The model answers only from retrieved reviews and cites them.
 - **Embedding**: a list of numbers that captures a text's meaning, so similar reviews end up close together.
-- **Gold set**: reviews you labelled by hand. They're the answer key used to grade the AI's tags.
-- **Cohen's κ (kappa)**: agreement between you and the AI, corrected for chance. 0.6+ counts as substantial.
+- **Cursor**: the newest timestamp a source has been collected up to; incremental runs start from it.
+- **Upsert**: insert a row, or update it if it already exists, so re-runs never create duplicates.
+- **Cross-model agreement**: two different AI models tag the same review without seeing each other's answer. Where they agree, the tag is more trustworthy; where they don't, it gets flagged.
+- **Cohen's κ (kappa)**: agreement between two taggers, corrected for chance. 0.6+ counts as substantial.
 - **Grounding**: checking that every quote the AI cites really exists in the source text.

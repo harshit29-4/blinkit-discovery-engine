@@ -1,0 +1,10 @@
+[project]
+name = "blinkit-discovery-engine"
+version = "0.1.0"
+description = "Collection and analysis pipeline for the Blinkit discovery engine"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live: hits real external APIs (run with -m live)"]
+addopts = "-m 'not live'"

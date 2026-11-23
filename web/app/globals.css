@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/*
+ * Colour tokens. Source colours come from the Okabe–Ito palette, which stays distinguishable
+ * for the common forms of colour blindness; every chart also labels values in text, so
+ * colour is never the only cue.
+ */
+:root {
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --border: #e3e3df;
+  --text: #1b1b1a;
+  --muted: #62625e;
+  --accent: #0b6e4f;
+  --accent-soft: #e3f1ec;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --bad: #a3271f;
+  --bad-soft: #fae3e1;
+
+  --src-play: #0072b2;     /* blue */
+  --src-app: #e69f00;      /* orange */
+  --src-rpost: #009e73;    /* bluish green */
+  --src-rcomment: #cc79a7; /* reddish purple */
+
+  --star-1: #a3271f;
+  --star-2: #d55e00;
+  --star-3: #b8a100;
+  --star-4: #56b4e9;
+  --star-5: #0072b2;
+  /* Text colour on each star segment, chosen for contrast. */
+  --star-ink-1: #ffffff;
+  --star-ink-2: #ffffff;
+  --star-ink-3: #111111;
+  --star-ink-4: #111111;
+  --star-ink-5: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111211;
+    --surface: #1a1b1a;
+    --border: #2d2f2d;
+    --text: #ececea;
+    --muted: #a3a39e;
+    --accent: #4fc39a;
+    --accent-soft: #15302a;
+    --warn: #f0b552;
+    --warn-soft: #33270f;
+    --bad: #f08a80;
+    --bad-soft: #3a1b18;
+
+    --src-play: #56b4e9;
+    --src-app: #f0b552;
+    --src-rpost: #3fcf9f;
+    --src-rcomment: #e19ac4;
+
+    --star-1: #f08a80;
+    --star-2: #f39a5b;
+    --star-3: #e3d061;
+    --star-4: #8fd0f2;
+    --star-5: #56b4e9;
+    --star-ink-1: #111111;
+    --star-ink-2: #111111;
+    --star-ink-3: #111111;
+    --star-ink-4: #111111;
+    --star-ink-5: #111111;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Never smaller than 14px anywhere (readability + the deck's font rule). */
+small,
+.text-xs {
+  font-size: 0.875rem;
+}
