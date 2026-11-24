@@ -119,6 +119,45 @@ def name_theme(groq: GroqClient, stats: dict, quotes: list[str]) -> dict[str, An
     return {"name": name, "description": desc, "kind": kind, "questions": qs}
 
 
+CONSOLIDATE_SYSTEM = """You review themes discovered by clustering customer feedback about Blinkit (Indian
+quick commerce). Clustering can split one underlying problem into several near-duplicate themes.
+
+Group together ONLY themes that describe the same user problem with the same cause and the same product
+scope. Keep themes separate when the product category differs (e.g. dairy vs. produce freshness), when the
+cause differs (e.g. expired stock vs. damaged packaging), or when one is positive and the other negative.
+When unsure, keep them separate.
+
+Return JSON: {"merge": [[id, id, ...], ...]} listing only groups of two or more ids; each id at most once.
+Return {"merge": []} if nothing should be merged."""
+
+
+def consolidate(groq: GroqClient, named: dict[int, dict], stats: dict[int, dict]) -> list[list[int]]:
+    """Asks the model which named themes are duplicates. Output is validated: unknown ids, repeated ids
+    and single-member groups are discarded."""
+    vocab = taxonomy()
+    listing = [{"id": c, "name": named[c]["name"], "description": named[c]["description"],
+                "top_barriers": [vocab["barriers"].get(k, k) for k, _ in stats[c]["top_barriers"][:3]],
+                "top_categories": [vocab["categories"].get(k, k) for k, _ in stats[c]["top_categories"][:3]]}
+               for c in named]
+    res = groq.chat_json(model=prompts.MODEL_TAGGING, system=CONSOLIDATE_SYSTEM, stage="theme_consolidation",
+                         items=len(listing), user=json.dumps(listing, ensure_ascii=False), max_tokens=900)
+    seen: set[int] = set()
+    groups: list[list[int]] = []
+    for g in (res.data.get("merge") or []) if isinstance(res.data, dict) else []:
+        ids = []
+        for x in g if isinstance(g, list) else []:
+            try:
+                i = int(x)
+            except (TypeError, ValueError):
+                continue
+            if i in named and i not in seen and i not in ids:
+                ids.append(i)
+        if len(ids) >= 2:
+            seen.update(ids)
+            groups.append(sorted(ids))
+    return groups
+
+
 def run_themes(store: Any, groq: GroqClient) -> dict[str, Any]:
     keys, emb = store.load_embeddings()
     if len(keys) < MIN_ITEMS:
@@ -129,22 +168,42 @@ def run_themes(store: Any, groq: GroqClient) -> dict[str, Any]:
     clusters = sorted({int(l) for l in labels if l >= 0})
     noise = int((labels < 0).sum())
     clustered = len(keys) - noise
-    themes, members = [], []
-    for c in clusters:
-        idx = np.where(labels == c)[0]
-        stats = theme_stats([rows[i] for i in idx])
+    # 1) statistics + names per cluster
+    idx_of = {c: np.where(labels == c)[0] for c in clusters}
+    stats, named = {}, {}
+
+    def describe(idx: np.ndarray) -> tuple[dict, list[int], dict]:
+        st = theme_stats([rows[i] for i in idx])
         reps = representatives(idx, emb, rows, max(REP_FOR_MODEL, REP_STORED))
         quotes = [(rows[i].get("evidence_span") if rows[i].get("evidence_grounded") else None)
                   or (rows[i].get("text") or "")[:300] for i in reps[:REP_FOR_MODEL]]
-        try:
-            named = name_theme(groq, stats, quotes)
-        except (BudgetExhausted, RateLimited, ModelOutputError) as exc:
-            return {"skipped": f"theme naming stopped: {type(exc).__name__}", "clusters": len(clusters)}
+        return st, reps, name_theme(groq, st, quotes)
+
+    reps_of = {}
+    try:
+        for c in clusters:
+            stats[c], reps_of[c], named[c] = describe(idx_of[c])
+        # 2) consolidation: merge near-duplicate themes, then re-describe the merged groups
+        merges = consolidate(groq, named, stats) if len(clusters) > 1 else []
+        for group in merges:
+            keep = group[0]
+            idx_of[keep] = np.concatenate([idx_of[c] for c in group])
+            for c in group[1:]:
+                del idx_of[c], stats[c], named[c], reps_of[c]
+            stats[keep], reps_of[keep], named[keep] = describe(idx_of[keep])
+    except (BudgetExhausted, RateLimited, ModelOutputError) as exc:
+        return {"skipped": f"theme naming stopped: {type(exc).__name__}", "clusters": len(clusters)}
+    params["consolidation"] = {"clusters_found": len(clusters), "merged_groups": merges}
+
+    # 3) rows to store
+    themes, members = [], []
+    for c, idx in idx_of.items():
+        st, reps = stats[c], reps_of[c]
         themes.append({
-            "theme_id": c, **named, "size": stats["size"], "share": round(stats["size"] / clustered, 4),
-            "avg_rating": stats["avg_rating"], "pct_negative": stats["pct_negative"],
-            "top_barriers": stats["top_barriers"], "top_categories": stats["top_categories"],
-            "sources": stats["sources"], "monthly": stats["monthly"],
+            "theme_id": c, **named[c], "size": st["size"], "share": round(st["size"] / clustered, 4),
+            "avg_rating": st["avg_rating"], "pct_negative": st["pct_negative"],
+            "top_barriers": st["top_barriers"], "top_categories": st["top_categories"],
+            "sources": st["sources"], "monthly": st["monthly"],
             "rep_keys": [[rows[i]["source"], rows[i]["source_id"]] for i in reps
                          if rows[i].get("evidence_grounded")][:REP_STORED],
         })
@@ -152,9 +211,10 @@ def run_themes(store: Any, groq: GroqClient) -> dict[str, Any]:
         centre /= np.linalg.norm(centre) or 1
         sims = emb[idx] @ centre
         members += [{"theme_id": c, "source": rows[i]["source"], "source_id": rows[i]["source_id"],
-                     "similarity": round(float(s), 4)} for i, s in zip(idx, sims)]
+                     "similarity": round(float(sim), 4)} for i, sim in zip(idx, sims)]
     # Publish gate: every theme named successfully (otherwise we returned above).
     snap = store.save_theme_snapshot(items=len(keys), noise=noise, params=params, model=prompts.MODEL_TAGGING,
                                      themes=themes, members=members)
-    return {"snapshot": snap, "entries": len(keys), "themes": len(themes), "outliers": noise,
+    return {"snapshot": snap, "entries": len(keys), "clusters": len(clusters), "themes": len(themes),
+            "merged": sum(len(g) - 1 for g in merges), "outliers": noise,
             "largest": max((t["size"] for t in themes), default=0)}

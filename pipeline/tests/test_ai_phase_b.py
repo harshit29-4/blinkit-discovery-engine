@@ -1,5 +1,7 @@
 """Phase B logic with fakes: metric maths, clustering, theme naming, cross-check, metric computation."""
 
+import json
+
 import numpy as np
 import pytest
 
@@ -215,3 +217,35 @@ def test_compute_metrics_values():
     # recall: found = 0.6*1000 = 600; missed = 0.05*4200 = 210 → 600/810
     assert m["v6_keyword_recall"] == pytest.approx(600 / 810, abs=1e-3)
     assert "v1_sentiment" in m and {r["metric"] for r in store.rows} >= {"v1_barriers", "v2_sentiment_vs_stars"}
+
+
+class MergingGroq:
+    """Names every cluster, then asks to merge the first two clusters it was shown."""
+
+    def __init__(self, merge=True):
+        self.merge, self.stages = merge, []
+
+    def chat_json(self, **kw):
+        self.stages.append(kw["stage"])
+        if kw["stage"] == "theme_consolidation":
+            ids = [t["id"] for t in json.loads(kw["user"])]
+            return CallResult({"merge": [[ids[0], ids[1], "junk", ids[0]]] if self.merge else []}, 1, 1)
+        return CallResult({"name": "Stockouts", "description": "Items missing.", "kind": "exploration_barrier",
+                           "questions": [2]}, 1, 1)
+
+
+def test_consolidation_merges_and_redescribes():
+    store = ThemeStore()
+    g = MergingGroq()
+    res = th.run_themes(store, g)
+    assert res["clusters"] == 3 and res["themes"] == 2 and res["merged"] == 1
+    sizes = sorted(t["size"] for t in store.saved["themes"])
+    assert sum(sizes) + res["outliers"] == res["entries"]  # no entry lost or double-counted
+    assert g.stages.count("theme_naming") == 4  # 3 clusters + 1 re-description of the merged group
+    assert store.saved["params"]["consolidation"]["merged_groups"]
+
+
+def test_consolidation_can_decline():
+    store = ThemeStore()
+    res = th.run_themes(store, MergingGroq(merge=False))
+    assert res["themes"] == 3 and res["merged"] == 0

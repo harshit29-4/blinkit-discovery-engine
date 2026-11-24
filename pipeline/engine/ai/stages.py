@@ -84,10 +84,16 @@ def _merge(a: dict, b: dict) -> dict:
 
 # ---------------------------------------------------------------- S1 pre-filter (no AI)
 
+SCREEN_BOOKMARK = "screen_bookmark"
+
+
 def run_screen(store: Store, deadline: float, page: int = 1000) -> dict:
+    """Screens rows added since the bookmark. The bookmark only advances after a page is stored,
+    so an interrupted run re-reads (idempotently) rather than skipping anything."""
     stats = Counter()
+    bookmark = store.get_state(SCREEN_BOOKMARK)
     while time.time() < deadline:
-        rows = store.queue_screen(page)
+        rows = store.queue_screen(bookmark, page)
         if not rows:
             break
         out = []
@@ -98,6 +104,9 @@ def run_screen(store: Store, deadline: float, page: int = 1000) -> dict:
             stats[s.pool] += 1
             stats[f"lang_{s.lang}"] += 1
         store.upsert("item_screen", out)
+        last = rows[-1]
+        bookmark = [last["first_seen_at"], last["source"], last["source_id"]]
+        store.set_state(SCREEN_BOOKMARK, bookmark)
         stats["screened"] += len(out)
     return dict(stats)
 
@@ -199,6 +208,32 @@ def run_tagging(store: Store, groq: GroqClient, deadline: float) -> dict:
                 stats["paused_rate_limit"] = 1
                 return dict(stats)
             except ModelOutputError as exc:
+                # The model occasionally fails to produce valid JSON for a whole batch ("json_validate_failed").
+                # Splitting isolates the entry that trips it; only the half that fails again is penalised.
+                if len(batch) > 1:
+                    mid = len(batch) // 2
+                    stats["split_batches"] += 1
+                    for half in (batch[:mid], batch[mid:]):
+                        try:
+                            r2 = groq.chat_json(model=prompts.MODEL_TAGGING, system=system,
+                                                user=prompts.entries_payload(half), stage="tagging", items=len(half),
+                                                max_tokens=200 * len(half) + 800)
+                            rows2, _ = _tag_rows(half, r2.data, stats)
+                            if rows2:
+                                store.upsert("item_tags", rows2)
+                                stats["tagged"] += len(rows2)
+                                stats["grounded"] += sum(x["evidence_grounded"] for x in rows2)
+                                stats["translated"] += sum(x["translation"] is not None for x in rows2)
+                        except BudgetExhausted:
+                            stats["stopped_daily_limit"] = 1
+                            return dict(stats)
+                        except RateLimited:
+                            stats["paused_rate_limit"] = 1
+                            return dict(stats)
+                        except ModelOutputError as exc2:
+                            store.mark_failed(_keys(half), f"tagging: {exc2}")
+                            stats["failed_items"] += len(half)
+                    continue
                 store.mark_failed(_keys(batch), f"tagging: {exc}")
                 stats["failed_items"] += len(batch)
                 continue

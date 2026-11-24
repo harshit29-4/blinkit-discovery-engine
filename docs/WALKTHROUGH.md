@@ -148,7 +148,17 @@ Code: `pipeline/engine/ai/embed.py`, `themes.py`. Daily workflow: `.github/workf
 2. **Clustering.** UMAP (8 dimensions, cosine, fixed seed) then HDBSCAN (min cluster ≈1% of entries). HDBSCAN leaves entries that fit no group as *unassigned* instead of forcing them into a theme; the Themes page reports how many.
 3. **Statistics in code:** size, share, average rating, % negative, top barriers and categories, sources, monthly counts.
 4. **AI naming:** gpt-oss-120b gets the statistics plus the 12 most central *verified* quotes and returns a name, a description, a kind (exploration barrier, habit, discovery, information need, general friction, positive experience) and which research questions the theme informs. The output is validated (kind and question ids must be valid).
-5. **Snapshot + publish gate:** each run writes a new snapshot and publishes it only after every theme is named and every row is written, so the site never shows a half-built set. Old snapshots are kept.
+5. **Consolidation:** clustering can split one problem into near-duplicates (e.g. three separate "can't return or refund" groups). One call shows gpt-oss-120b every theme's name, description and top tags and asks which describe the *same problem with the same cause and product scope*; merged groups get their statistics, quotes and name recomputed. It's told to keep themes apart when category or cause differs. On 2026-11-24 it turned 9 clusters into 6 themes: the refund and expired-food duplicates merged, while produce freshness stayed separate from dairy/meat. Centre-to-centre similarity couldn't do this: duplicates scored 0.96, but so did unrelated themes.
+6. **Snapshot + publish gate:** each run writes a new snapshot and publishes it only after every theme is named and every row is written, so the site never shows a half-built set. Old snapshots are kept, with the merges recorded in `params.consolidation`.
+
+### Scale fixes (2026-11-24)
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Vercel build failed: "statement timeout" | Dashboard views read every full review row (109k reviews + 368k ratings); public queries are limited to 3 s | Covering indexes (migration 0007): 3.4 s → 72 ms |
+| Hourly AI run did no work (HTTP 500 on queues) | Queue functions sorted the whole backlog (1.3–4.6 s idle), over the 8 s API limit under load | Migration 0008: pre-filter reads from a bookmark; relevance/tagging walk an index on a stored random key (all queues < 0.5 s) |
+| Whole tagging batch lost on "Failed to generate JSON" | gpt-oss-120b occasionally can't produce valid JSON for a batch | The batch is split in half and retried; only a half that fails again is penalised |
+| ~370 entries tagged per day | Groq free tier caps each model at ~200k tokens/day | Batches of 12 (tagging) / 30 (relevance) and shorter outputs; the tagged set is a random sample at every point, with its margin of error shown on How it works |
 
 ## 6. How insights are generated _(phase C, not built yet)_
 

@@ -124,11 +124,19 @@ def test_gpt_oss_requests_low_reasoning():
 
 class FakeStore:
     def __init__(self, raw):
-        self.raw = raw  # list of raw_items rows
+        self.raw = [{"first_seen_at": "2026-11-01T00:00:00+00:00", **r} for r in raw]  # raw_items rows
         self.screen, self.tags, self.failed, self.calls = {}, {}, [], []
 
-    def queue_screen(self, n):
-        return [r for r in self.raw if (r["source"], r["source_id"]) not in self.screen][:n]
+    def queue_screen(self, after, n):
+        keyed = sorted(self.raw, key=lambda r: (r.get("first_seen_at", ""), r["source"], r["source_id"]))
+        start = tuple(after) if after else ("", "", "")
+        return [r for r in keyed if (r.get("first_seen_at", ""), r["source"], r["source_id"]) > start][:n]
+
+    def get_state(self, key):
+        return getattr(self, "_state", {}).get(key)
+
+    def set_state(self, key, value):
+        self._state = {**getattr(self, "_state", {}), key: value}
 
     def queue_relevance(self, n):
         out = []
@@ -276,3 +284,27 @@ def test_lane_gives_every_stage_turns_while_upstream_runs(monkeypatch):
     res = stages.run_phase_a(object(), object(), ["tag", "translation", "crosscheck"], minutes=0.02)
     assert "crosscheck" in calls and res["crosscheck"]["crosschecked"] == 2
     assert calls.index("crosscheck") < len(calls) - 1  # reached early, not only at the very end
+
+
+def test_screen_bookmark_only_reads_new_rows():
+    store = FakeStore(RAW)
+    run_phase_a(store, None, ["screen"], minutes=1)
+    assert len(store.screen) == 3
+    store.raw.append({"source": "play_store", "source_id": "d", "title": None, "text": "baby diapers fake",
+                      "meta": {}, "first_seen_at": "2026-11-02T00:00:00+00:00"})
+    res = run_phase_a(store, None, ["screen"], minutes=1)
+    assert res["screen"]["screened"] == 1 and store.screen[("play_store", "d")]["pool"] == "candidate"
+
+
+def test_bad_json_batch_is_split_and_good_half_saved():
+    class HalfBroken(FakeGroq):
+        def chat_json(self, **kw):
+            entries = json.loads(kw["user"])
+            if kw["stage"] == "tagging" and any("kabhi" in e["text"] for e in entries) and len(entries) > 1:
+                raise ModelOutputError("HTTP 400: json_validate_failed")
+            return super().chat_json(**kw)
+
+    store = FakeStore(RAW)
+    res = run_phase_a(store, HalfBroken(), ["screen", "relevance", "tag"], minutes=1)
+    assert res["tag"]["split_batches"] == 1
+    assert set(store.tags) == {("play_store", "a"), ("play_store", "b")}  # both halves recovered

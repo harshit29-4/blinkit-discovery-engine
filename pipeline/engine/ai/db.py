@@ -54,8 +54,22 @@ class AIStore:
         r.raise_for_status()
 
     # Queues
-    def queue_screen(self, n: int) -> list[dict]:
-        return self.rpc("ai_queue_screen", n=n)
+    def queue_screen(self, after: list | None, n: int) -> list[dict]:
+        """Rows added after the bookmark [first_seen_at, source, source_id], in insertion order."""
+        ts, src, sid = after or ["-infinity", "", ""]
+        return self.rpc("ai_queue_screen", after_ts=ts, after_source=src, after_id=sid, n=n)
+
+    def get_state(self, key: str):
+        r = self.http.get("/ai_state", params={"select": "value", "key": f"eq.{key}"})
+        r.raise_for_status()
+        rows = r.json()
+        return rows[0]["value"] if rows else None
+
+    def set_state(self, key: str, value) -> None:
+        from datetime import datetime, timezone
+
+        self.upsert("ai_state", [{"key": key, "value": value, "updated_at": datetime.now(timezone.utc).isoformat()}],
+                    on_conflict="key")
 
     def queue_relevance(self, n: int) -> list[dict]:
         return self.rpc("ai_queue_relevance", n=n)

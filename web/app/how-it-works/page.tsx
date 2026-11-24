@@ -66,6 +66,9 @@ async function Pipeline() {
   const estMissed = Math.round(ctrlRate * nonCandidates);
   const estFound = f.candidates_checked ? Math.round((f.candidates_relevant / f.candidates_checked) * f.candidates) : 0;
   const recall = estFound + estMissed ? pct(estFound, estFound + estMissed) : 0;
+  // Entries are processed in a fixed random order, so the tagged set is a random sample at any point.
+  const estRelevant = estFound + estMissed;
+  const moe = f.tagged ? 1.96 * Math.sqrt(0.25 / f.tagged) * 100 : null; // worst-case 95% margin for a proportion
   return (
     <ol className="space-y-4">
       <Stage n={1} title="Collection" method="Python collectors on a GitHub Actions schedule; idempotent upserts into Supabase (Postgres).">
@@ -100,6 +103,12 @@ async function Pipeline() {
           <Metric label="Quotes verified verbatim" value={`${pct(f.grounded, f.tagged)}%`} note={`${fmtInt(f.grounded)} of ${fmtInt(f.tagged)}`} />
           <Metric label="Translated" value={fmtInt(f.translated)} />
         </div>
+        <p className="mt-3 rounded-lg bg-bg p-3">
+          <span className="font-medium">Sampling.</span> Entries are reviewed and tagged in a fixed random order across
+          months and sources, so the tagged set is a random sample at every point.{" "}
+          {estRelevant > 0 && <>About {fmtInt(estRelevant)} relevant entries are estimated in total; {fmtInt(f.tagged)} ({pct(f.tagged, estRelevant)}%) are tagged so far. </>}
+          {moe !== null && <>With {fmtInt(f.tagged)} tagged entries, percentages computed from them carry a margin of error of at most ±{moe.toFixed(1)} points (95% confidence); the margin narrows as tagging continues, within the free daily model allowance.</>}
+        </p>
         <p className="mt-3">
           <Link href="/evidence?tagged=1" className="text-accent underline underline-offset-2">Browse tagged entries in Evidence</Link>
         </p>
