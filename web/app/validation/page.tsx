@@ -187,27 +187,23 @@ async function Checks() {
           Every entry behind the return and quality themes, re-read by {V9_RECHECK.models}. Shares count entries where
           both models agreed.
         </p>
-        <table className="mt-2 w-full text-sm">
-          <tbody>
-            {V9_RECHECK.rows.map((r) => (
-              <tr key={r.label} className="border-t border-border align-top">
-                <td className="py-2 pr-3">
-                  <span className="font-semibold">{r.label}</span>
-                  <span className="block text-muted">
-                    {fmtInt(r.entries)} entries · models agreed on {pctStr(r.agreement)} (kappa {r.kappa.toFixed(2)})
+        <div className="mt-2 text-sm">
+          {V9_RECHECK.rows.map((r) => (
+            <div key={r.label} className="border-t border-border py-2">
+              <span className="font-semibold">{r.label}</span>
+              <span className="text-muted">
+                {" "}· {fmtInt(r.entries)} entries · models agreed on {pctStr(r.agreement)} (kappa {r.kappa.toFixed(2)})
+              </span>
+              <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                {r.parts.map(([name, share]) => (
+                  <span key={name} className="whitespace-nowrap">
+                    <b>{pctStr(share)}</b> {name.toLowerCase()}
                   </span>
-                </td>
-                <td className="py-2 text-right">
-                  {r.parts.map(([name, share]) => (
-                    <span key={name} className="block whitespace-nowrap">
-                      <b>{pctStr(share)}</b> {name.toLowerCase()}
-                    </span>
-                  ))}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
         <p className="mt-3">
           Public feedback is written by people who already bought, so it measures what goes wrong after an order, not what
           stops someone trying. That is why the engine over-rated return fear. The interviews&rsquo; barrier, a question the
