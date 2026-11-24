@@ -184,7 +184,7 @@ Decision (2026-11-24): **no pre-written answers to every question.** The site ha
 
 **How one answer is made** (`web/lib/agent/`, `web/app/api/ask/route.ts`):
 
-1. The question goes to **qwen3.8-27b** on Groq with four **tools** it may call (tool calling). If qwen is busy or its daily allowance is spent, **gpt-oss-20b** takes over; the answer says which model wrote it.
+1. The question goes to **qwen3.8-27b** on Groq with four **tools** it may call (tool calling). If qwen hits a short per-minute limit (typical while the daily pipeline is using it), the engine waits a few seconds and retries. If a model's daily allowance is spent, **gpt-oss-20b** and then **gpt-oss-120b** take over; the answer says which model wrote it and why. (First live test, 2026-11-24: during the daily run, qwen was busy and gpt-oss-20b had used its day, so the question was refused; this waiting and the third model were added after that.)
 2. The tools are read-only database functions (migration 0010), callable with the public key:
 
    | Tool | What it returns |

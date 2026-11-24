@@ -11,6 +11,7 @@ import { EvidenceRegistry, runTool, TOOL_DEFS, type Evidence } from "./tools";
 
 export const MAIN_MODEL = "qwen/qwen3.8-27b";
 export const FALLBACK_MODEL = "openai/gpt-oss-20b";
+export const LAST_RESORT_MODEL = "openai/gpt-oss-120b"; // pipeline stops it at 150K/day, so ~50K is left
 export const JUDGE_MODEL = "openai/gpt-oss-20b";
 const MAX_ROUNDS = 4; // each round resends the whole conversation, so rounds are the main token cost
 const URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -36,6 +37,10 @@ export type Answer = {
 export type Faithfulness = { score: number | null; unsupported: string[]; note?: string };
 
 export class ModelUnavailable extends Error {}
+/** A per-minute limit that clears within `wait` seconds. */
+class Busy extends Error {
+  constructor(public model: string, public wait: number) { super(`${model}: busy for ${wait}s`); }
+}
 
 // A model whose daily allowance is spent stays skipped until Groq says it resets (per server instance).
 const skipUntil = new Map<string, number>();
@@ -91,7 +96,8 @@ async function groq(model: string, messages: Msg[], opts: { tools: boolean; json
   if (res.status === 429 || res.status === 413) {
     const text = (await res.text()).toLowerCase();
     const daily = text.includes("per day");
-    const wait = Number(res.headers.get("retry-after") ?? "60");
+    const wait = Number(res.headers.get("retry-after") ?? "60") || 60;
+    if (!daily && res.status === 429 && wait <= 12) throw new Busy(model, wait); // worth waiting for
     skipUntil.set(model, Date.now() + (daily ? Math.max(wait, 600) : Math.min(wait, 60)) * 1000);
     throw new ModelUnavailable(`${model}: ${daily ? "daily allowance spent" : "busy (per-minute limit)"}`);
   }
@@ -122,12 +128,14 @@ export async function answerQuestion(question: string, history: { role: "user" |
     { role: "user", content: question },
   ];
 
-  const models = [MAIN_MODEL, FALLBACK_MODEL].filter(available);
-  if (!models.length) throw new ModelUnavailable("both models are at their limit");
+  const models = [MAIN_MODEL, FALLBACK_MODEL, LAST_RESORT_MODEL].filter(available);
+  if (!models.length) throw new ModelUnavailable("all models are at their limit");
   let model = models[0];
   let fallback: string | null = model === MAIN_MODEL ? null : "main model at its limit";
+  const started = Date.now();
 
   async function call(opts: { tools: boolean; maxTokens: number }) {
+    let waits = 0;
     for (;;) {
       try {
         const r = await groq(model, messages, opts);
@@ -135,7 +143,16 @@ export async function answerQuestion(question: string, history: { role: "user" |
         tokens.output += r.tout;
         return r.message;
       } catch (e) {
+        // A per-minute limit (e.g. while the daily pipeline uses the same model) clears within
+        // seconds: wait for it twice at most, while the answer stays well inside the 60 s limit.
+        if (e instanceof Busy && waits < 2 && Date.now() - started + e.wait * 1000 < 35_000) {
+          waits++;
+          const ms = e.wait * 1000 + 250;
+          await new Promise((r) => setTimeout(r, ms));
+          continue;
+        }
         const next = models[models.indexOf(model) + 1];
+        if (e instanceof Busy) e = new ModelUnavailable(`${model}: busy (per-minute limit)`);
         if (e instanceof ModelUnavailable && next) {
           fallback = e.message;
           model = next;
