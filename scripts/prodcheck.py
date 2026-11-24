@@ -33,14 +33,14 @@ def text_of(html):
 
 # 1. Pages and status codes
 for path, expect in [("/", 200), ("/evidence", 200), ("/themes", 200), ("/validation", 200),
-                     ("/how-it-works", 200), ("/health", 200), ("/definitely-not-a-page", 404)]:
+                     ("/how-it-works", 200), ("/health", 200), ("/ask", 200), ("/definitely-not-a-page", 404)]:
     t = time.perf_counter()
     r = c.get(BASE + path)
     ms = (time.perf_counter() - t) * 1000
     check(f"GET {path} → {expect}", r.status_code == expect, f"got {r.status_code} in {ms:.0f} ms")
 
 # 2. Warm latency
-for path in ["/", "/themes", "/evidence", "/evidence?q=delivery"]:
+for path in ["/", "/themes", "/evidence", "/evidence?q=delivery", "/evidence?q=refund&tagged=1"]:
     times = []
     for _ in range(5):
         t = time.perf_counter()
@@ -101,10 +101,10 @@ def env_file(path):
 
 root_env = env_file(os.path.join(ROOT, ".env"))
 secrets = {k: v for k, v in root_env.items()
-           if k in ("SUPABASE_SECRET_KEY", "SUPABASE_DB_URL", "GROQ_API_KEY") and len(v) > 8}
+           if k in ("SUPABASE_SECRET_KEY", "SUPABASE_DB_URL", "GROQ_API_KEY", "REFRESH_PASSCODE", "GITHUB_DISPATCH_TOKEN") and len(v) > 8}
 static_text = "".join(open(f, encoding="utf-8", errors="ignore").read()
                       for f in glob.glob(os.path.join(WEB, ".next", "static", "**", "*.js"), recursive=True))
-pages_html = "".join(c.get(BASE + p).text for p in ["/", "/evidence", "/themes", "/validation", "/health"])
+pages_html = "".join(c.get(BASE + p).text for p in ["/", "/evidence", "/themes", "/validation", "/health", "/ask"])
 for k, v in secrets.items():
     check(f"secret {k} absent from client JS + HTML", v not in static_text and v not in pages_html)
 pub = root_env.get("SUPABASE_PUBLISHABLE_KEY", "")
@@ -125,6 +125,17 @@ scripts = set(re.findall(r'src="(/_next/static/[^"]+\.js)"', home))
 blobs = [c.get(BASE + s).content for s in scripts]
 gz = sum(len(gzip.compress(b, 9)) for b in blobs)
 check("first-load JS < 200 KB gzipped", gz < 200_000, f"{len(scripts)} files, {gz // 1024} KB gzipped")
+
+# APIs (no AI tokens spent: only inputs rejected before the model is called)
+r = c.post(BASE + "/api/ask", json={"question": "x"})
+check("POST /api/ask rejects a too-short question (400)", r.status_code == 400, f"HTTP {r.status_code}")
+r = c.post(BASE + "/api/ask", content=b"not json", headers={"Content-Type": "application/json"})
+check("POST /api/ask rejects invalid JSON (400)", r.status_code == 400, f"HTTP {r.status_code}")
+r = c.get(BASE + "/api/run")
+check("GET /api/run returns the run status", r.status_code == 200 and "latest" in r.json(), f"HTTP {r.status_code}")
+r = c.post(BASE + "/api/run", json={"passcode": "wrong-passcode"})
+check("POST /api/run refuses a wrong passcode (403, or 503 if not configured)", r.status_code in (403, 503), f"HTTP {r.status_code}")
+check("GET /api/run is not cached", "no-store" in r.headers.get("cache-control", ""), r.headers.get("cache-control", ""))
 
 failed = [r for r in results if not r[1]]
 print(f"\n{len(results) - len(failed)}/{len(results)} passed")

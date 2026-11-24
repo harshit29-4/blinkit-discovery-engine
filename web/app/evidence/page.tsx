@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { Card, Skeleton, SourceBadge, Stars } from "@/components/ui";
-import { PAGE_SIZE, SOURCE_LABEL, getSourceCounts, getThemes, searchEvidence, type Evidence, type EvidenceFilters } from "@/lib/data";
+import { MAX_PAGES, PAGE_SIZE, SOURCE_LABEL, getSourceCounts, getThemes, searchEvidence, type Evidence, type EvidenceFilters } from "@/lib/data";
 import { fmtDate, fmtInt } from "@/lib/format";
 import { TAXONOMY, label } from "@/lib/taxonomy";
 
@@ -47,7 +47,8 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
   ]);
   const themeName = new Map(themes.map((t) => [t.theme_id, t.name]));
   const available = counts.filter((c) => c.items > 0).sort((a, b) => b.items - a.items);
-  const pages = total ? Math.ceil(total / PAGE_SIZE) : 1;
+  const allPages = total ? Math.ceil(total / PAGE_SIZE) : 1;
+  const pages = Math.min(allPages, MAX_PAGES); // browsable pages
   const page = filters.page ?? 1;
 
   const href = (p: number) => {
@@ -109,7 +110,8 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
 
       <p className="text-sm text-muted" aria-live="polite">
         {approximate ? "About " : ""}{fmtInt(total ?? rows.length)} {total === 1 ? "result" : "results"}
-        {pages > 1 && page <= pages && ` · Page ${fmtInt(page)} of ${approximate ? "about " : ""}${fmtInt(pages)}`}
+        {pages > 1 && page <= pages && ` · Page ${fmtInt(page)} of ${allPages > MAX_PAGES ? fmtInt(pages) : `${approximate ? "about " : ""}${fmtInt(pages)}`}`}
+        {allPages > MAX_PAGES && ` (the newest ${fmtInt(MAX_PAGES * PAGE_SIZE)} can be browsed; add a keyword or filter to narrow the rest)`}
         {filters.q && " · Matches word forms (refund also finds refunds, refunded); use \"quotes\" for a phrase"}
       </p>
 
@@ -123,7 +125,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
       ) : rows.length === 0 && total && page > pages ? (
         <Card>
           <p className="text-muted">
-            The results contain {fmtInt(pages)} pages.{" "}
+            {allPages > MAX_PAGES ? `Browsing stops at page ${fmtInt(pages)}.` : `The results contain ${fmtInt(pages)} pages.`}{" "}
             <Link className="text-accent underline underline-offset-2" href={href(pages)}>Go to the last page</Link>
           </p>
         </Card>

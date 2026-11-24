@@ -173,11 +173,14 @@ export type EvidenceFilters = {
   barrier?: string; category?: string; stage?: string; tagged?: string; theme?: string;
 };
 export const PAGE_SIZE = 25;
+// Browsing stops at page 200 (the newest 5,000 matches): reaching page N makes the database walk
+// N × 25 rows in date order, and the last of 109k entries took ~3 s. Keywords and filters narrow further.
+export const MAX_PAGES = 200;
 
 export async function searchEvidence(f: EvidenceFilters) {
   "use cache";
   cacheLife("minutes");
-  const page = Math.min(Math.max(1, Math.floor(f.page ?? 1)), 10_000);
+  const page = Math.max(1, Math.floor(f.page ?? 1) || 1);
   // Full-text search on the indexed fts column: English word forms ("refund" finds refunds/refunded),
   // whole words only ("pet" does not match "petty"), "quoted phrases", OR and -exclusions.
   // Commas/parens would break PostgREST's filter syntax; capped at 100 characters.
@@ -210,8 +213,9 @@ async function runSearch(q: string, f: EvidenceFilters, page: number) {
     {
       select: EVIDENCE_COLUMNS,
       order: "posted_at.desc",
-      limit: PAGE_SIZE,
-      offset: (page - 1) * PAGE_SIZE,
+      // Past the browsable range: count only (no rows), so the page can offer the last browsable page.
+      limit: page > MAX_PAGES ? 0 : PAGE_SIZE,
+      offset: page > MAX_PAGES ? 0 : (page - 1) * PAGE_SIZE,
       fts: q ? `wfts(english).${q}` : undefined,
       source: f.source && SOURCES.includes(f.source as Source) ? `eq.${f.source}` : undefined,
       rating: f.rating && /^[1-5]$/.test(f.rating) ? `eq.${f.rating}` : undefined,
