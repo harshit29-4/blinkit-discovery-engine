@@ -123,7 +123,7 @@ async function Progress() {
   const sources = cursors.filter((c) => !c.key.startsWith("reddit_sub:"));
   return (
     <div className={`grid gap-6 ${subs.length ? "lg:grid-cols-2" : ""}`}>
-      <Card title="Collection progress" subtitle="Most recent entry collected from each source. Each hourly run continues from this point.">
+      <Card title="Collection progress" subtitle="Most recent entry collected from each source. Each daily run continues from this point.">
         {sources.length === 0 ? <p className="text-muted">No source has completed a run yet.</p> : (
           <ul className="space-y-2 text-sm">
             {sources.map((c) => (

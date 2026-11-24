@@ -13,7 +13,7 @@ export default function HowItWorksPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">How the discovery engine works</h1>
         <p className="mt-1 max-w-3xl text-muted">
-          Public feedback is collected every hour and passed through a sequence of deterministic and AI stages.
+          Public feedback is collected once a day (and on request) and passed through a sequence of deterministic and AI stages.
           Each stage below shows live counts from the database, so the path from raw feedback to structured
           evidence can be followed and checked end to end.
         </p>
@@ -38,7 +38,7 @@ function Stage({ n, title, method, children, status = "live" }: {
           <span className="mr-2 text-muted tabular-nums">{n}.</span>{title}
         </h2>
         <span className={`rounded-full px-2 py-0.5 text-sm font-medium ${status === "live" ? "bg-accent-soft text-accent" : "bg-border text-text"}`}>
-          {status === "live" ? "Running hourly" : "In development"}
+          {status === "live" ? "Runs daily" : "In development"}
         </span>
       </div>
       <p className="mt-1 text-sm text-muted">{method}</p>

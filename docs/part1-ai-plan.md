@@ -108,5 +108,6 @@ New secrets: `GROQ_API_KEY` goes to **GitHub Actions** (pipeline) and to **Verce
 - **D1 Social media → YouTube: YES.** Comments on Blinkit haul/review videos via the free YouTube Data API key (reverses the earlier skip). Built in phase E; key setup in WALKTHROUGH §1.
 - **D2 Quick-commerce discussions → NO broadening.** Reddit stays "Blinkit mentions only". Quick-commerce discussion is covered to the extent Blinkit threads discuss it; the deck states this scope choice.
 - **D3 Forums & product reviews → YES.** Polite, low-volume collector for consumer-complaint forums (consumercomplaints.in; MouthShut to be checked), public pages only, robots.txt respected. Built in phase E.
-- **D4 Groq daily token limit: [OPEN]** please read it from console.groq.com/settings/limits.
+- **D4 Groq limits: confirmed** (2026-11-24): 200K tokens/day, 1K requests/day, 8K tokens/min for each of gpt-oss-120b, gpt-oss-20b and qwen3.8-27b → tagging ≈ 500 entries/day.
+- **D5 Scheduling: once daily + on request** (2026-11-24); hourly runs dropped. See WALKTHROUGH §3.
 - **Phase A approved and built (2026-11-23).** Tagging model switched to gpt-oss-120b after discovering qwen's 1,000 output-tokens/minute cap; qwen now does checks.

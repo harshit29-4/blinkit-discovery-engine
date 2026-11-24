@@ -249,3 +249,25 @@ def test_consolidation_can_decline():
     store = ThemeStore()
     res = th.run_themes(store, MergingGroq(merge=False))
     assert res["themes"] == 3 and res["merged"] == 0
+
+
+def test_v1_only_scores_pairs_on_current_prompt_versions():
+    from engine.ai import prompts
+
+    class VersionedStore(MetricStore):
+        def load_tags_for_validation(self):
+            tags = super().load_tags_for_validation()
+            tags[("p", "1")]["prompt_version"] = "tag-v1"           # old tag: excluded
+            tags[("p", "2")]["prompt_version"] = prompts.PROMPT_VERSION
+            return tags
+
+        def load_table_by_key(self, table, latest_week=False):
+            rows = super().load_table_by_key(table, latest_week)
+            for k, r in rows.items():
+                r["prompt_version"] = va.CROSS_VERSION
+            return rows
+
+    store = VersionedStore()
+    va.compute_metrics(store)
+    v1 = next(r for r in store.rows if r["metric"] == "v1_sentiment")
+    assert v1["n"] == 1 and v1["details"]["versions"] == [prompts.PROMPT_VERSION, va.CROSS_VERSION]

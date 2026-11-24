@@ -14,6 +14,7 @@ from .groq import BudgetExhausted, GroqClient, ModelOutputError, RateLimited
 from .taxonomy import allowed, taxonomy
 from .validate import clean_tags
 
+CROSS_VERSION = "cross-v2"  # bump together with prompts.core_field_rules changes
 CROSS_BATCH = 10    # qwen: compact output keeps a request under its 1,000 output tokens/minute
 STABILITY_BATCH = 8
 CHECK_FIELDS_SINGLE = ("sentiment", "category_behavior", "funnel_stage")
@@ -70,7 +71,7 @@ def run_crosscheck(store: Any, groq: GroqClient, deadline: float) -> dict:
             if not a:
                 continue
             rows.append({"source": r["source"], "source_id": r["source_id"], "model": prompts.MODEL_CHECK,
-                         "prompt_version": "cross-v2", **_subset(clean_tags(a).tags)})
+                         "prompt_version": CROSS_VERSION, **_subset(clean_tags(a).tags)})
         if rows:
             store.upsert("item_crosscheck", rows)
             stats["crosschecked"] += len(rows)
@@ -111,6 +112,7 @@ def run_stability(store: Any, groq: GroqClient, deadline: float) -> dict:
             if a:
                 t = clean_tags(a).tags
                 rows.append({"source": r["source"], "source_id": r["source_id"], "run_week": week.isoformat(),
+                             "prompt_version": prompts.PROMPT_VERSION,
                              "sentiment": t["sentiment"], "categories": t["categories"], "barriers": t["barriers"],
                              "funnel_stage": t["funnel_stage"]})
         if rows:
@@ -170,12 +172,14 @@ def compute_metrics(store: Any) -> dict[str, Any]:
         out.append({"metric": metric, "value": None if value is None else round(float(value), 4), "n": n,
                     "details": json.loads(json.dumps(details, default=str))})
 
-    # V1 cross-model agreement
-    pairs = [(tags[k], c) for k, c in cross.items() if k in tags]
+    # V1 cross-model agreement: only pairs where both sides used the current instructions, so the score
+    # measures disagreement between models, not between differently worded prompts.
+    current = {k: t for k, t in tags.items() if t.get("prompt_version") in (None, prompts.PROMPT_VERSION)}
+    pairs = [(current[k], c) for k, c in cross.items() if k in current and c.get("prompt_version") in (None, CROSS_VERSION)]
     for f in CHECK_FIELDS_SINGLE:
         a = [p[0].get(f) or "none" for p in pairs]
         b = [p[1].get(f) or "none" for p in pairs]
-        put(f"v1_{f}", cohen_kappa(a, b), len(pairs),
+        put(f"v1_{f}", cohen_kappa(a, b), len(pairs), versions=[prompts.PROMPT_VERSION, CROSS_VERSION],
             agreement=(sum(x == y for x, y in zip(a, b)) / len(a)) if a else None)
     for f in CHECK_FIELDS_MULTI:
         m = multilabel_agreement([p[0].get(f) or [] for p in pairs], [p[1].get(f) or [] for p in pairs], allowed(f))
@@ -208,7 +212,7 @@ def compute_metrics(store: Any) -> dict[str, Any]:
             control_relevant_rate=ctrl_rate, candidate_relevant_rate=cand_rate)
 
     # V7 stability (latest weekly panel vs the production tags)
-    sp = [(tags[k], s) for k, s in stab.items() if k in tags]
+    sp = [(current[k], s) for k, s in stab.items() if k in current and s.get("prompt_version") in (None, prompts.PROMPT_VERSION)]
     if sp:
         agree = {fld: sum((x[0].get(fld) or ([] if fld in CHECK_FIELDS_MULTI else "none")) ==
                           (x[1].get(fld) or ([] if fld in CHECK_FIELDS_MULTI else "none")) for x in sp) / len(sp)

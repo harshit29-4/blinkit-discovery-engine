@@ -1,6 +1,6 @@
 name: collect
 
-# Hourly incremental collection into Supabase, plus manual runs (e.g. the 12-month backfill).
+# Manual collection runs (e.g. a backfill). The scheduled run is part of daily.yml.
 on:
   workflow_dispatch:
     inputs:
@@ -14,8 +14,6 @@ on:
         default: all
         type: choice
         options: [all, play_store, app_store, reddit]
-  schedule:
-    - cron: "17 * * * *"   # hourly, off the top of the hour to avoid GitHub's busiest minute
 
 concurrency:
   group: collect          # never two collection runs at once

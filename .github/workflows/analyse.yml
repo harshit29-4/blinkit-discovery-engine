@@ -1,20 +1,15 @@
 name: analyse
 
-# Hourly AI run: pre-filter → (parallel per model) relevance · tagging + stability · translation check
-# + cross-check → embeddings → validation metrics. Runs at minute 40 (collection runs at 17), time-boxed
-# so runs never overlap, and stops cleanly when a model's free daily allowance is used up; the next run
-# picks up where it left off. Stability re-tags its panel only once per week.
+# Manual AI runs on request (any subset of stages). The scheduled run is part of daily.yml.
 on:
-  schedule:
-    - cron: "40 * * * *"
   workflow_dispatch:
     inputs:
       stages:
         description: "comma-separated stages"
-        default: screen,relevance,tag,translation,crosscheck,stability,embed,metrics
+        default: screen,relevance,tag,translation,crosscheck,stability,embed,themes,metrics
       minutes:
         description: "time budget in minutes"
-        default: "45"
+        default: "60"
 
 concurrency:
   group: analyse
@@ -23,7 +18,7 @@ concurrency:
 jobs:
   analyse:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 150
     defaults:
       run:
         working-directory: pipeline
@@ -48,6 +43,6 @@ jobs:
       - name: Analyse
         run: >
           python -m engine analyse
-          --stages ${{ inputs.stages || 'screen,relevance,tag,translation,crosscheck,stability,embed,metrics' }}
-          --minutes ${{ inputs.minutes || '45' }}
-          --trigger ${{ github.event_name == 'schedule' && 'schedule' || 'manual' }}
+          --stages ${{ inputs.stages }}
+          --minutes ${{ inputs.minutes }}
+          --trigger manual

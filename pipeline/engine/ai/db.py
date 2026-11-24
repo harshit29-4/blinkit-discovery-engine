@@ -75,7 +75,9 @@ class AIStore:
         return self.rpc("ai_queue_relevance", n=n)
 
     def queue_tagging(self, n: int) -> list[dict]:
-        return self.rpc("ai_queue_tagging", n=n)
+        from .prompts import PROMPT_VERSION
+
+        return self.rpc("ai_queue_tagging", n=n, version=PROMPT_VERSION)
 
     def queue_translation_check(self, n: int) -> list[dict]:
         return self.rpc("ai_queue_translation_check", n=n)
@@ -86,7 +88,10 @@ class AIStore:
         return self.rpc("ai_queue_embedding", n=n)
 
     def queue_crosscheck(self, n: int) -> list[dict]:
-        return self.rpc("ai_queue_crosscheck", n=n)
+        from .prompts import PROMPT_VERSION
+        from .validation import CROSS_VERSION
+
+        return self.rpc("ai_queue_crosscheck", n=n, tag_version=PROMPT_VERSION, cross_version=CROSS_VERSION)
 
     def queue_stability(self, n: int, week: str) -> list[dict]:
         return self.rpc("ai_queue_stability", n=n, week=week)
@@ -145,7 +150,7 @@ class AIStore:
 
     def load_tags_for_validation(self) -> dict[tuple[str, str], dict]:
         rows = self.get_all("/item_tags", {
-            "select": "source,source_id,sentiment,categories,category_behavior,barriers,funnel_stage,"
+            "select": "source,source_id,prompt_version,sentiment,categories,category_behavior,barriers,funnel_stage,"
                       "evidence_grounded,translation_score,translation_ok,raw,raw_items(rating)",
             "order": "source,source_id"})
         out = {}

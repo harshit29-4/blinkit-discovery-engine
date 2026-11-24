@@ -19,7 +19,7 @@ export default function OverviewPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Data collection overview</h1>
         <p className="mt-1 max-w-3xl text-muted">
           This dashboard summarises publicly available customer feedback on Blinkit from the past 12 months. Data
-          is refreshed automatically every hour, and AI models screen, tag and translate the relevant feedback
+          is refreshed automatically once a day, and AI models screen, tag and translate the relevant feedback
           (see <Link href="/how-it-works" className="underline underline-offset-2">How it works</Link>). Themes,
           research findings and the research agent will follow as the next stages are completed.
         </p>

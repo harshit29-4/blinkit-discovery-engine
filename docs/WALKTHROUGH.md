@@ -130,9 +130,24 @@ On GitHub, `.github/workflows/analyse.yml` runs this hourly at minute 40, time-b
 | **qwen: 1,000 *output* tokens/minute** (not in headers) | A 429 saying "Request too large … OTPM" | Raised immediately (`RequestTooLarge`), no pointless waiting. Tagging moved to gpt-oss-120b (~1,400 entries/hour vs ~300); qwen does the low-output checks |
 | Daily token cap | Shows up as a 429 "per day" | `BudgetExhausted`: the stage stops; others continue |
 
+**Confirmed Groq free-tier limits (from the Groq console, 2026-11-24):**
+
+| Model | Requests/min | Requests/day | Tokens/min | Tokens/day | Our use |
+|---|---|---|---|---|---|
+| openai/gpt-oss-120b | 30 | 1K | 8K | **200K** | tagging, theme naming, stability |
+| openai/gpt-oss-20b | 30 | 1K | 8K | **200K** | relevance gate |
+| qwen/qwen3.8-27b | 30 | 1K | 8K | **200K** (+ 1K *output* tokens/min, not shown in the console) | translation check, cross-check |
+| openai/gpt-oss-safeguard-20b | 3 | 1K | 2K | 200K | not used (too slow) |
+| allam-2-7b | 30 | 7K | 6K | 500K | not used (small, Arabic-focused; would need a quality test) |
+
+**Daily budget at these limits** (tokens per entry measured on real runs): relevance ≈ 2,300 entries/day, tagging ≈ 500 entries/day (≈ 4.7k tokens per 12-entry call, including the model's reasoning). Tagging is the bottleneck. One daily run of ~100 minutes uses each model's full allowance (8k tokens/minute → ~25 minutes per 200k tokens, plus waits).
+
+**Scheduling (decision 2026-11-24):** one daily pipeline run (`.github/workflows/daily.yml`, 02:23 IST): collect, then all AI stages, plus runs on request (Actions → daily → Run workflow, or `gh workflow run daily.yml`). Hourly runs were dropped. GitHub's scheduler delayed or skipped most of them, and because AI output is capped per day they added moving parts without adding output. `collect.yml` and `analyse.yml` remain for manual runs of individual parts.
+
 **Prompt iterations (documented because they changed results):**
 - `rel-v2`: v1 rejected product return/exchange complaints as "support only". Return policy is part of the risk of trying a new category, so it now counts as relevant (14 of 15 such entries flipped).
 - `tag-v2`: v1 guessed a funnel stage from generic praise ("good products" → repeat). Now "none" unless the text describes the stage.
+- `tag-v3` + `cross-v2`: the first cross-model scores for funnel stage and behaviour were weak (κ ≈ 0.2), partly because the cross-checker got shorter definitions than the tagger. Both prompts now share `core_field_rules()` verbatim, with explicit definitions for every behaviour and funnel-stage value. Migration 0009 makes the queues re-tag and re-check outdated entries first, and validation scores **only pairs on the current versions** (recorded in the metric's details), so the score measures the models, not the wording.
 
 ## 4. How tagging is used on the website
 
