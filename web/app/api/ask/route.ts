@@ -7,7 +7,7 @@
  */
 import { createHash } from "node:crypto";
 import { getSourceCounts } from "@/lib/data";
-import { answerQuestion, ModelUnavailable, type Answer } from "@/lib/agent/run";
+import { answerQuestion, JUDGE_MODEL, ModelUnavailable, type Answer } from "@/lib/agent/run";
 import { questionKey } from "@/lib/agent/checks";
 import { rpc } from "@/lib/supabase";
 
@@ -59,7 +59,7 @@ async function record(a: Answer) {
     p_model: a.model, p_tool_calls: a.steps.length, p_tokens_in: a.tokens.input, p_tokens_out: a.tokens.output,
     p_citations_valid: a.checks.citations.ok, p_numbers_verified: a.checks.numbers.ok,
     p_faithfulness: a.checks.faithfulness.score, p_cached: a.cached,
-    p_judge_model: a.tokens.judge ? "openai/gpt-oss-20b" : null, p_judge_tokens: a.tokens.judge,
+    p_judge_model: a.tokens.judge ? JUDGE_MODEL : null, p_judge_tokens: a.tokens.judge,
   }, { secret: true }).catch(() => undefined); // logging must never break an answer
 }
 

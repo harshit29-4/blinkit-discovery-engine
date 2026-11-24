@@ -1,18 +1,21 @@
 /**
  * The insight engine: a tool-calling agent over the collected feedback.
  *
- *   question -> model (qwen3.8-27b; gpt-oss-20b if qwen's allowance is spent) -> up to 5 tool rounds
+ *   question -> model (gpt-oss-20b; then gpt-oss-120b, then qwen3.8-27b) -> up to 4 tool rounds
  *            -> draft answer with [E#] citations
  *            -> C1 citation check + C2 number check (code); one repair attempt if either fails
- *            -> C3 faithfulness judge (gpt-oss-20b, a different model family)
+ *            -> C3 faithfulness judge (qwen3.8-27b, a different model family from the answerer)
+ *
+ * Why this order: qwen allows 8K tokens/minute and each agent round costs ~4K (prompt, tools and the
+ * reserved reply), so it cannot carry a multi-round answer; one judge call (~3K) fits its minute.
  */
 import { checkCitations, checkNumbers, collectNumbers, type CitationCheck, type NumberCheck } from "./checks";
 import { EvidenceRegistry, runTool, TOOL_DEFS, type Evidence } from "./tools";
 
-export const MAIN_MODEL = "qwen/qwen3.8-27b";
-export const FALLBACK_MODEL = "openai/gpt-oss-20b";
-export const LAST_RESORT_MODEL = "openai/gpt-oss-120b"; // pipeline stops it at 150K/day, so ~50K is left
-export const JUDGE_MODEL = "openai/gpt-oss-20b";
+export const MAIN_MODEL = "openai/gpt-oss-20b";     // pipeline stops it at 90K/day: ~110K left for answers
+export const FALLBACK_MODEL = "openai/gpt-oss-120b"; // pipeline stops it at 150K/day: ~50K left
+export const LAST_RESORT_MODEL = "qwen/qwen3.8-27b"; // only short answers fit its per-minute limit
+export const JUDGE_MODEL = "qwen/qwen3.8-27b";
 const MAX_ROUNDS = 4; // each round resends the whole conversation, so rounds are the main token cost
 const URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -98,7 +101,8 @@ async function groq(model: string, messages: Msg[], opts: { tools: boolean; json
     const daily = text.includes("per day");
     const wait = Number(res.headers.get("retry-after") ?? "60") || 60;
     if (!daily && res.status === 429 && wait <= 20) throw new Busy(model, wait); // worth waiting for
-    skipUntil.set(model, Date.now() + (daily ? Math.max(wait, 600) : Math.min(wait, 60)) * 1000);
+    // Groq's daily window is rolling, so a model can come back within minutes: skip it for 10 at most.
+    skipUntil.set(model, Date.now() + (daily ? Math.min(Math.max(wait, 60), 600) : Math.min(wait, 60)) * 1000);
     throw new ModelUnavailable(`${model}: ${daily ? "daily allowance spent" : "busy (per-minute limit)"}`);
   }
   if (!res.ok) throw new Error(`Groq ${model}: HTTP ${res.status} ${(await res.text()).slice(0, 200)}`);
@@ -115,6 +119,7 @@ function available(model: string) {
 }
 
 const NUMBER_FREE = /\d/;
+const TOOL_MARKUP = /<\/?tool_call>|<function=|"tool_calls"|^\s*\{\s*"name"\s*:/i;
 
 export async function answerQuestion(question: string, history: { role: "user" | "assistant"; content: string }[],
                                      overview: string): Promise<Answer> {
@@ -144,7 +149,7 @@ export async function answerQuestion(question: string, history: { role: "user" |
         return r.message;
       } catch (e) {
         // A per-minute limit (e.g. while the daily pipeline uses the same model) clears within
-        // seconds (the pipeline leaves qwen 4K tokens/min of headroom): wait twice at most, within 40 s.
+        // seconds: wait twice at most, within 40 s.
         if (e instanceof Busy && waits < 2 && Date.now() - started + e.wait * 1000 < 40_000) {
           waits++;
           const ms = e.wait * 1000 + 250;
@@ -163,12 +168,23 @@ export async function answerQuestion(question: string, history: { role: "user" |
     }
   }
 
+  const WRITE_NOW = "Stop calling tools. Write the final answer now, using only the tool results above. " +
+    "Do not call or write out any tool call.";
   let draft = "";
   for (let round = 0; round <= MAX_ROUNDS; round++) {
-    const msg = await call({ tools: round < MAX_ROUNDS, maxTokens: 900 });
+    // Last round, or 30 s spent (waiting out rate limits): write the answer, leaving time for the checks.
+    const last = round === MAX_ROUNDS || Date.now() - started > 30_000;
+    if (last) messages.push({ role: "user", content: WRITE_NOW });
+    const msg = await call({ tools: !last, maxTokens: 900 });
     const calls = (msg.tool_calls ?? []).slice(0, 3);
     if (!calls.length) {
       draft = (msg.content ?? "").trim();
+      // A model may write a tool call out as text when tools are off; ask once more, then give up honestly.
+      if (TOOL_MARKUP.test(draft)) {
+        messages.push({ role: "assistant", content: draft }, { role: "user", content: WRITE_NOW });
+        draft = ((await call({ tools: false, maxTokens: 900 })).content ?? "").trim();
+        if (TOOL_MARKUP.test(draft)) draft = "";
+      }
       break;
     }
     messages.push({ role: "assistant", content: msg.content ?? null, tool_calls: calls });
@@ -233,7 +249,12 @@ cited entries or the counts support it. Quotes support what they literally say; 
 shares (a percent in the answer is supported if a count result shows it). A claim about which sources
 the feedback comes from needs a source count or the cited entries. Return JSON: {"score": <share of claims supported, 0 to 1>, "unsupported": [<short description of each
 unsupported claim, at most 3>]}.`;
-  const r = await groq(JUDGE_MODEL, [{ role: "system", content: sys }, { role: "user", content: user }], { tools: false, json: true, maxTokens: 600 });
+  const msgs: Msg[] = [{ role: "system", content: sys }, { role: "user", content: user }];
+  const r = await groq(JUDGE_MODEL, msgs, { tools: false, json: true, maxTokens: 600 }).catch(async (e) => {
+    if (!(e instanceof Busy)) throw e; // a per-minute limit: wait once
+    await new Promise((res) => setTimeout(res, (e as Busy).wait * 1000 + 250));
+    return groq(JUDGE_MODEL, msgs, { tools: false, json: true, maxTokens: 600 });
+  });
   tokens.judge += r.tin + r.tout;
   const j = JSON.parse(r.message.content ?? "{}");
   const score = typeof j.score === "number" ? Math.max(0, Math.min(1, j.score)) : null;

@@ -142,7 +142,7 @@ async function Checks() {
       </Check>
 
       <Check id="V10" title="Answer checks (Ask page)"
-             what="Every answer from the insight engine is checked before it is shown: each citation must be an entry the agent retrieved, each number must appear in the data it retrieved (allowing for rounding), and a second model family (gpt-oss-20b) scores how far the cited evidence supports the claims. Answers that fail are rewritten once, and any remaining failure is shown with the answer.">
+             what="Every answer from the insight engine is checked before it is shown: each citation must be an entry the agent retrieved, each number must appear in the data it retrieved (allowing for rounding), and a different model family (qwen3.8-27b) scores how far the cited evidence supports the claims. Answers that fail are rewritten once, and any remaining failure is shown with the answer.">
         {chat && chat.answers > 0 ? (
           <>
             <Big>{pctStr(chat.numbers_verified_rate)} of answers had every number traced to the data</Big>

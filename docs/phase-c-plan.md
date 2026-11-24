@@ -52,9 +52,9 @@ If a check fails, the agent gets one repair attempt; if it still fails, the answ
 
 | Model | Pipeline cap | Left for |
 |---|---|---|
-| gpt-oss-120b | tagging stops at 150K | themes (~30K) |
-| gpt-oss-20b | relevance stops at 150K | answer judge, chat fallback |
-| qwen3.8-27b | checks stop at 60K | **the chat** (~140K ≈ 20–30 questions/day; cached repeats are free) |
+| gpt-oss-120b | tagging stops at 150K | themes (~30K), chat fallback |
+| gpt-oss-20b | relevance stops at 90K | **the chat** (~110K) |
+| qwen3.8-27b | checks stop at 60K; 4K tokens/min kept free | the answer judge (8K tokens/min is too little for multi-round answers) |
 
 ## Not in phase C (later)
 

@@ -177,7 +177,7 @@ function AnswerCard({ t }: { t: Turn & { answer: Answer } }) {
           ))}
           <li>Answer written by {MODEL[a.model] ?? a.model}{a.fallback ? ` (main model unavailable: ${a.fallback.replace(/^[^:]+:\s*/, "")})` : ""}
             {a.checks.repaired ? "; rewritten once after failing an automatic check" : ""}.</li>
-          <li>Checked: citations and numbers by code; support by a second model (GPT-OSS 20B).</li>
+          <li>Checked: citations and numbers by code; support by a model from a different family (Qwen 3.8 27B).</li>
         </ol>
         {a.cached && <p className="mt-2 text-muted">This answer was reused from the last 24 hours (same question).</p>}
       </details>
