@@ -15,7 +15,7 @@ Decisions taken (self-approved 2026-11-24):
 ## How an answer is produced
 
 ```
-question ──► agent (qwen3.8-27b via Groq, tool calling, ≤ 5 tool rounds)
+question ──► agent (Gemini 3.5 Flash-Lite; Groq gpt-oss-20b/120b as fallback; tool calling, ≤ 4 rounds)
                │  tools (read-only database functions; numbers computed in SQL):
                │   • search_feedback   full-text search + filters (source, barrier, category, theme, rating…)
                │   • count_feedback    counts and shares of tagged entries by a field, with filters
@@ -26,7 +26,7 @@ question ──► agent (qwen3.8-27b via Groq, tool calling, ≤ 5 tool rounds)
                │
                ├─ C1 citation check (code): every cited entry was returned by a tool in this turn
                ├─ C2 number check   (code): every number in the answer appears in a tool result
-               ├─ C3 faithfulness   (gpt-oss-20b, a different model family): do the cited quotes support the answer? 0–1
+               ├─ C3 faithfulness   (qwen3.8-27b on Groq, a different company's model): do the cited quotes support the answer? 0–1
                ▼
            answer card: text · key numbers with sample sizes · cited quotes (with links) ·
                         "how this answer was built" (tool steps) · check results
@@ -52,6 +52,7 @@ If a check fails, the agent gets one repair attempt; if it still fails, the answ
 
 | Model | Pipeline cap | Left for |
 |---|---|---|
+| gemini-3.5-flash-lite (Google, free) | not used by the pipeline | **the chat, first** (~500 requests/day reported ≈ 60–80 answers) |
 | gpt-oss-120b | tagging stops at 150K | themes (~30K), chat fallback |
 | gpt-oss-20b | relevance stops at 90K | **the chat** (~110K) |
 | qwen3.8-27b | checks stop at 60K; 4K tokens/min kept free | the answer judge (8K tokens/min is too little for multi-round answers) |

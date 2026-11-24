@@ -14,7 +14,7 @@ type Answer = {
   answer: string; citations: Evidence[]; steps: Step[]; model: string; fallback?: string | null; cached: boolean;
   remaining: number | null;
   checks: {
-    citations: { ok: boolean; cited: string[]; unknown: string[] };
+    citations: { ok: boolean; cited: string[]; unknown: string[]; missing?: boolean };
     numbers: { ok: boolean; checked: number; unverified: string[] };
     faithfulness: { score: number | null; unsupported: string[]; note?: string };
     repaired: boolean;
@@ -35,7 +35,7 @@ const TOOL: Record<string, string> = {
   get_reliability: "Read the reliability results",
 };
 const MODEL: Record<string, string> = {
-  "qwen/qwen3.8-27b": "Qwen 3.8 27B", "openai/gpt-oss-20b": "GPT-OSS 20B", "openai/gpt-oss-120b": "GPT-OSS 120B",
+  "gemini-3.5-flash-lite": "Gemini 3.5 Flash-Lite", "qwen/qwen3.8-27b": "Qwen 3.8 27B", "openai/gpt-oss-20b": "GPT-OSS 20B", "openai/gpt-oss-120b": "GPT-OSS 120B",
 };
 
 const fmtDate = (iso: string) =>
@@ -116,9 +116,12 @@ function Checks({ a }: { a: Answer }) {
       {!a.checks.citations.ok && (
         <p className="text-sm text-warn">Some citations do not match an entry the engine read ({a.checks.citations.unknown.join(", ")}).</p>
       )}
-      {fOk === false && f.unsupported.length > 0 && (
+      {a.checks.citations.missing && (
+        <p className="text-sm text-warn">The answer cites no entries, although the engine retrieved some. Check the claims against the Evidence page.</p>
+      )}
+      {f.unsupported.length > 0 && (
         <div className="text-sm text-warn">
-          <p>A second AI model judged these claims as not fully supported by the cited evidence:</p>
+          <p>A second AI model judged these claims as not supported by the data the engine retrieved:</p>
           <ul className="list-disc pl-5">{f.unsupported.map((u, i) => <li key={i}>{u}</li>)}</ul>
         </div>
       )}

@@ -9,6 +9,10 @@ test("citations: ids in order, grouped form, unknown ids flagged", () => {
   assert.equal(c.ok, false);
   assert.deepEqual(c.unknown, ["E9"]);
   assert.equal(checkCitations("No citations here.", new Set()).ok, true);
+  // Entries were retrieved but none is cited: fails, so the agent is asked to rewrite with citations.
+  const none = checkCitations("Users want refunds.", new Set(["E1"]));
+  assert.equal(none.ok, false);
+  assert.equal(none.missing, true);
 });
 
 test("numbers are collected from nested tool output, including inside strings", () => {

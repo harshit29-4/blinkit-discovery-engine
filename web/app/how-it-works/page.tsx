@@ -124,7 +124,7 @@ async function Pipeline() {
       <Stage n={6} title="Embeddings and theme discovery" method="Each tagged entry is embedded with gte-small (run locally, no API). UMAP and HDBSCAN group similar entries; gpt-oss-120b names each group from its most representative verified quotes. Size, ratings, sentiment and trends are computed in code.">
         <p><Link href="/themes" className="text-accent underline underline-offset-2">See the current themes</Link></p>
       </Stage>
-      <Stage n={7} title="Insight engine (Ask)" status="on_request" method="Model: gpt-oss-20b (then gpt-oss-120b when its daily allowance is used up), with tool calling. Instead of pre-written findings, the agent answers each question by calling read-only database tools: keyword search over all entries, counts and shares of tagged entries (computed in SQL), the current themes and the reliability results. It cites the entries it used.">
+      <Stage n={7} title="Insight engine (Ask)" status="on_request" method="Model: Gemini 3.5 Flash-Lite (Google, free tier), with gpt-oss-20b and gpt-oss-120b on Groq as fallbacks, using tool calling. Instead of pre-written findings, the agent answers each question by calling read-only database tools: keyword search over all entries, counts and shares of tagged entries (computed in SQL), the current themes and the reliability results. It cites the entries it used.">
         <p>
           Each answer is checked before it is shown: citations must be entries the agent retrieved, every number must
           appear in the retrieved data, and qwen3.8-27b (a different model family) scores whether the cited evidence supports the claims. The

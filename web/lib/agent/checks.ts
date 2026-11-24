@@ -9,7 +9,7 @@
  */
 
 export type NumberCheck = { ok: boolean; checked: number; unverified: string[] };
-export type CitationCheck = { ok: boolean; cited: string[]; unknown: string[] };
+export type CitationCheck = { ok: boolean; cited: string[]; unknown: string[]; missing: boolean };
 
 /** Citation ids in order of first appearance, e.g. ["E3", "E1"]. Also accepts [E1, E2]. */
 export function citedIds(answer: string): string[] {
@@ -20,10 +20,15 @@ export function citedIds(answer: string): string[] {
   return [...seen];
 }
 
+/**
+ * Fails when an id was never returned by a tool, and also when the tools returned entries but the
+ * answer cites none (claims about feedback must point at the feedback).
+ */
 export function checkCitations(answer: string, known: Set<string>): CitationCheck {
   const cited = citedIds(answer);
   const unknown = cited.filter((id) => !known.has(id));
-  return { ok: unknown.length === 0, cited, unknown };
+  const missing = known.size > 0 && cited.length === 0;
+  return { ok: unknown.length === 0 && !missing, cited, unknown, missing };
 }
 
 /** Every number found anywhere in a value (numbers, and digits inside strings such as dates or quotes). */

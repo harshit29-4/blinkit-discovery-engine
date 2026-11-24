@@ -14,7 +14,7 @@ import { rpc } from "@/lib/supabase";
 export const maxDuration = 60;
 
 const PER_VISITOR_HOUR = 8;
-const PER_DAY = 40; // ~8–10K tokens per answer against the free daily allowance; cached repeats are free
+const PER_DAY = 60; // Gemini Flash-Lite (~500 requests/day free, ~7 per answer) plus Groq fallback; cached repeats are free
 
 type Body = { question?: unknown; history?: unknown };
 type Turn = { role: "user" | "assistant"; content: string };
@@ -112,8 +112,10 @@ export async function POST(req: Request) {
     return json({ error: "The engine could not answer this question. Please try again." }, 500);
   }
 
+  // Only fully clean answers are reused: any claim the judge flagged keeps the answer out of the cache.
+  const f = answer.checks.faithfulness;
   const checksPassed = answer.checks.citations.ok && answer.checks.numbers.ok &&
-    (answer.checks.faithfulness.score === null || answer.checks.faithfulness.score >= 0.7);
+    f.score !== null && f.score >= 0.7 && f.unsupported.length === 0;
   if (!history.length && checksPassed) {
     await rpc("chat_cache_put", { p_key: key, p_answer: answer }, { secret: true }).catch(() => undefined);
   }
