@@ -3,7 +3,7 @@ import { Suspense, type ReactNode } from "react";
 import { Card, PageHeader, Skeleton } from "@/components/ui";
 import { getChatQuality, getValidation, type Metric } from "@/lib/data";
 import { fmtDateTime, fmtInt } from "@/lib/format";
-import { kappaBand } from "@/lib/research";
+import { INTERVIEW_VERDICTS, VERDICT_LABEL, kappaBand } from "@/lib/research";
 import { label } from "@/lib/taxonomy";
 
 export const metadata: Metadata = { title: "Validation" };
@@ -159,9 +159,29 @@ async function Checks() {
         ) : <p className="text-muted">Results appear once questions have been asked on the Ask page.</p>}
       </Check>
 
-      <Check id="V9" title="Primary research"
-             what="AI findings are a starting point. Interviews with users from the target segment will confirm or challenge each finding; results will be recorded here.">
-        <p className="text-muted">Planned for Part 2 of the study.</p>
+      <Check id="V9" title="User interviews"
+             what="Six users (three who mostly reorder, three who recently tried a new category) tested the engine's hypotheses.">
+        <Big>3 confirmed · 1 contradicted · 2 unclear</Big>
+        <table className="mt-3 w-full text-sm">
+          <tbody>
+            {INTERVIEW_VERDICTS.map((v) => (
+              <tr key={v.id} className="border-t border-border align-top">
+                <td className="py-2 pr-2 font-semibold text-muted">{v.id}</td>
+                <td className="py-2 pr-3">{v.hypothesis}<span className="block text-muted">{v.note}</span></td>
+                <td className="py-2 text-right">
+                  <span className={`whitespace-nowrap rounded-full px-2.5 py-0.5 font-bold ${
+                    v.verdict === "confirmed" ? "bg-accent-soft text-accent" : v.verdict === "contradicted" ? "bg-warn-soft text-warn" : "bg-bg text-muted"}`}>
+                    {VERDICT_LABEL[v.verdict]}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-3">
+          The barrier was rarely fear of a bad buy: it was one practical question the listing didn&rsquo;t answer, and new
+          categories were found through people, not the app.
+        </p>
       </Check>
 
       <p className="text-sm text-muted">
