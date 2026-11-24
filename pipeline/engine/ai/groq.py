@@ -62,6 +62,17 @@ class CallResult:
     tokens_out: int
 
 
+# Daily soft caps for the pipeline, per model, counted over the last 24 hours (Groq's own limit is
+# 200K tokens/day per model). They leave room for theme naming and for the Ask page's chat, which
+# logs its use to the same ai_calls table. Theme stages are exempt: they are small and run last.
+DAILY_CAPS = {
+    "openai/gpt-oss-120b": 150_000,
+    "openai/gpt-oss-20b": 150_000,
+    "qwen/qwen3.8-27b": 60_000,
+}
+CAP_EXEMPT_STAGES = frozenset({"theme_naming", "theme_consolidation"})
+
+
 @dataclass
 class GroqClient:
     api_key: str
@@ -69,6 +80,8 @@ class GroqClient:
     http: httpx.Client | None = None
     sleep: Callable[[float], None] = time.sleep
     states: dict[str, ModelState] = field(default_factory=dict)
+    caps: dict[str, int] = field(default_factory=dict)       # model -> daily token cap (empty = none)
+    used: dict[str, int] = field(default_factory=dict)       # model -> tokens used in the last 24 h
 
     def __post_init__(self) -> None:
         self.http = self.http or httpx.Client(timeout=120)
@@ -99,6 +112,9 @@ class GroqClient:
         s = self._state(model)
         if s.exhausted:
             raise BudgetExhausted(model)
+        cap = self.caps.get(model)
+        if cap is not None and stage not in CAP_EXEMPT_STAGES and self.used.get(model, 0) >= cap:
+            raise BudgetExhausted(f"{model}: pipeline cap of {cap:,} tokens/24h reached")
         body: dict[str, Any] = {
             "model": model,
             "temperature": 0,
@@ -162,6 +178,7 @@ class GroqClient:
             except json.JSONDecodeError:
                 self._log(stage, model, items, tin, tout, False, "invalid JSON")
                 raise ModelOutputError("invalid JSON") from None
+            self.used[model] = self.used.get(model, 0) + tin + tout
             self._log(stage, model, items, tin, tout, True, None)
             return CallResult(data, tin, tout)
         self._log(stage, model, items, 0, 0, False, "server errors after retries")

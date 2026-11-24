@@ -72,7 +72,14 @@ def main(argv: list[str] | None = None) -> int:
         if unknown:
             parser.error(f"unknown stage(s): {', '.join(unknown)}")
         store = AIStore()
-        groq = GroqClient(SETTINGS.groq_api_key, log_call=store.log_call) if SETTINGS.groq_api_key else None
+        groq = None
+        if SETTINGS.groq_api_key:
+            from .ai.groq import DAILY_CAPS
+
+            used = store.usage_24h()
+            groq = GroqClient(SETTINGS.groq_api_key, log_call=store.log_call, caps=dict(DAILY_CAPS), used=used)
+            print("  tokens used in the last 24 h: " +
+                  ", ".join(f"{m.split('/')[-1]} {used.get(m, 0):,}/{c:,}" for m, c in DAILY_CAPS.items()))
         run_id = store.start_run(args.trigger)
         results = run_phase_a(store, groq, stages, args.minutes)
         errors = [s for s, r in results.items() if isinstance(r, dict) and r.get("error")]

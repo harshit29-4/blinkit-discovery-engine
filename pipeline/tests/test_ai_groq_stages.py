@@ -308,3 +308,19 @@ def test_bad_json_batch_is_split_and_good_half_saved():
     res = run_phase_a(store, HalfBroken(), ["screen", "relevance", "tag"], minutes=1)
     assert res["tag"]["split_batches"] == 1
     assert set(store.tags) == {("play_store", "a"), ("play_store", "b")}  # both halves recovered
+
+
+def test_daily_cap_stops_pipeline_stages_but_not_theme_naming():
+    calls = {"n": 0}
+
+    def handler(req):
+        calls["n"] += 1
+        return _ok({"items": []})  # 15 tokens per call
+
+    c, _ = client(handler)
+    c.caps, c.used = {"m": 20}, {"m": 10}
+    c.chat_json(model="m", system="s", user="u", stage="tagging", items=1)  # 10 -> 25, over the cap
+    with pytest.raises(BudgetExhausted):
+        c.chat_json(model="m", system="s", user="u", stage="tagging", items=1)
+    c.chat_json(model="m", system="s", user="u", stage="theme_naming", items=1)  # exempt
+    assert calls["n"] == 2 and c.used["m"] == 40

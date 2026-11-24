@@ -72,12 +72,17 @@ class AIStore:
                     on_conflict="key")
 
     def queue_relevance(self, n: int) -> list[dict]:
-        return self.rpc("ai_queue_relevance", n=n)
+        return self.rpc("ai_queue_relevance", n=n, discussion_share=0.4)
 
     def queue_tagging(self, n: int) -> list[dict]:
         from .prompts import PROMPT_VERSION
 
-        return self.rpc("ai_queue_tagging", n=n, version=PROMPT_VERSION)
+        # Up to 40% of each batch from discussion sources (Reddit), so they are not drowned by reviews.
+        return self.rpc("ai_queue_tagging", n=n, version=PROMPT_VERSION, discussion_share=0.4)
+
+    def usage_24h(self) -> dict[str, int]:
+        """Tokens per model over the last 24 hours (pipeline and chat), for the daily caps."""
+        return {r["model"]: int(r["tokens"]) for r in self.rpc("ai_usage_24h")}
 
     def queue_translation_check(self, n: int) -> list[dict]:
         return self.rpc("ai_queue_translation_check", n=n)
