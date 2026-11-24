@@ -16,7 +16,7 @@ export default function OpengraphImage() {
             Why do quick-commerce shoppers stick to the same categories?
           </div>
           <div style={{ fontSize: 30, color: "#4a3f12" }}>
-            Public Play Store, App Store and Reddit feedback about Blinkit, collected daily and analysed with AI.
+            Public Play Store, App Store, Reddit and YouTube feedback about Blinkit, collected daily and analysed with AI.
           </div>
         </div>
         <div style={{ display: "flex", fontSize: 24, color: "#4a3f12" }}>

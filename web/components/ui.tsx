@@ -6,6 +6,7 @@ export const SOURCE_COLOR: Record<string, string> = {
   app_store: "var(--src-app)",
   reddit_post: "var(--src-rpost)",
   reddit_comment: "var(--src-rcomment)",
+  youtube_comment: "var(--src-youtube)",
 };
 
 export function Card({ title, subtitle, children, className = "" }: {

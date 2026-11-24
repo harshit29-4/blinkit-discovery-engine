@@ -13,6 +13,10 @@ from ..store.supabase import auth_headers
 BATCH = 500
 
 
+# Sources where people discuss Blinkit (vs. app-store reviews); they share up to 40% of every
+# relevance and tagging batch, so they are not drowned by ~100k Play Store reviews.
+DISCUSSION_SOURCES = ["reddit_post", "reddit_comment", "youtube_comment"]
+
 class _RetryingClient(httpx.Client):
     """Retries a request once when the server dropped an idle keep-alive connection. That happens
     when one stage leaves the connection idle for minutes while other lanes run."""
@@ -72,13 +76,14 @@ class AIStore:
                     on_conflict="key")
 
     def queue_relevance(self, n: int) -> list[dict]:
-        return self.rpc("ai_queue_relevance", n=n, discussion_share=0.4)
+        return self.rpc("ai_queue_relevance", n=n, discussion_share=0.4, discussion_sources=DISCUSSION_SOURCES)
 
     def queue_tagging(self, n: int) -> list[dict]:
         from .prompts import PROMPT_VERSION
 
         # Up to 40% of each batch from discussion sources (Reddit), so they are not drowned by reviews.
-        return self.rpc("ai_queue_tagging", n=n, version=PROMPT_VERSION, discussion_share=0.4)
+        return self.rpc("ai_queue_tagging", n=n, version=PROMPT_VERSION, discussion_share=0.4,
+                        discussion_sources=DISCUSSION_SOURCES)
 
     def usage_24h(self) -> dict[str, int]:
         """Tokens per model over the last 24 hours (pipeline and chat), for the daily caps."""

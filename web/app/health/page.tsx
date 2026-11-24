@@ -32,6 +32,7 @@ const CURSOR_LABEL: Record<string, string> = {
   play_store: "Play Store",
   app_store: "App Store",
   reddit_post: "Reddit",
+  youtube_comment: "YouTube",
 };
 const TRIGGER_LABEL: Record<string, string> = { schedule: "Scheduled", manual: "Manual", button: "On demand" };
 const MODE_LABEL: Record<string, string> = { backfill: "12-month backfill", incremental: "Incremental update", analyse: "AI stages" };
@@ -122,9 +123,10 @@ async function Runs() {
 async function Progress() {
   const cursors = await getCursors();
   const subs = cursors.filter((c) => c.key.startsWith("reddit_sub:"));
-  const sources = cursors.filter((c) => !c.key.startsWith("reddit_sub:"));
+  const queries = cursors.filter((c) => c.key.startsWith("youtube_q:"));
+  const sources = cursors.filter((c) => !c.key.startsWith("reddit_sub:") && !c.key.startsWith("youtube_q:"));
   return (
-    <div className={`grid gap-6 ${subs.length ? "lg:grid-cols-2" : ""}`}>
+    <div className={`grid gap-6 ${subs.length || queries.length ? "lg:grid-cols-2" : ""}`}>
       <Card title="Collection progress" subtitle="Most recent entry collected from each source. Each daily run continues from this point.">
         {sources.length === 0 ? <p className="text-muted">No source has completed a run yet.</p> : (
           <ul className="space-y-2 text-sm">
@@ -146,6 +148,20 @@ async function Progress() {
               <li key={c.key} className="flex justify-between gap-4 border-t border-border pt-2 first:border-0 first:pt-0">
                 <span>r/{c.key.replace("reddit_sub:", "")}</span>
                 <span className="text-muted">Complete up to {fmtDateTime(c.newest_seen)} IST</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+      {/* Shown only once YouTube collection has begun. */}
+      {queries.length > 0 && (
+        <Card title="YouTube collection by search"
+              subtitle="Videos found by each search; comments are read only on videos whose title names Blinkit. The free quota allows about 10,000 units a day (a search costs 100).">
+          <ul className="space-y-2 text-sm">
+            {queries.map((c) => (
+              <li key={c.key} className="flex justify-between gap-4 border-t border-border pt-2 first:border-0 first:pt-0">
+                <span>“{c.key.replace("youtube_q:", "")}”</span>
+                <span className="text-muted">Newest video read: {fmtDateTime(c.newest_seen)} IST</span>
               </li>
             ))}
           </ul>

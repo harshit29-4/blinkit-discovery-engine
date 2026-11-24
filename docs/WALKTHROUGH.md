@@ -53,6 +53,7 @@ Code: `pipeline/engine/collectors/`. Every collector turns its source into the s
 | Play Store | `play_store.py` | `google-play-scraper`, newest first, for both the English and Hindi feeds | The library returns *local* time without a timezone, so we convert to UTC. See "Play Store: the 40-character rule" below |
 | App Store | `app_store.py` | Apple's public RSS feed, 10 pages × 50 | Only the latest ~500 reviews exist, so frequent runs build up history. Times come with a US offset and are normalised to UTC |
 | Reddit | `reddit.py` | Arctic Shift archive: search posts for "blinkit" in 16 Indian subreddits, then pull the comments of threads *about* Blinkit | See "Reddit: how we made it fast enough" below |
+| YouTube | `youtube.py` | YouTube Data API v3 (free key `YOUTUBE_API_KEY`): 8 searches ("blinkit", "blinkit review", "… haul", "… vs zepto"…), then the comments (and replies) of videos whose **title** names Blinkit | See "YouTube: quota and what is kept" below |
 
 ### Play Store: the 40-character rule
 
@@ -98,6 +99,15 @@ Every run reports `skipped_threads`, `reused_threads`, `failed_threads` and `fai
 - Usernames are never stored, only a salted hash (`AUTHOR_HASH_SALT`).
 
 **Storage** (`pipeline/engine/store/`): `local` is a SQLite file in `data/` for development, with no accounts needed. `supabase` writes the same tables to Supabase through its REST API. The schema is in `supabase/migrations/` (`0001_collection.sql`: raw items, cursors, run log; `0002_short_reviews.sql`: rating-only rows).
+
+### YouTube: quota and what is kept (added 2026-11-24)
+
+- **Quota:** the free key gets 10,000 units a day. A search page (50 videos) costs **100**; a page of 100 comment threads costs **1**. So searches are the expensive part: 8 queries × 2 pages = 1,600 units. Each run stops at **4,000 units** (`youtube_quota_per_run`), leaving room for button-started runs the same day. A quota error stops the source cleanly; the next run continues.
+- **Which videos:** only videos whose *title* names Blinkit get their comments read. Videos that mention Blinkit only in the description (sponsor lines in recipe or haul videos) are skipped, because their comments are about the video, not Blinkit. Same idea as Reddit's "threads about Blinkit" rule.
+- **First run vs later runs:** a query's first run searches by **relevance** across the 12-month window (YouTube returns only a few hundred results per search, so "newest first" would only reach back a few weeks). Later runs search **newest first** from that query's cursor (`youtube_q:<query>` in `cursors`), and re-read videos from the last 14 days because their comments keep growing.
+- **What is kept:** comments and replies of 30+ characters ("nice video" and emoji-only comments are dropped), up to 200 per video (lowered from 400 after the first run: some Shorts had 400+ off-topic comments). Each item stores the video title as `post_title` (context for screening and tagging), the video id, channel and like count. Authors are stored as a salted hash of their channel id.
+- **AI stages:** YouTube comments count as a discussion source with Reddit, sharing up to 40% of every relevance and tagging batch (`DISCUSSION_SOURCES` in `engine/ai/db.py`). Many are in Hinglish, which the translation check covers.
+- **Cursor safety:** a query's cursor only moves past videos whose comments were all stored; if one video's comments fail, the next run reads it again. Videos with comments turned off are skipped and counted.
 
 ## 3. How the AI stages work (phase A)
 

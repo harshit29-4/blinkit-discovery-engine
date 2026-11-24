@@ -60,6 +60,17 @@ class Settings:
     # On incremental runs, re-check comments on threads this recent (they keep growing).
     reddit_comment_refresh_days: int = 7
 
+    # YouTube Data API v3 (free key; 10,000 quota units/day; search = 100 units, comment page = 1)
+    youtube_queries: tuple[str, ...] = (
+        "blinkit", "blinkit review", "blinkit haul", "blinkit order", "blinkit unboxing",
+        "blinkit vs zepto", "blinkit experience", "blinkit delivery",
+    )
+    youtube_search_pages: int = 2           # 50 videos per page
+    youtube_max_comments_per_video: int = 200  # spreads coverage over more videos (some Shorts have 400+ off-topic comments)
+    youtube_min_chars: int = 30             # shorter comments ("nice video") are not stored
+    youtube_comment_refresh_days: int = 14  # recent videos are searched again: comments keep growing
+    youtube_quota_per_run: int = 4_000      # leaves room in the day for button-started runs
+
     # HTTP politeness
     user_agent: str = "blinkit-discovery-engine/0.1 (public research project)"
     request_pause_s: float = 1.0
@@ -69,6 +80,7 @@ class Settings:
 
     # Secrets (optional until the stage that needs them)
     groq_api_key: str | None = field(default_factory=lambda: os.getenv("GROQ_API_KEY") or None)
+    youtube_api_key: str | None = field(default_factory=lambda: os.getenv("YOUTUBE_API_KEY") or None)
     # Normalised to the bare project URL: the dashboard sometimes shows it with "/rest/v1/".
     supabase_url: str | None = field(default_factory=lambda: _project_url(os.getenv("SUPABASE_URL")))
     # New-style secret key (sb_secret_...) preferred; the legacy service_role JWT also works.

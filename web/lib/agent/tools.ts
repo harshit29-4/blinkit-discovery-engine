@@ -23,7 +23,7 @@ export const GROUP_BY = {
 } as const;
 
 const FILTERS = {
-  source: { type: "string", enum: ["play_store", "app_store", "reddit"], description: "Only this source" },
+  source: { type: "string", enum: ["play_store", "app_store", "reddit", "youtube"], description: "Only this source" },
   barrier: { type: "string", enum: keys("barriers"), description: "Only entries tagged with this barrier" },
   category: { type: "string", enum: keys("categories"), description: "Only entries about this category" },
   theme_id: { type: "integer", description: "Only entries in this theme (ids from get_themes)" },
@@ -36,7 +36,7 @@ export const TOOL_DEFS = [
     function: {
       name: "search_feedback",
       description:
-        "Find customer feedback entries (app reviews and Reddit). Keyword search over all collected entries; " +
+        "Find customer feedback entries (app reviews, Reddit, and comments on YouTube videos about Blinkit). Keyword search over all collected entries; " +
         "AI-tagged entries are listed first. Returns entries with ids (E1, E2…) to cite. Use short keyword " +
         "queries (e.g. 'expired milk', 'pet food', 'refund'), not full sentences.",
       parameters: {
@@ -137,7 +137,9 @@ const oneOf = (v: unknown, allowed: string[]) => (typeof v === "string" && allow
 function labelFor(group: string, value: string): string {
   const field = GROUP_BY[group as keyof typeof GROUP_BY];
   if (field) return TAXONOMY[field][value] ?? value;
-  if (group === "source") return { play_store: "Google Play", app_store: "App Store", reddit: "Reddit" }[value] ?? value;
+  if (group === "source") {
+    return { play_store: "Google Play", app_store: "App Store", reddit: "Reddit", youtube_comment: "YouTube" }[value] ?? value;
+  }
   if (group === "rating") return `${value} star${value === "1" ? "" : "s"}`;
   return value;
 }
@@ -153,7 +155,8 @@ export async function runTool(name: string, rawArgs: string, reg: EvidenceRegist
     return { content: { error: "arguments were not valid JSON" }, summary: "invalid arguments" };
   }
   const filters = {
-    p_source: oneOf(a.source, ["play_store", "app_store", "reddit"]),
+    // "youtube" is the agent-facing name; the database stores comments as youtube_comment.
+    p_source: a.source === "youtube" ? "youtube_comment" : oneOf(a.source, ["play_store", "app_store", "reddit"]),
     p_barrier: oneOf(a.barrier, keys("barriers")),
     p_category: oneOf(a.category, keys("categories")),
     p_theme: int(a.theme_id),

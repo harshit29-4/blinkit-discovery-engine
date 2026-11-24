@@ -97,7 +97,8 @@ async function Sources() {
 
 async function Ratings() {
   const [mix, counts] = await Promise.all([getRatingMix(), getSourceCounts()]);
-  const hasReddit = counts.some((c) => c.source.startsWith("reddit") && c.items > 0);
+  const has = (prefix: string) => counts.some((c) => c.source.startsWith(prefix) && c.items > 0);
+  const unrated = [has("reddit") && "Reddit", has("youtube") && "YouTube"].filter(Boolean).join(" and ");
   const play = mix.filter((m) => m.source === "play_store");
   const fives = (rows: typeof play, kind: "short" | "long") => {
     const pick = (m: (typeof play)[number]) => (kind === "short" ? m.short_reviews ?? 0 : m.reviews - (m.short_reviews ?? 0));
@@ -109,7 +110,7 @@ async function Ratings() {
   return (
     <Card
       title="Rating distribution"
-      subtitle={`All star ratings, including rating-only reviews.${hasReddit ? " Reddit content carries no star ratings." : ""}`}
+      subtitle={`All star ratings, including rating-only reviews.${unrated ? ` ${unrated} content carries no star ratings.` : ""}`}
     >
       <RatingBars mix={mix} />
       {s.total > 0 && l.total > 0 && (

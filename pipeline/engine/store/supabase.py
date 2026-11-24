@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+import time
 from datetime import datetime, timezone
 
 import httpx
@@ -9,6 +11,8 @@ import httpx
 from ..config import SETTINGS
 from ..models import RawItem, ShortReview
 from ..util import short_id, to_utc
+
+log = logging.getLogger("engine.store")
 
 BATCH = 500
 
@@ -78,12 +82,20 @@ class SupabaseStore:
             rows = [{k: v for k, v in i.to_row().items()} for i in chunk]
             # Count which keys already exist, so we can report "new" vs "updated".
             existing = self.existing_keys([(i.source, i.source_id) for i in chunk])
-            resp = self.http.post(
-                "/raw_items",
-                params={"on_conflict": "source,source_id"},
-                headers={"Prefer": "resolution=merge-duplicates,return=minimal"},
-                json=rows,
-            )
+            for attempt in (1, 2):
+                resp = self.http.post(
+                    "/raw_items",
+                    params={"on_conflict": "source,source_id"},
+                    headers={"Prefer": "resolution=merge-duplicates,return=minimal"},
+                    json=rows,
+                )
+                if resp.status_code < 500 or attempt == 2:
+                    break
+                # A transient server error (e.g. a busy database) gets one retry.
+                log.warning("raw_items upsert: HTTP %s %s, retrying", resp.status_code, resp.text[:200])
+                time.sleep(3)
+            if resp.status_code >= 400:
+                log.error("raw_items upsert failed: HTTP %s %s", resp.status_code, resp.text[:300])
             resp.raise_for_status()
             new += sum(1 for i in chunk if (i.source, i.source_id) not in existing)
             # A review edited from short to long moves tables, so ratings are never double-counted.

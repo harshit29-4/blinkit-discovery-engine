@@ -27,6 +27,7 @@ const SOURCE: Record<string, { label: string; color: string }> = {
   app_store: { label: "App Store", color: "var(--src-app)" },
   reddit_post: { label: "Reddit post", color: "var(--src-rpost)" },
   reddit_comment: { label: "Reddit comment", color: "var(--src-rcomment)" },
+  youtube_comment: { label: "YouTube comment", color: "var(--src-youtube)" },
 };
 const TOOL: Record<string, string> = {
   search_feedback: "Searched the feedback",

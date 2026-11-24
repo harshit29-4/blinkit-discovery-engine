@@ -32,6 +32,7 @@
   --src-app: #c47f00;      /* orange (darkened from Okabe–Ito #e69f00 for 3:1 on white) */
   --src-rpost: #009e73;    /* bluish green */
   --src-rcomment: #cc79a7; /* reddish purple */
+  --src-youtube: #d55e00;   /* vermillion (Okabe–Ito), 3.7:1 on white */
 
   --star-1: #a3271f;
   --star-2: #d55e00;
@@ -65,6 +66,7 @@
     --src-app: #f0b552;
     --src-rpost: #3fcf9f;
     --src-rcomment: #e19ac4;
+    --src-youtube: #f39a5b;
 
     --star-1: #f08a80;
     --star-2: #f39a5b;

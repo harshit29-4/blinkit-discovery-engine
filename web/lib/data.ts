@@ -7,7 +7,7 @@ import { cacheLife } from "next/cache";
 import { select, UpstreamError } from "./supabase";
 import { isKey } from "./taxonomy";
 
-export const SOURCES = ["play_store", "app_store", "reddit_post", "reddit_comment"] as const;
+export const SOURCES = ["play_store", "app_store", "reddit_post", "reddit_comment", "youtube_comment"] as const;
 export type Source = (typeof SOURCES)[number];
 
 export const SOURCE_LABEL: Record<string, string> = {
@@ -15,6 +15,7 @@ export const SOURCE_LABEL: Record<string, string> = {
   app_store: "App Store",
   reddit_post: "Reddit posts",
   reddit_comment: "Reddit comments",
+  youtube_comment: "YouTube comments",
 };
 
 export type SourceCount = { source: string; items: number; oldest: string; newest: string; last_fetched: string };

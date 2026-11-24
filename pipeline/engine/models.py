@@ -31,7 +31,7 @@ class ShortReview:
 
 @dataclass
 class RawItem:
-    source: str               # play_store | app_store | reddit_post | reddit_comment
+    source: str               # play_store | app_store | reddit_post | reddit_comment | youtube_comment
     source_id: str            # unique within the source
     text: str                 # main body (title kept separately)
     posted_at: datetime       # always timezone-aware UTC

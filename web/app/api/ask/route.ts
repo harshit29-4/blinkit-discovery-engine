@@ -37,7 +37,7 @@ async function overview(): Promise<string> {
     rpc<{ value: string; entries: number }[]>("count_feedback", { group_by: "source" }),
   ]);
   const name: Record<string, string> = { play_store: "Google Play reviews", app_store: "App Store reviews",
-    reddit_post: "Reddit posts", reddit_comment: "Reddit comments", reddit: "Reddit" };
+    reddit_post: "Reddit posts", reddit_comment: "Reddit comments", reddit: "Reddit", youtube_comment: "YouTube comments" };
   const collected = counts.map((c) => `${c.items} ${name[c.source] ?? c.source}`).join(", ");
   const taggedText = tagged.map((t) => `${t.entries} ${name[t.value] ?? t.value}`).join(", ") || "none yet";
   const text = `collected entries: ${collected}. Of these, a random sample of relevant entries has been ` +

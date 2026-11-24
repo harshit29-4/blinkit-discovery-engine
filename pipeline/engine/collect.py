@@ -14,8 +14,9 @@ from .store import Store
 log = logging.getLogger("engine.collect")
 
 FLUSH_EVERY = 100  # small, so an interrupted run keeps most of its progress
-# Reddit yields two item sources; its cursor is tracked under one name.
-CURSOR_SOURCES = {"play_store": "play_store", "app_store": "app_store", "reddit": "reddit_post"}
+# Reddit yields two item sources; its cursor is tracked under one name. YouTube keeps per-query cursors.
+CURSOR_SOURCES = {"play_store": "play_store", "app_store": "app_store", "reddit": "reddit_post",
+                  "youtube": "youtube_comment"}
 
 
 def collect_source(store: Store, name: str, mode: str, max_items: int | None) -> dict:
@@ -61,7 +62,8 @@ def collect_source(store: Store, name: str, mode: str, max_items: int | None) ->
             flush()
             log.info("%s: %d seen (+%d short), %d new so far", name, stats["seen"], stats["short_seen"], stats["new"])
     flush()
-    for counter in ("failed_windows", "failed_threads", "skipped_threads", "reused_threads", "stopped_early"):
+    for counter in ("failed_windows", "failed_threads", "skipped_threads", "reused_threads", "stopped_early",
+                    "disabled_comments", "units"):
         if getattr(collector, counter, 0):
             stats[counter] = getattr(collector, counter)
 

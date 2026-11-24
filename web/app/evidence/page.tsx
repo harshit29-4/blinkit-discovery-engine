@@ -148,8 +148,10 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
                   </a>
                 )}
               </div>
-              {r.source === "reddit_comment" && r.post_title && (
-                <p className="mt-2 text-sm text-muted">Comment on: “{r.post_title}”</p>
+              {(r.source === "reddit_comment" || r.source === "youtube_comment") && r.post_title && (
+                <p className="mt-2 text-sm text-muted">
+                  {r.source === "youtube_comment" ? "Comment on the video" : "Comment on"}: “{r.post_title}”
+                </p>
               )}
               {r.title && <p className="mt-2 font-medium">{r.title}</p>}
               {r.text && <p className="mt-1 whitespace-pre-line leading-relaxed">{r.text}</p>}
