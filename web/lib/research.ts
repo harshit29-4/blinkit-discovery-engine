@@ -48,3 +48,17 @@ export const INTERVIEW_VERDICTS: { id: string; hypothesis: string; verdict: Verd
     note: "Each gap was closed by a person, not the app" },
 ];
 export const VERDICT_LABEL: Record<Verdict, string> = { confirmed: "Confirmed", contradicted: "Contradicted", unclear: "Unclear" };
+
+/** V9 re-check (pipeline/engine/ai/recheck.py, docs/data/v9-recheck.json): every entry behind the return and
+ *  quality themes, re-labelled by two models; shares count only entries where both agreed. */
+export const V9_RECHECK = {
+  models: "gpt-oss-20b and qwen3.8-27b",
+  rows: [
+    { label: "Return or refund mentions", entries: 130, agreement: 0.892, kappa: 0.396,
+      parts: [["Written after a purchase", 0.957], ["Holding back before trying", 0.034]] },
+    { label: "Quality or trust doubts", entries: 226, agreement: 0.876, kappa: 0.59,
+      parts: [["Written after a purchase", 0.884], ["Holding back before trying", 0.106]] },
+    { label: "What the quality doubt is about", entries: 226, agreement: 0.801, kappa: 0.659,
+      parts: [["Condition on arrival", 0.68], ["Authenticity", 0.144], ["No product concern", 0.138], ["Suitability", 0.039]] },
+  ] as { label: string; entries: number; agreement: number; kappa: number; parts: [string, number][] }[],
+};

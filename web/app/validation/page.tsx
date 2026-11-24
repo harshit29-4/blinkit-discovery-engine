@@ -3,7 +3,7 @@ import { Suspense, type ReactNode } from "react";
 import { Card, PageHeader, Skeleton } from "@/components/ui";
 import { getChatQuality, getValidation, type Metric } from "@/lib/data";
 import { fmtDateTime, fmtInt } from "@/lib/format";
-import { INTERVIEW_VERDICTS, VERDICT_LABEL, kappaBand } from "@/lib/research";
+import { INTERVIEW_VERDICTS, V9_RECHECK, VERDICT_LABEL, kappaBand } from "@/lib/research";
 import { label } from "@/lib/taxonomy";
 
 export const metadata: Metadata = { title: "Validation" };
@@ -181,6 +181,38 @@ async function Checks() {
         <p className="mt-3">
           The barrier was rarely fear of a bad buy: it was one practical question the listing didn&rsquo;t answer, and new
           categories were found through people, not the app.
+        </p>
+        <h3 className="mt-5 font-bold">Engine re-check after the interviews</h3>
+        <p className="mt-1 text-muted">
+          Every entry behind the return and quality themes, re-read by {V9_RECHECK.models}. Shares count entries where
+          both models agreed.
+        </p>
+        <table className="mt-2 w-full text-sm">
+          <tbody>
+            {V9_RECHECK.rows.map((r) => (
+              <tr key={r.label} className="border-t border-border align-top">
+                <td className="py-2 pr-3">
+                  <span className="font-semibold">{r.label}</span>
+                  <span className="block text-muted">
+                    {fmtInt(r.entries)} entries · models agreed on {pctStr(r.agreement)} (kappa {r.kappa.toFixed(2)})
+                  </span>
+                </td>
+                <td className="py-2 text-right">
+                  {r.parts.map(([name, share]) => (
+                    <span key={name} className="block whitespace-nowrap">
+                      <b>{pctStr(share)}</b> {name.toLowerCase()}
+                    </span>
+                  ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-3">
+          Public feedback is written by people who already bought, so it measures what goes wrong after an order, not what
+          stops someone trying. That is why the engine over-rated return fear. The interviews&rsquo; barrier, a question the
+          listing didn&rsquo;t answer, almost never reaches a review: most &ldquo;suitability&rdquo; entries were a wrong item
+          delivered, and most &ldquo;before trying&rdquo; entries were warnings to others after a bad order.
         </p>
       </Check>
 

@@ -1,0 +1,3343 @@
+{
+ "models": [
+  "openai/gpt-oss-20b",
+  "qwen/qwen3.8-27b"
+ ],
+ "pool": 275,
+ "return_timing": {
+  "entries": 130,
+  "both_labelled": 130,
+  "agreed": 116,
+  "agreement": 0.892,
+  "kappa": 0.396,
+  "counts": {
+   "before_trying": 4,
+   "after_purchase": 111,
+   "unclear": 1
+  },
+  "shares": {
+   "before_trying": 0.034,
+   "after_purchase": 0.957,
+   "unclear": 0.009
+  }
+ },
+ "quality_timing": {
+  "entries": 226,
+  "both_labelled": 226,
+  "agreed": 198,
+  "agreement": 0.876,
+  "kappa": 0.59,
+  "counts": {
+   "before_trying": 21,
+   "after_purchase": 175,
+   "unclear": 2
+  },
+  "shares": {
+   "before_trying": 0.106,
+   "after_purchase": 0.884,
+   "unclear": 0.01
+  }
+ },
+ "quality_kind": {
+  "entries": 226,
+  "both_labelled": 226,
+  "agreed": 181,
+  "agreement": 0.801,
+  "kappa": 0.659,
+  "counts": {
+   "authenticity": 26,
+   "arrival_condition": 123,
+   "suitability": 7,
+   "none": 25
+  },
+  "shares": {
+   "authenticity": 0.144,
+   "arrival_condition": 0.68,
+   "suitability": 0.039,
+   "none": 0.138
+  }
+ },
+ "items": [
+  {
+   "source": "play_store",
+   "source_id": "000c49c9-b54f-4607-a2d4-fa4cb1452c56",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "01794773-86a2-4527-a27b-5de29b682ef5",
+   "barriers": [
+    "expiry_freshness",
+    "price_fees",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "before_trying",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "0358ef03-8390-4c7b-b3c5-b38c372998fa",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "042e22b4-0e47-49fc-b53c-76ed179f57a8",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "04f90934-5c2b-4469-9857-d4b79481ec0c",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "09ddea4d-d63e-4d17-9d60-4e10887756cd",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "0b0c2449-64e6-484c-a051-fd4b6219a29a",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "0d1118ce-fe44-4e97-b925-ff08a38fcffa",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "before_trying",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "106c6bdb-0d3b-4847-a268-e5414b6a7010",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "10c495e2-1d89-4826-b016-f26f7af232ed",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "suitability",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "11606521-6f95-4b03-b3e2-9968a161df77",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1313fd7e-7979-491e-9e42-ad7ba14a9802",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1359c1ad-17f2-475f-9b8b-a05843caef33",
+   "barriers": [
+    "quality_trust",
+    "stockout"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "136603e4-f6ad-4bd5-bdfa-60a8ad8df2fe",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "15e2fec3-e101-4712-995e-e92bcd7229d1",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "165a5355-8e4d-4a36-8715-440d772d4503",
+   "barriers": [
+    "quality_trust",
+    "authenticity"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "18c881a2-8191-4b98-9bfe-a68b02afce06",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "19e5d026-cfcd-436e-ba5c-9a96f9db12d0",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1a5b39fd-5b46-4a1a-a008-894216f06f5c",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1a68b639-f4ef-4230-a3f3-95d690721f69",
+   "barriers": [
+    "price_fees",
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "before_trying",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1b37f1e9-d40b-4d7b-81a1-676fff18beeb",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1c6354f9-d485-4825-912e-6b6e51e9b1d0",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1c810f0c-a38a-4a4f-b79b-63f43f0d555b",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1c9af19f-91bf-4f6c-9ef9-0db45a16406e",
+   "barriers": [
+    "quality_trust",
+    "authenticity",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1d46b7d3-5a2b-425b-95cf-63ab0e585441",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "1d6fcea8-bc60-4cbc-b562-b419f45a3f2f",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2003d74c-df95-4049-90da-a434a648656b",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "22b7b099-c133-4e22-b847-a8deb71b6cff",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "25dfd788-624e-457e-8e0f-c35996716634",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "25f32393-6662-4b91-a114-745e99ffbeb2",
+   "barriers": [
+    "price_fees",
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "26158604-f511-431b-a6e6-c8325f9383c6",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "262bb81e-f45d-4f11-a55d-4fd8fc224d5e",
+   "barriers": [
+    "stockout",
+    "time_pressure",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2661b250-4da7-43d7-9e7b-ec5910cafcb7",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "26ced715-594c-418f-8443-68184e87fbd0",
+   "barriers": [
+    "quality_trust",
+    "price_fees"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "arrival_condition",
+   "timing_b": "before_trying",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "26f69ac8-e217-4357-96f3-850a78e554bc",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2a4260dc-34d8-4464-b4d6-f761c62d6fa4",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2aeaf608-bdc9-4b30-b13d-759a1bd44eea",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2b647295-313f-4c10-9961-2f4e834117a0",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2c8f4fff-fbb2-4389-9da9-ab49e0294e32",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2eb45048-484d-468e-8bcc-9a9d7f02c283",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "stockout"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2ece9450-bc8d-4930-a1bd-05b6a0d2c5d8",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "2f7b9e97-8397-4978-8473-513d125bd309",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "320893ca-bde3-45da-bcb1-3b1644347391",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "33ebea15-04d6-4d55-b3b9-7f42bba800c6",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "3445293d-768c-4e7b-964e-45028f5a5d1d",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "34697897-2134-47ef-80be-e980d691fff2",
+   "barriers": [
+    "price_fees",
+    "return_refund_friction",
+    "time_pressure"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "34786d2b-6ccf-4e9d-a29f-bd9fd2af2f9e",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "37292934-94ae-45ef-a80c-ca24f453e07e",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "37b0a851-8a4f-4a4c-8d0c-bf1755a7f17a",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "suitability",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "38e60b4c-2b7a-4ea5-a91f-13008be4d735",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction",
+    "time_pressure"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "39879b19-d06a-4c16-9849-95599be628b5",
+   "barriers": [
+    "return_refund_friction",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "39e8d980-4bfa-4116-9452-3453913af32b",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "3a16ed13-7d4e-4243-86c0-bd0bd1420ba3",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "3d3254bc-5e87-419b-8985-f459341f4b1f",
+   "barriers": [
+    "price_fees",
+    "return_refund_friction"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "3d4dd981-062a-476c-a47e-abbd452cebba",
+   "barriers": [
+    "quality_trust",
+    "stockout"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "3ed1cb7d-602b-45dd-bffc-8a896d793baf",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "3ed32360-dad7-40ba-a68e-5958ac42e088",
+   "barriers": [
+    "authenticity",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "3f9fbe6e-eac4-4e17-8152-2dfac3df8dfe",
+   "barriers": [
+    "missing_product_info",
+    "authenticity"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "408d929e-6ad4-4b55-92aa-b923118272c3",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "419dcda1-b051-4525-9ab8-6f67bebe856d",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "427105a2-95e9-4de4-83ea-9cb330f332c6",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "45045ac9-d7db-46de-8b81-ea8de46fdf6b",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "450a66e5-91a4-42ac-b707-9bf40d16b975",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4537e05b-3cee-4290-ae85-d76204a67b71",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "46e1c9e8-8ced-44bd-b9cf-1f1360f84366",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "47841827-2928-4ef0-a586-139b4f5be05a",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "48aa3e71-502e-455c-a2ca-0fbc725f109e",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4b8446b7-81d9-46fb-a20a-b5ccea3dab37",
+   "barriers": [
+    "expiry_freshness",
+    "price_fees",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4ba3d696-3627-4159-8606-ad350487f83b",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4c1aa8ef-4eb3-4be0-a706-1b84e32d5b3f",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4e6dde7e-8d96-4c31-815d-c6191e343d55",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4e90c482-a436-461d-8f46-998024f8c5f1",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction",
+    "time_pressure"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "suitability",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4f07492d-51b8-4e12-bd5e-260d53109db3",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "4f741385-8adb-477d-80e5-35f1634501a2",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5085c4fb-d231-46f7-9978-92dc759c4891",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "508f8cdc-5f0c-4684-a48b-07fb2e22a0e5",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5256ca5c-bffa-499e-bfa6-daca689f6629",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "528f7081-4009-414b-a6aa-b6f15088d7ac",
+   "barriers": [
+    "quality_trust",
+    "price_fees"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "532ff2f0-7e4f-4be0-8586-fb986bb6f085",
+   "barriers": [
+    "price_fees",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "54a4dc53-bac5-46fe-8e19-37abd95d6afd",
+   "barriers": [
+    "authenticity",
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "54d37858-0529-4c29-a685-067eaa2a75f8",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "54e9e3fa-209a-476f-8dc6-908bdd027777",
+   "barriers": [
+    "return_refund_friction",
+    "price_fees"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5519649c-b7bb-495e-8a9a-29a10be39cae",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5570e03b-966c-4de2-8969-dd1af68b8556",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "55af9d1e-ee6d-4701-99c8-2ff8740d4af4",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "560a5bef-af23-45c3-b8d7-5e8e55e13f59",
+   "barriers": [
+    "quality_trust",
+    "stockout"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "563d88e9-1995-4e9f-a84b-6a69fd000049",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "56bee766-e4b0-4e55-945a-8eb00764522f",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "56f4221b-b693-4ea7-bb24-cb3761857cc1",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust",
+    "price_fees"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "58706989-f3d8-4fee-84fe-c068bd8ba840",
+   "barriers": [
+    "authenticity"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "58d69cc4-e5af-405d-a47f-6902044d00ca",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "59d91d41-ecdd-47b9-9e83-30448f1894fd",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5c7784aa-5ac5-4cbb-aa9c-044bf09b3c76",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5e19f87d-6d11-4394-8f98-79a592fc8f45",
+   "barriers": [
+    "authenticity",
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5e85a748-6c8e-4aee-99cd-c480a1a71c9f",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "5ec0bfb0-0b13-4ead-bf52-c4273affe027",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "price_fees",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "60134926-4893-4f7a-9239-ca83bb5c2b1b",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "60479cd3-368b-4b42-9b17-44ac4e47997b",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "617c5468-7b4c-4d51-a4f1-9321540cae83",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "61f66962-d349-4a1f-9a79-0c80f5370782",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "missing_product_info"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6574ca27-9572-487c-b85e-d1cdbcab9acd",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "65fee7b9-86fb-4007-9bf2-8ae0adf5e49e",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6611e2af-58af-4a37-86b8-23cfc984bd05",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "66b7695d-e705-43d9-8e92-5753364b4ff8",
+   "barriers": [
+    "expiry_freshness",
+    "price_fees",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "67ac37dc-66e5-42f3-82d6-859ffa3e7d01",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "69b6da7d-94ca-43f0-96c7-69775141e395",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6a7df3af-7a21-4b73-a0f0-dee811564205",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6d4add62-dd68-4d66-aefe-70d53c7a7d13",
+   "barriers": [
+    "price_fees",
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6efe7aa7-e05d-4d34-9440-e41e6c96d022",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6f7dc080-1a70-43f2-8912-06e188eab144",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6fa7406a-9e7b-47c8-b43a-fa883336c0e0",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "6fe00ff7-bac7-4bb1-a543-bce73fd88ade",
+   "barriers": [
+    "missing_product_info",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "70ea5416-ccbe-41d2-9376-89b442236f5f",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "716a1301-4374-4ec6-a431-dd0bd75f17fd",
+   "barriers": [
+    "price_fees",
+    "expiry_freshness",
+    "quality_trust",
+    "return_refund_friction",
+    "assortment_gap"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "73686167-813f-4050-ae28-f7dabde96564",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "73c9e55c-b494-4158-a216-6b352cb16ae0",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "75a86f53-bc4f-4bc1-a699-96a588d2e910",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "76bc12e7-4b94-41c8-96ab-8d4ece3445e4",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "78ad39e2-25a7-44eb-9e05-09eef73ba80e",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "7910413f-b123-41c3-9666-39d8462ac7e1",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "791d2199-d5c6-4a85-b9a7-b32e2ceca20c",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "7adcd74e-9f5f-489a-a01f-c9a05fbd7ace",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "7b555b67-4e88-42bf-a024-7a93bd5a79bc",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust",
+    "authenticity"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "7c5fca3d-c6bf-4791-937c-61e49d47ca4d",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "7dad0bb0-5fbc-4e91-bbe5-28d7c09386a1",
+   "barriers": [
+    "authenticity",
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "7e505952-3c00-471c-bf8e-265af818d48e",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "7fdb2bf2-a9e3-4a4f-ac3c-73a02b5c825e",
+   "barriers": [
+    "quality_trust",
+    "stockout",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "81c3b054-ba17-4d45-a1cd-b154c126f4fd",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8328c318-f6fd-4543-a442-a134a317007f",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "832b1693-5a13-4cac-a200-b8955442d56f",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "83356005-4402-49b1-ada2-da8ff1bc42a9",
+   "barriers": [
+    "expiry_freshness",
+    "price_fees",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8501dbf5-f183-449f-b095-621d61820779",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "price_fees"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "85208b58-76c6-49ef-8e71-be6cf7ff3b24",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "874243d1-dc96-40c6-891e-679c5d07bb93",
+   "barriers": [
+    "price_fees",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8861a197-2235-40d0-973f-157676563070",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8960ed9a-5ee3-456e-b201-5a04ea9034c7",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "89dff615-fd51-4f3d-aa1b-a82d8e495018",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8d8df493-6cf5-479b-b506-10f3eadc0cba",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8d9fcb62-76d5-4ae5-b029-308d3011d6a3",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8e41ddd2-94d7-423c-9bdb-ec2dbf732555",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "8f42a3cd-fb72-4d67-bc48-312870aa68ef",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "94a1de6d-018d-4a8d-995e-1de6456210c4",
+   "barriers": [
+    "return_refund_friction",
+    "time_pressure"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "9546d918-36a4-4454-a692-8c4ada9527af",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "95b2ff1b-6077-4841-a84a-9de112dfe636",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "96512a4c-0a17-411a-ba2f-5bd47c1251a1",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "970c8c68-3cb2-4f01-84e9-9aa5b1a39433",
+   "barriers": [
+    "stockout",
+    "return_refund_friction",
+    "search_irrelevant"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "97828254-7c4b-49eb-88bd-1e2d3f961370",
+   "barriers": [
+    "quality_trust",
+    "stockout",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "97bf3c76-7e26-4abc-bc27-b6069d65c8ef",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "980995dd-a4f1-491e-874f-5d64f23a9949",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "98526f91-c1ef-454a-b9fd-fb48f077d47b",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "996765db-052f-408d-813c-b44d64d18147",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "9c05e8f0-0838-4492-a6d6-80972435ebe2",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "9eb909e5-6491-40c9-9357-df9cd8693713",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "9ec876b6-b4f0-492f-8647-2d9dd5544eb3",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "9f0d9ffb-ed25-41e6-943c-7fd121d78b56",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "suitability",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "9f5af845-d5a4-4469-912b-20e05740861c",
+   "barriers": [
+    "price_fees",
+    "quality_trust",
+    "time_pressure"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a079af91-48df-4380-b711-995b610e1209",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a118752b-5291-4b89-abae-161c4f3d410f",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a1ffd07c-89bd-4c75-a0fd-d820fd96c676",
+   "barriers": [
+    "price_fees",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a2584023-bde4-44c8-99b9-ad1f8c6ff14f",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a2c05e5d-e515-4947-a485-730b41d9340e",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a36f4998-26aa-4446-81c7-c3f6f0698a61",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a4fa3fd1-8c47-4353-8b02-30e56bd4104e",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a6b48159-2dc4-438b-bcbb-7589326edc66",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a736ccf0-3e02-4f91-806b-8a0f725cfdbd",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a7cac864-e85a-46fc-835d-9b16ec324cfe",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "a7e07a18-f514-4e9d-83d1-0e7a19c8878b",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "aa38837f-7b4d-40b3-88d5-f2febaa20072",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "aaf6fe88-4caf-49ca-a029-760deae43f31",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "abe17f5f-af3d-41ad-bfcc-27def470b96a",
+   "barriers": [
+    "quality_trust",
+    "authenticity"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ac6634cb-c818-4d6b-b085-fcbf0397728c",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ad67467c-2095-48b6-8a70-0bc0d34b6bca",
+   "barriers": [
+    "return_refund_friction",
+    "stockout"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "adc69846-8437-4d19-bf6a-2ba13ffb5993",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ade7254d-0b10-4940-9566-d002a2739397",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b166f1e9-9405-42bd-a7a3-8dae3c3eecf7",
+   "barriers": [
+    "quality_trust",
+    "authenticity"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b16fed0e-9477-4318-ac51-7b5d91077be5",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b2fd0e9e-4bec-42ed-903d-122dee476f8a",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b3307b6c-fd31-4ee1-8702-257b23ac561c",
+   "barriers": [
+    "quality_trust",
+    "authenticity"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b4cc621e-6b80-4866-b43f-cd8a45700258",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b5abd253-4ba7-4ebb-86cd-db0bb534bb24",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b5ad4069-848e-4398-ba4a-57cec78ac7e5",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "b785a6f1-76df-4d16-92f4-d7863d047927",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ba2c3e14-6e6a-4b61-b116-dbc5684a2a6b",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "bb73903f-1400-464d-8233-ab7aab4f9297",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "suitability",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "bb7c1200-9ab9-4c85-ac7b-5c6f101e5946",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "bba3c542-95dc-458c-a677-a8d1d8db8f03",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "bd543f80-80fa-4493-b259-0e240ad0fe93",
+   "barriers": [
+    "expiry_freshness",
+    "price_fees",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "bd71d763-9126-451b-a3e3-cbd9819294df",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "be98be1e-1516-46a8-97b1-795296d7406d",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "bf680dab-586e-408d-8e97-d2d6f9ae68b7",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c14ee388-2a8a-4666-ab92-ef4cb9985d89",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c2df2a5a-643e-41d0-b180-c8acd638415c",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c3cbcdec-5973-4ba0-97ae-ca0006ace6c9",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction",
+    "authenticity"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c44e58ad-71fb-4b83-83c9-6ec64d3b2225",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust",
+    "stockout"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c5304b06-1541-40ad-81da-6e7d66606819",
+   "barriers": [
+    "stockout",
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c578058d-c789-4d85-8db9-16f181633fe9",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c6ebf820-7c26-4718-8a93-6ab8a49d8cba",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "c984bd01-6ea9-4be1-9331-b83d8b9488ed",
+   "barriers": [
+    "price_fees",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "caada3f3-50da-4b47-b3af-0a34d05ce607",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "cceeafb0-8624-42f4-949f-191b15250442",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "cea1db36-e8ed-44d3-a69f-4f36ebf342ba",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "cf1be0ba-0587-4e39-9898-cb2927338a99",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "cfb66e3a-3bb7-42d0-a30b-d221f93a8207",
+   "barriers": [
+    "expiry_freshness",
+    "price_fees",
+    "stockout",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "d127225a-7104-4fbd-9c3e-2d135b1cbd5c",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction",
+    "stockout"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "d24e415d-3bde-4ac9-a09e-a2af39606c4c",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "d36a0dc2-9e50-4f27-ac0e-675f89d46096",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "d59f5922-0ba0-4456-96fc-e1fbf4c14f51",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "d6cee766-43f5-4c92-8be6-e938c035aa9f",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "d8b809b8-a2ef-41a8-baa4-67339115a1e0",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "d8f8f40f-289a-4ff0-b26c-1d59e1e829ad",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "dcced8d8-f131-4838-bc31-758e3a5bd8af",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "df1b148c-e54a-48b4-9e0d-f838d65e9581",
+   "barriers": [
+    "authenticity",
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "df9d3fbf-0013-4fd1-a76b-93b534dada19",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "play_store",
+   "source_id": "dfa8e6b0-bf9b-48aa-8fa1-2f8892b55005",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e258b333-e926-4c73-9473-6b837518be56",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e2622b36-9c88-42db-ad19-62c7d1d67915",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e2fcb9ab-36be-4c06-829f-66d7d1b06016",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e360dbe0-8701-424d-81c0-2bc9ec616616",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e4255e33-1dde-4100-87ab-7b06235ce75f",
+   "barriers": [
+    "stockout",
+    "return_refund_friction",
+    "time_pressure"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e449c17d-7785-41b3-894c-1a76eacec894",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e57093eb-7d27-4911-bf40-7d2f9e0b3d96",
+   "barriers": [
+    "authenticity",
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e739de8e-e2e2-4848-ab24-f26be9efbd69",
+   "barriers": [
+    "authenticity"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "e884d351-eac1-4781-84b3-4d30d57c9139",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ea15873b-ca97-4088-8ff5-de97a61af3d8",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "eafabda9-a36c-40bd-9aac-778bb7b771fe",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ed202d62-b198-4082-8023-fd56d2eafb77",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "edb6433b-4cec-44e8-9a64-1bfa8da4a5d7",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ee0ed23f-0985-4342-8102-098fbf555ba2",
+   "barriers": [
+    "stockout",
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "ee46d877-6aa5-4d70-bc65-1054c216c938",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "eef14d9a-db0b-42e2-80b8-2a53eea05fa4",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "f0a1e670-f030-4111-a432-17bf9ad12b91",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "f0c1d8ea-8523-4193-8779-b93829912560",
+   "barriers": [
+    "expiry_freshness",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "f3a0765d-6d75-4b68-b8e6-cbcafc632598",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "f42b1ac6-e988-4f21-82bc-218f8803ffd1",
+   "barriers": [
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "f8fdc626-489b-40c4-bf55-380b7a8996e7",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "play_store",
+   "source_id": "fb3a1777-02b4-44d6-8739-4652f71bcbe8",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "fb4aaf09-7c13-46c6-933d-20eb6f0f7ee0",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "play_store",
+   "source_id": "fb758bd9-72a2-440e-862a-2b852586915b",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness",
+    "time_pressure"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "play_store",
+   "source_id": "fff5c51c-517d-457e-98f8-f07fd2d82f27",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "19rthgipk0o2s",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "nsr3axl",
+   "barriers": [
+    "authenticity",
+    "price_fees"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "nsrhr53",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "nsssr1u",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "nsv815p",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "nswj5ds",
+   "barriers": [
+    "quality_trust",
+    "authenticity"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "nv9srst",
+   "barriers": [
+    "authenticity"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "nwhw81s",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "o7gzjv7",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "ocfk43k",
+   "barriers": [
+    "return_refund_friction",
+    "stockout"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "ofzzzri",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "og1mznd",
+   "barriers": [
+    "authenticity"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "og1yq73",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "unclear",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "og4uwkf",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "om9rjqa",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "unclear",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "onz58gy",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "unclear",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "onzj81g",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "p24o92n",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "suitability",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "p3frsup",
+   "barriers": [
+    "authenticity",
+    "return_refund_friction",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "pe2dous",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "reddit_comment",
+   "source_id": "pe5xi21",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1p8o4ju",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1qmn6p1",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1ravrok",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1rtlk18",
+   "barriers": [
+    "price_fees",
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1s0urkq",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "unclear",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1s5s0i5",
+   "barriers": [
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "none",
+   "timing_b": "after_purchase",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1t38uvc",
+   "barriers": [
+    "authenticity"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "authenticity",
+   "timing_b": "before_trying",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1to9bvo",
+   "barriers": [
+    "quality_trust",
+    "return_refund_friction"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1u1bmeh",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "before_trying",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1u8kiqq",
+   "barriers": [
+    "quality_trust",
+    "authenticity"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1upmbbk",
+   "barriers": [
+    "expiry_freshness",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1vyqibf",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "suitability",
+   "timing_b": "after_purchase",
+   "kind_b": "suitability"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1wx2cks",
+   "barriers": [
+    "quality_trust"
+   ],
+   "timing_a": "before_trying",
+   "kind_a": "none",
+   "timing_b": "before_trying",
+   "kind_b": "none"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1xezad1",
+   "barriers": [
+    "quality_trust",
+    "expiry_freshness"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "arrival_condition",
+   "timing_b": "after_purchase",
+   "kind_b": "arrival_condition"
+  },
+  {
+   "source": "reddit_post",
+   "source_id": "1xi3kia",
+   "barriers": [
+    "authenticity",
+    "quality_trust"
+   ],
+   "timing_a": "after_purchase",
+   "kind_a": "authenticity",
+   "timing_b": "after_purchase",
+   "kind_b": "authenticity"
+  }
+ ]
+}
