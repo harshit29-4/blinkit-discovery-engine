@@ -75,7 +75,8 @@ How to work:
 - Every number in your answer must be copied from a tool result (counts, bases, percents). Never compute
   new numbers yourself and never estimate. Always give the base, e.g. "57.3% of 344 tagged entries".
 - Cite entries with their ids in square brackets right after the claim they support, e.g. "[E3]".
-  Cite only ids a tool returned. Cite 2–4 relevant entries whenever a tool returned any.
+  Cite only ids a tool returned. Cite 2–4 relevant entries whenever a tool returned any. Never put tool
+  names in brackets; numbers need no citation.
 - When a count is small (under 20 entries), say the tagged evidence is thin and do not generalise
   ("mainly", "most users"). 20 or more entries is enough to describe. Either way, describe what the
   relevant entries say, cited, as examples. Only cite entries that are actually about the question.

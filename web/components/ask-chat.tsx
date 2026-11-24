@@ -66,7 +66,9 @@ function inline(text: string, onCite: (id: string) => void): ReactNode[] {
   return out;
 }
 
-function AnswerText({ text, onCite }: { text: string; onCite: (id: string) => void }) {
+function AnswerText({ text: raw, onCite }: { text: string; onCite: (id: string) => void }) {
+  // Models sometimes cite a tool by name ("[count_feedback]"); the numbers are checked anyway, so hide it.
+  const text = raw.replace(/\s?\[(?:count_feedback|search_feedback|get_themes|get_reliability)\]/g, "");
   const blocks: ReactNode[] = [];
   let bullets: string[] = [];
   const flush = () => {
