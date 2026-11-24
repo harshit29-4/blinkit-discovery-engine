@@ -6,6 +6,7 @@
  * Text is rendered as React elements (no HTML injection): only paragraphs, bullets and **bold**.
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Evidence = { id: string; source: string; source_id: string; url: string | null; rating: number | null;
   posted_at: string; text: string; translation: string | null };
@@ -210,6 +211,20 @@ export function AskChat({ suggestions }: { suggestions: string[] }) {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [turns.length, busy]);
 
+  // A question sent from the header's ask bar, the home page or a question tile (?q=...): ask it once,
+  // then drop it from the address so going back or reloading does not ask again.
+  const params = useSearchParams();
+  const router = useRouter();
+  const fromUrl = useRef(false);
+  useEffect(() => {
+    const q = params.get("q");
+    if (!q || fromUrl.current) return;
+    fromUrl.current = true;
+    router.replace("/ask", { scroll: false });
+    void ask(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+
   async function ask(question: string) {
     const q = question.trim();
     if (q.length < 3 || busy) return;
@@ -237,13 +252,14 @@ export function AskChat({ suggestions }: { suggestions: string[] }) {
     <div className="space-y-6">
       {turns.length === 0 && (
         <section aria-labelledby="suggested">
-          <h2 id="suggested" className="text-sm font-semibold">The eight research questions</h2>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+          <h2 id="suggested" className="text-lg font-extrabold tracking-tight">Try a research question</h2>
+          <ul className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
             {suggestions.map((s, i) => (
               <li key={s}>
                 <button type="button" onClick={() => ask(s)} disabled={busy}
-                  className="h-full w-full rounded-lg border border-border bg-surface p-3 text-left text-sm hover:border-accent disabled:opacity-60">
-                  <span className="font-semibold text-muted">Q{i + 1}.</span> {s}
+                  className="flex h-full w-full flex-col gap-2 rounded-xl bg-tile p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-60">
+                  <span className="text-sm font-extrabold text-accent">Q{i + 1}</span>
+                  <span className="font-semibold leading-snug">{s}</span>
                 </button>
               </li>
             ))}
@@ -254,7 +270,7 @@ export function AskChat({ suggestions }: { suggestions: string[] }) {
       <div className="space-y-6" aria-live="polite">
         {turns.map((t) => (
           <div key={t.id} className="space-y-3">
-            <p className="ml-auto w-fit max-w-[85%] rounded-xl bg-brand-ink px-4 py-2 text-brand-yellow">{t.question}</p>
+            <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-brand-yellow px-4 py-2 font-semibold text-brand-ink">{t.question}</p>
             {t.answer ? <AnswerCard t={t as Turn & { answer: Answer }} />
               : t.error ? <p role="alert" className="rounded-xl bg-bad-soft px-4 py-3 text-bad">{t.error}</p>
               : (
@@ -267,22 +283,25 @@ export function AskChat({ suggestions }: { suggestions: string[] }) {
         <div ref={endRef} />
       </div>
 
-      <form onSubmit={(e) => { e.preventDefault(); void ask(input); }} className="sticky bottom-3 space-y-2 rounded-xl border border-border bg-surface p-3 shadow-sm">
-        <label htmlFor="q" className="sr-only">Your question</label>
-        <textarea id="q" value={input} onChange={(e) => setInput(e.target.value)} rows={2} maxLength={500}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void ask(input); } }}
-          placeholder="Ask about the feedback, e.g. Why do people hesitate to buy fresh produce on Blinkit?"
-          className="w-full resize-none rounded-md border border-border bg-bg p-2 text-base focus:border-accent focus:outline-none" />
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-muted">
-            {remaining !== null ? `${remaining} questions left today across the site. ` : ""}Answers use only the collected feedback.
-            {turns.length > 0 && <> <button type="button" onClick={() => setTurns([])} className="text-accent underline underline-offset-2">New conversation</button></>}
-          </p>
+      <form onSubmit={(e) => { e.preventDefault(); void ask(input); }}
+        className="sticky bottom-20 rounded-2xl border border-border bg-surface p-2 shadow-lg sm:bottom-3 sm:p-3">
+        <div className="flex items-end gap-2">
+          <label htmlFor="q" className="sr-only">Your question</label>
+          <textarea id="q" value={input} onChange={(e) => setInput(e.target.value)} rows={1} maxLength={500}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void ask(input); } }}
+            placeholder={turns.length ? "Ask a follow-up…" : "Ask about Blinkit shoppers…"}
+            className="max-h-32 min-h-11 w-full resize-y rounded-xl border border-border bg-bg px-3 py-2.5 text-base focus:border-accent focus:outline-none" />
           <button type="submit" disabled={busy || input.trim().length < 3}
-            className="rounded-md bg-accent px-4 py-2 font-semibold text-accent-ink disabled:opacity-50">
-            {busy ? "Answering…" : "Ask"}
+            className="h-11 shrink-0 rounded-xl bg-accent px-5 font-bold text-accent-ink disabled:opacity-50">
+            {busy ? "…" : "Ask"}
           </button>
         </div>
+        <p className="mt-1.5 flex flex-wrap justify-between gap-x-3 px-1 text-sm text-muted">
+          <span>{remaining !== null ? `${remaining} questions left today` : "Answers use only the collected feedback"}</span>
+          {turns.length > 0 && (
+            <button type="button" onClick={() => setTurns([])} className="font-semibold text-accent">New conversation</button>
+          )}
+        </p>
       </form>
     </div>
   );

@@ -2,9 +2,9 @@
 
 /*
  * Colour tokens.
- * - Frame (header, nav, buttons, links) uses Blinkit's widely cited brand colours:
- *   yellow #F8CB46, green #0C831F, near-black #1C1C1C (third-party values; Blinkit publishes
- *   no official hex codes). Pairings are chosen by measured WCAG contrast: black on yellow
+ * - Frame follows blinkit.com's own palette (read from its live CSS, 2026-11-24): yellow #F8CB46,
+ *   green #0C831F, text #1F1F1F / #666666, grey panels #F8F8F8, borders #E8E8E8, pale green
+ *   #F7FFF9 and pale blue tiles. Blinkit publishes no official brand codes. Pairings are chosen by measured WCAG contrast: black on yellow
  *   11:1, green on white 4.9:1. Green text is never put on yellow (only 3.2:1).
  * - Data (charts) keeps the Okabe–Ito palette, which stays distinguishable for the common
  *   forms of colour blindness; a yellow/green data palette would not. Every chart also
@@ -15,14 +15,18 @@
   --brand-ink: #1c1c1c;        /* on yellow: 11.1:1 */
   --brand-ink-muted: #4a3f12;  /* on yellow: 6.8:1 */
 
-  --bg: #f7f7f5;
+  --brand-yellow-soft: #fff6d6; /* banner tint; ink on it 14:1 */
+
+  --bg: #f8f8f8;
   --surface: #ffffff;
-  --border: #e3e3df;
-  --text: #1b1b1a;
-  --muted: #62625e;
+  --border: #e8e8e8;
+  --text: #1f1f1f;
+  --muted: #666666;       /* 5.7:1 on white, 5.4:1 on --bg */
   --accent: #0c831f;      /* Blinkit green: 4.9:1 on white, 4.6:1 on --bg */
   --accent-ink: #ffffff;  /* text on green buttons: 4.9:1 */
-  --accent-soft: #f1faf2; /* green text on it: 4.6:1 */
+  --accent-soft: #eaf7ec; /* green text on it: 4.3:1 (large/bold labels only) and badges */
+  --tile: #edf4fb;        /* Blinkit-style category tiles (pale blue) */
+  --tile-2: #f7fff9;      /* pale green tiles */
   --warn: #9a5b00;
   --warn-soft: #fbf0dc;
   --bad: #a3271f;
@@ -57,6 +61,9 @@
     --accent: #4cc962;      /* Blinkit green lightened for dark backgrounds: 8.1:1 */
     --accent-ink: #0b2a10;  /* text on green buttons: 7.3:1 */
     --accent-soft: #15301c; /* green text on it: 6.7:1 */
+    --brand-yellow-soft: #2e2810;
+    --tile: #1b2430;
+    --tile-2: #142219;
     --warn: #f0b552;
     --warn-soft: #33270f;
     --bad: #f08a80;
@@ -85,6 +92,9 @@
   --color-brand-yellow: var(--brand-yellow);
   --color-brand-ink: var(--brand-ink);
   --color-brand-ink-muted: var(--brand-ink-muted);
+  --color-brand-yellow-soft: var(--brand-yellow-soft);
+  --color-tile: var(--tile);
+  --color-tile-2: var(--tile-2);
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-border: var(--border);
@@ -97,7 +107,7 @@
   --color-warn-soft: var(--warn-soft);
   --color-bad: var(--bad);
   --color-bad-soft: var(--bad-soft);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-brand);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -108,7 +118,8 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  /* Blinkit uses its own "Okra" typeface; Plus Jakarta Sans is the closest free match. */
+  font-family: var(--font-brand), system-ui, sans-serif;
 }
 
 /* Never smaller than 14px anywhere (readability + the deck's font rule). */

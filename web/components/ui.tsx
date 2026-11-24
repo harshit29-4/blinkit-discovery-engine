@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { SOURCE_LABEL } from "@/lib/data";
 
@@ -16,8 +17,8 @@ export function Card({ title, subtitle, children, className = "" }: {
   className?: string;
 }) {
   return (
-    <section className={`rounded-xl border border-border bg-surface p-5 ${className}`}>
-      {title && <h2 className="font-semibold tracking-tight">{title}</h2>}
+    <section className={`rounded-2xl border border-border bg-surface p-5 ${className}`}>
+      {title && <h2 className="font-extrabold tracking-tight">{title}</h2>}
       {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
       <div className={title || subtitle ? "mt-4" : ""}>{children}</div>
     </section>
@@ -26,7 +27,7 @@ export function Card({ title, subtitle, children, className = "" }: {
 
 export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: ReactNode }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
+    <div className="rounded-2xl border border-border bg-surface p-4">
       <p className="text-sm text-muted">{label}</p>
       <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">{value}</p>
       {hint && <p className="mt-1 text-sm text-muted">{hint}</p>}
@@ -75,4 +76,31 @@ export function StatusPill({ status }: { status: string }) {
 
 export function Skeleton({ h = "h-40" }: { h?: string }) {
   return <div className={`${h} animate-pulse rounded-xl border border-border bg-surface`} aria-label="Loading" />;
+}
+
+/** Page title with one line of context; the detail lives on How it works (`learn` anchor). */
+export function PageHeader({ title, subtitle, learn }: { title: string; subtitle?: ReactNode; learn?: string }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+      <div>
+        <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1>
+        {subtitle && <p className="mt-1 text-muted">{subtitle}</p>}
+      </div>
+      {learn && (
+        <Link href={`/how-it-works#${learn}`} className="text-sm font-semibold text-accent hover:underline">
+          How this works →
+        </Link>
+      )}
+    </div>
+  );
+}
+
+/** Section heading with an optional "see all" link, as on Blinkit's home page. */
+export function SectionTitle({ title, href, link }: { title: string; href?: string; link?: string }) {
+  return (
+    <div className="mb-3 flex items-baseline justify-between gap-4">
+      <h2 className="text-lg font-extrabold tracking-tight">{title}</h2>
+      {href && <Link href={href} className="shrink-0 text-sm font-semibold text-accent hover:underline">{link ?? "See all"}</Link>}
+    </div>
+  );
 }

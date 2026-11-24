@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense, type ReactNode } from "react";
-import { Card, Skeleton } from "@/components/ui";
+import { Card, PageHeader, Skeleton } from "@/components/ui";
 import { getChatQuality, getValidation, type Metric } from "@/lib/data";
 import { fmtDateTime, fmtInt } from "@/lib/format";
 import { kappaBand } from "@/lib/research";
@@ -11,14 +11,8 @@ export const metadata: Metadata = { title: "Validation" };
 export default function ValidationPage() {
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Validation</h1>
-        <p className="mt-1 max-w-3xl text-muted">
-          Every AI output is checked automatically, and the results are published here as they are computed. Where
-          a check compares two raters, agreement is reported as Cohen&rsquo;s kappa (κ), which corrects for agreement
-          expected by chance; 0.61 to 0.80 is conventionally read as substantial agreement.
-        </p>
-      </div>
+      <PageHeader title="Can we trust it?" subtitle="Every AI output is checked automatically; these are the live results."
+        learn="validation" />
       <Suspense fallback={<Skeleton h="h-[36rem]" />}>
         <Checks />
       </Suspense>
@@ -30,9 +24,9 @@ const pctStr = (v: number | null | undefined) => (v === null || v === undefined 
 
 function Check({ id, title, what, children, m }: { id: string; title: string; what: string; children: ReactNode; m?: Metric }) {
   return (
-    <Card>
+    <Card className="rounded-2xl">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-semibold tracking-tight"><span className="mr-2 text-muted">{id}</span>{title}</h2>
+        <h2 className="font-extrabold tracking-tight"><span className="mr-2 rounded-md bg-brand-yellow px-1.5 py-0.5 text-sm text-brand-ink">{id}</span>{title}</h2>
         {m && <span className="text-sm text-muted">Sample: {fmtInt(m.n)} · Updated {fmtDateTime(m.computed_at)} IST</span>}
       </div>
       <p className="mt-1 text-sm text-muted">{what}</p>

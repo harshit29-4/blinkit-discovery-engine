@@ -74,7 +74,7 @@ def run(collector):
 
 
 def test_comments_only_for_videos_titled_about_blinkit(settings):
-    api = FakeApi([video("v1", "My Blinkit haul", 3),
+    api = FakeApi([video("v1", "My Blinkit haul &amp; more", 3),
                    video("v2", "Paneer butter masala recipe", 2, description="Ingredients ordered from Blinkit")],
                   {"v1": [thread("c1", LONG, replies=[LONG + " too", "ok"])], "v2": [thread("c2", LONG)]})
     c = YouTubeCollector(api)
@@ -82,7 +82,7 @@ def test_comments_only_for_videos_titled_about_blinkit(settings):
     items = [i for i in out if isinstance(i, RawItem)]
     assert [i.source_id for i in items] == ["c1", "c1.r0"]  # short reply dropped, sponsor-mention video skipped
     assert items[0].source == "youtube_comment"
-    assert items[0].meta["post_title"] == "My Blinkit haul" and items[0].meta["is_top_level"]
+    assert items[0].meta["post_title"] == "My Blinkit haul & more" and items[0].meta["is_top_level"]
     assert items[1].meta["parent_id"] == "c1"
     assert items[0].url.endswith("v=v1&lc=c1") and items[0].author_hash and items[0].author_hash != "a"
     assert c.skipped_threads == 1

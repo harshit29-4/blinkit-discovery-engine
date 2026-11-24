@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Card, Skeleton, StatusPill } from "@/components/ui";
+import { Card, PageHeader, Skeleton, StatusPill } from "@/components/ui";
 import { RunButton } from "@/components/run-button";
 import { SOURCE_LABEL, getCursors, getRuns, type SourceStats } from "@/lib/data";
 import { duration, fmtDateTime, fmtInt } from "@/lib/format";
@@ -10,13 +10,8 @@ export const metadata: Metadata = { title: "Health" };
 export default function HealthPage() {
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Pipeline health</h1>
-        <p className="mt-1 max-w-3xl text-muted">
-          A record of every data collection run, including the volume collected and any issues encountered.
-          Collection is fully automated; any gaps are logged and retried in the following run.
-        </p>
-      </div>
+      <PageHeader title="Pipeline" subtitle="Every collection and AI run, and how far each source has been collected."
+        learn="collection" />
       <RunButton />
       <Suspense fallback={<Skeleton h="h-80" />}>
         <Runs />

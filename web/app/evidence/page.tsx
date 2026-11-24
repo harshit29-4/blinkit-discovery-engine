@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
-import { Card, Skeleton, SourceBadge, Stars } from "@/components/ui";
+import { Card, PageHeader, Skeleton, SourceBadge, Stars } from "@/components/ui";
+import { IconSearch } from "@/components/icons";
 import { MAX_PAGES, PAGE_SIZE, SOURCE_LABEL, getSourceCounts, getThemes, searchEvidence, type Evidence, type EvidenceFilters } from "@/lib/data";
 import { fmtDate, fmtInt } from "@/lib/format";
 import { TAXONOMY, label } from "@/lib/taxonomy";
@@ -14,13 +15,8 @@ const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) 
 export default function EvidencePage(props: PageProps<"/evidence">) {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Evidence</h1>
-        <p className="mt-1 max-w-2xl text-muted">
-          All collected feedback with analysable text, most recent first. Search by keyword, filter by source,
-          rating or AI-assigned tags, and open any entry at its original source.
-        </p>
-      </div>
+      <PageHeader title="Evidence" subtitle="Every review and comment collected, newest first, with links to the originals."
+        learn="evidence" />
       <Suspense fallback={<Skeleton h="h-96" />}>
         <Results searchParams={props.searchParams as Promise<SP>} />
       </Suspense>
@@ -64,12 +60,21 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
 
   return (
     <>
-      <form action="/evidence" className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-surface p-4">
-        <label className="flex min-w-60 flex-1 flex-col gap-1 text-sm">
-          <span className="text-muted">Keyword</span>
-          <input name="q" defaultValue={filters.q} placeholder="e.g. pet food, expiry, refund" maxLength={100}
-                 className="rounded-md border border-border bg-bg px-3 py-2 text-base" />
-        </label>
+      <form action="/evidence" className="space-y-3 rounded-2xl border border-border bg-surface p-4">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <label className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-bg px-3 focus-within:border-accent">
+            <IconSearch className="h-5 w-5 shrink-0 text-muted" />
+            <span className="sr-only">Keyword</span>
+            <input name="q" defaultValue={filters.q} placeholder={"Search feedback, e.g. pet food, expiry, \u201cfresh vegetables\u201d"}
+                   maxLength={100} className="w-full bg-transparent py-2.5 text-base focus:outline-none" />
+          </label>
+          <button className="rounded-xl bg-accent px-5 py-2.5 font-bold text-accent-ink hover:brightness-110">Search</button>
+        </div>
+        <details className="group" open={!!(filters.source || filters.rating || filters.barrier || filters.category || filters.stage || filters.tagged || filters.theme)}>
+          <summary className="cursor-pointer list-none text-sm font-semibold text-accent">
+            <span className="group-open:hidden">+ More filters</span><span className="hidden group-open:inline">− Fewer filters</span>
+          </summary>
+          <div className="mt-3 flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-muted">Source</span>
           <select name="source" defaultValue={filters.source} className="rounded-md border border-border bg-bg px-3 py-2 text-base">
@@ -102,9 +107,10 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
           <input type="checkbox" name="tagged" value="1" defaultChecked={filters.tagged === "1"} className="h-4 w-4" />
           AI-tagged only
         </label>
-        <button className="rounded-md bg-accent px-4 py-2 font-medium text-accent-ink">Apply filters</button>
+          </div>
+        </details>
         {(filters.q || filters.source || filters.rating || filters.barrier || filters.category || filters.stage || filters.tagged || filters.theme) && (
-          <Link href="/evidence" className="px-2 py-2 text-sm text-muted underline underline-offset-2">Reset</Link>
+          <Link href="/evidence" className="inline-block text-sm text-muted underline underline-offset-2">Clear search and filters</Link>
         )}
       </form>
 
@@ -112,7 +118,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
         {approximate ? "About " : ""}{fmtInt(total ?? rows.length)} {total === 1 ? "result" : "results"}
         {pages > 1 && page <= pages && ` · Page ${fmtInt(page)} of ${allPages > MAX_PAGES ? fmtInt(pages) : `${approximate ? "about " : ""}${fmtInt(pages)}`}`}
         {allPages > MAX_PAGES && ` (the newest ${fmtInt(MAX_PAGES * PAGE_SIZE)} can be browsed; add a keyword or filter to narrow the rest)`}
-        {filters.q && " · Matches word forms (refund also finds refunds, refunded); use \"quotes\" for a phrase"}
+
       </p>
 
       {blocked ? (

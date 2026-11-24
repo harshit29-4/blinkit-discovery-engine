@@ -12,6 +12,7 @@ searched again for `youtube_comment_refresh_days`, because their comments keep g
 
 from __future__ import annotations
 
+import html
 import logging
 import time
 from collections.abc import Callable, Iterator
@@ -150,8 +151,10 @@ class YouTubeCollector:
                 sn = it.get("snippet") or {}
                 vid = (it.get("id") or {}).get("videoId")
                 if vid:
-                    videos.append({"id": vid, "title": sn.get("title") or "", "description": sn.get("description") or "",
-                                   "channel": sn.get("channelTitle"), "published": to_utc(sn["publishedAt"])})
+                    # search.list returns titles HTML-escaped ("Haul &amp; More"); store them as plain text.
+                    videos.append({"id": vid, "title": html.unescape(sn.get("title") or ""),
+                                   "description": html.unescape(sn.get("description") or ""),
+                                   "channel": html.unescape(sn.get("channelTitle") or ""), "published": to_utc(sn["publishedAt"])})
             token = data.get("nextPageToken")
             if not token:
                 break
