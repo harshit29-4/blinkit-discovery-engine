@@ -71,6 +71,9 @@ DAILY_CAPS = {
     "qwen/qwen3.8-27b": 60_000,
 }
 CAP_EXEMPT_STAGES = frozenset({"theme_naming", "theme_consolidation"})
+# Per-minute headroom the pipeline leaves for the Ask page. qwen (8K tokens/min) is the chat's main
+# model; without a reserve, the daily run used the whole minute and live questions were refused.
+TPM_RESERVE = {"qwen/qwen3.8-27b": 4_000}
 
 
 @dataclass
@@ -82,6 +85,7 @@ class GroqClient:
     states: dict[str, ModelState] = field(default_factory=dict)
     caps: dict[str, int] = field(default_factory=dict)       # model -> daily token cap (empty = none)
     used: dict[str, int] = field(default_factory=dict)       # model -> tokens used in the last 24 h
+    tpm_reserve: dict[str, int] = field(default_factory=dict)  # model -> tokens/min left for the chat
 
     def __post_init__(self) -> None:
         self.http = self.http or httpx.Client(timeout=120)
@@ -91,6 +95,7 @@ class GroqClient:
 
     def _respect_tpm(self, model: str, est_tokens: int) -> None:
         s = self._state(model)
+        est_tokens += self.tpm_reserve.get(model, 0)
         if s.remaining_tokens is not None and s.remaining_tokens < est_tokens:
             wait = min(max(0.0, s.tokens_reset_at - time.time()), MAX_WAIT_S)
             if wait > 0:

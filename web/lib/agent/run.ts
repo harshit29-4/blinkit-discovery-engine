@@ -97,7 +97,7 @@ async function groq(model: string, messages: Msg[], opts: { tools: boolean; json
     const text = (await res.text()).toLowerCase();
     const daily = text.includes("per day");
     const wait = Number(res.headers.get("retry-after") ?? "60") || 60;
-    if (!daily && res.status === 429 && wait <= 12) throw new Busy(model, wait); // worth waiting for
+    if (!daily && res.status === 429 && wait <= 20) throw new Busy(model, wait); // worth waiting for
     skipUntil.set(model, Date.now() + (daily ? Math.max(wait, 600) : Math.min(wait, 60)) * 1000);
     throw new ModelUnavailable(`${model}: ${daily ? "daily allowance spent" : "busy (per-minute limit)"}`);
   }
@@ -144,8 +144,8 @@ export async function answerQuestion(question: string, history: { role: "user" |
         return r.message;
       } catch (e) {
         // A per-minute limit (e.g. while the daily pipeline uses the same model) clears within
-        // seconds: wait for it twice at most, while the answer stays well inside the 60 s limit.
-        if (e instanceof Busy && waits < 2 && Date.now() - started + e.wait * 1000 < 35_000) {
+        // seconds (the pipeline leaves qwen 4K tokens/min of headroom): wait twice at most, within 40 s.
+        if (e instanceof Busy && waits < 2 && Date.now() - started + e.wait * 1000 < 40_000) {
           waits++;
           const ms = e.wait * 1000 + 250;
           await new Promise((r) => setTimeout(r, ms));

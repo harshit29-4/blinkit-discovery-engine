@@ -324,3 +324,17 @@ def test_daily_cap_stops_pipeline_stages_but_not_theme_naming():
         c.chat_json(model="m", system="s", user="u", stage="tagging", items=1)
     c.chat_json(model="m", system="s", user="u", stage="theme_naming", items=1)  # exempt
     assert calls["n"] == 2 and c.used["m"] == 40
+
+
+def test_pipeline_leaves_per_minute_headroom_for_the_chat():
+    # 4,050 tokens left this minute; a small call needs ~100. With a 4,000 reserve for the chat the
+    # pipeline waits for the minute to reset; without one it goes ahead.
+    def handler(req):
+        return _ok({"items": []}, headers={"x-ratelimit-remaining-tokens": "4050", "x-ratelimit-reset-tokens": "7s"})
+
+    for reserve, expect_wait in ((4000, True), (0, False)):
+        c, sleeps = client(handler)
+        c.tpm_reserve = {"m": reserve}
+        for _ in range(2):  # the first call learns the remaining budget from the headers
+            c.chat_json(model="m", system="s", user="u", stage="crosscheck", items=1, max_tokens=200)
+        assert bool(sleeps) is expect_wait
