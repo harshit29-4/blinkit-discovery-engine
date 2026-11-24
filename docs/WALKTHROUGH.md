@@ -181,6 +181,7 @@ Code: `pipeline/engine/ai/embed.py`, `themes.py`. Daily workflow: `.github/workf
 | Symptom | Cause | Fix |
 |---|---|---|
 | Stats views timed out right after migration 0010 | Adding the generated `fts` column rewrote `raw_items`, which reset the visibility map, so the covering indexes could no longer answer from the index alone | `VACUUM (ANALYZE) raw_items`: back to index-only scans. Do this after any migration that rewrites a big table |
+| Site build failed again after the first YouTube collection (23,000 new rows) | Postgres only auto-vacuums after inserts of 20% of a table, so the new rows weren't marked visible and the stats views' index-only scans fell back to reading the table | `VACUUM (ANALYZE)`, and migration 0015 sets `raw_items` to auto-vacuum after 2% (~2,200 rows), so daily runs keep it current |
 | Site build failed on `v_ai_funnel` (7 s) | The view scanned `item_screen` six times and `item_tags` five times | Migration 0014: one pass per table with `FILTER` (0.2 s) |
 | Evidence "AI-tagged only" + keyword timed out | `ai_tagged` is computed from a left join, so the planner walked every keyword match looking for the few tagged rows | `v_evidence_tagged` starts from the 344 tagged entries (0.2 s); used whenever a tag filter is set |
 | Vercel build failed: "statement timeout" | Dashboard views read every full review row (109k reviews + 368k ratings); public queries are limited to 3 s | Covering indexes (migration 0007): 3.4 s → 72 ms |
