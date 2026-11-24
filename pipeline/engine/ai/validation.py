@@ -166,6 +166,7 @@ def compute_metrics(store: Any) -> dict[str, Any]:
     cross = store.load_table_by_key("item_crosscheck")
     stab = store.load_table_by_key("item_stability", latest_week=True)
     funnel = store.load_funnel()
+    state = {"learned_screen": store.get_state("learned_screen")} if hasattr(store, "get_state") else {}
     out: list[dict] = []
 
     def put(metric: str, value: float | None, n: int, **details):
@@ -207,9 +208,21 @@ def compute_metrics(store: Any) -> dict[str, Any]:
         ctrl_rate = f["control_relevant"] / f["control_checked"]
         cand_rate = f["candidates_relevant"] / f["candidates_checked"] if f.get("candidates_checked") else 0
         found = cand_rate * f["candidates"]
-        missed = ctrl_rate * (f["excluded"] + f["control_sample"])
+        # Entries without a keyword hit: still 'excluded', moved to 'promoted' by the learned screen, or control.
+        no_keyword = f["excluded"] + f.get("promoted", 0) + f["control_sample"]
+        missed = ctrl_rate * no_keyword
         put("v6_keyword_recall", found / (found + missed) if (found + missed) else None, f["control_checked"],
             control_relevant_rate=ctrl_rate, candidate_relevant_rate=cand_rate)
+        # V6b: keywords + learned screen. The screen's recall on entries with no keyword hit is measured by
+        # cross-validation on the control sample (engine/ai/learned_screen.py), and applies once those
+        # entries have been scored (`coverage`).
+        ls = (state or {}).get("learned_screen") or {}
+        if ls.get("control_recall") is not None and (found + missed):
+            coverage = f.get("scored", 0) / max(f["excluded"] + f.get("promoted", 0), 1)
+            caught = missed * ls["control_recall"] * min(coverage, 1.0)
+            put("v6b_screen_recall", (found + caught) / (found + missed), ls.get("control_n", 0),
+                screen_recall_no_keyword=ls["control_recall"], screen_precision_no_keyword=ls.get("control_precision"),
+                auc=ls.get("auc"), coverage=round(coverage, 4), keyword_only=found / (found + missed))
 
     # V7 stability (latest weekly panel vs the production tags)
     sp = [(current[k], s) for k, s in stab.items() if k in current and s.get("prompt_version") in (None, prompts.PROMPT_VERSION)]

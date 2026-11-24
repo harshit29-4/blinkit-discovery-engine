@@ -82,6 +82,7 @@ Daily at 02:23 IST (or from the Run button): **collect → pre-filter → AI rel
 | # | Stage | Tool / model | What it does | Why this way |
 |---|---|---|---|---|
 | 1 | Pre-filter | Code (no AI) | Detects English / Hindi / Hinglish; keyword screen for categories, discovery, trust, habits, info needs; keeps a reproducible **5% control sample** of skipped entries. | AI quota is scarce, so cheap keywords go first, and the control sample *measures* what keywords miss. |
+| 1b | **Learned screen** | Logistic regression on gte-small embeddings (local CPU) | Trained on the relevance gate's own past decisions; scores everything the keywords skipped and promotes likely relevant entries (score ≥ 0.5) to the gate. | Keywords reached only 28% of relevant feedback; with the learned screen it's 78%. No AI tokens. |
 | 2 | Relevance gate | **gpt-oss-20b** (Groq) | Yes/no: is this about what or why people buy (vs only delivery/payment/support)? Batches of 30. | Small fast model for a simple decision. |
 | 3 | Tagging + translation | **gpt-oss-120b** (Groq) | Fixed taxonomy: sentiment, categories, category behaviour, barriers, funnel stage, discovery channels, info needs, segment signals, unmet need; a **verbatim supporting quote**; English translation for Hindi/Hinglish. | Biggest model for the hardest task. A fixed taxonomy makes tags countable. |
 | 4 | Translation check | **qwen3.8-27b** (Groq) | Scores each translation; failures are never shown. | A different model family catches the translator's blind spots. |
@@ -106,7 +107,7 @@ Daily at 02:23 IST (or from the Run button): **collect → pre-filter → AI rel
 | V2 Stars vs sentiment | AI sentiment vs the reviewer's own 1–2 / 4–5 stars | 96% agree (304) | The AI reads tone correctly. |
 | V3 Grounding | The supporting quote must appear verbatim in the text | 98% (442) | Tags are backed by real words; failed quotes are never shown. |
 | V4 Schema | Raw output valid against the taxonomy | 97% | |
-| V6 Keyword recall | Relevance rate in the control sample vs candidates | ~28% | **The keyword screen misses most relevant feedback.** Honest limitation, and the top next step. |
+| V6 / V6b Recall | Relevance rate in the control sample (never filtered) vs the screened-in pools | keywords alone ~28%; **with the learned screen ~78%** | Found a real gap (28%) and fixed it with a classifier trained on the AI's own decisions; the control sample keeps measuring it. |
 | V7 Stability | Same panel re-tagged a week later | 90% | Little drift. |
 | V8 Translation | Second model scores translations | 81% pass (26) | Failed translations are hidden. |
 | V10 Ask answers | Citations valid, numbers traced, support score | 12 answers: 100% citations, 100% numbers, mean support 0.76 | |
@@ -194,6 +195,7 @@ Say "suggests" and "in the tagged sample", not "proves" or "all users". Written 
 
 ## 13. Problems I hit and how I solved them (pick 3 for "tell me about a challenge")
 
+0. **Low recall, found by measuring.** A 5% control sample of entries the keyword filter skipped showed the filter reached only 28% of relevant feedback. I trained a classifier on the AI gate's own past decisions (embeddings + logistic regression, AUC 0.88, cross-validated), scored the 85,000 skipped entries in 19 minutes on CPU, and raised recall to 78% without spending AI tokens.
 1. **"It's not really AI-powered."** The first version was a dashboard. I rebuilt it around AI stages with measurable checks, and later replaced pre-written answers with an agent.
 2. **AI agreement looked terrible (κ ≈ 0.2).** Part of it was unfair: tags and cross-checks used different prompt wordings. I versioned prompts, re-tagged, and compared like with like. Concrete fields rose to 0.8; interpretive fields stayed weak, and I report that openly.
 3. **The chat and the pipeline fought over the same free quota.** Live questions failed on launch day. Fix: per-model daily caps, a per-minute reserve, a second provider (Gemini) for answers, waiting out short rate limits, and a fallback chain.
@@ -207,7 +209,7 @@ Say "suggests" and "in the tagged sample", not "proves" or "all users". Written 
 ## 14. Trade-offs and limitations (say these before they're asked)
 
 - **Small tagged sample** (442 of an estimated ~10K+ relevant entries), limited by free AI quotas; margins of error are shown.
-- **Keyword screen recall is low (~28%)**: many relevant entries never reach the AI. Next step below.
+- **The AI relevance gate is the bottleneck**: after the learned screen raised recall to ~78%, ~39,000 entries wait at ~900 checks a day. The tagged set stays a random sample, so findings are unbiased but grow slowly.
 - **Funnel stage and category behaviour tags are unreliable** (κ 0.2–0.3); answers are told to treat them with care.
 - **Review data is biased:** negative, Play Store-heavy, and self-selected. It says little about discovery or segments.
 - **Unofficial sources** (Play scraper, Arctic Shift) can break without notice; the run log and Health page make that visible.
@@ -231,6 +233,8 @@ Say "suggests" and "in the tagged sample", not "proves" or "all users". Written 
 - *Why not let the LLM create themes directly?* It would invent and drift; clustering is reproducible and the LLM only names and merges groups, with statistics computed in code.
 - *How did you choose the sample size?* Budget-bound; I report the margin of error (±4.7 points at 442) rather than overstate precision.
 - *What is RAG here?* The Ask agent retrieves evidence through tools (full-text search, SQL counts) before answering: retrieval-augmented generation with tool calling, plus verification.
+- *How did you improve recall without more AI calls?* Section 13, story 0: a learned screen (logistic regression on embeddings) trained on the expensive model's own labels: a cheap model learns from the expensive one (a form of distillation / weak supervision).
+- *How do you know the learned screen works?* 5-fold cross-validation (AUC 0.88), and the control sample it never touches: 69% of relevant non-keyword entries caught at 74% precision.
 - *Why keyword search and not vector search for the agent?* Keyword + tag filters were enough, faster and free; semantic search is a planned upgrade.
 
 **Engineering**
@@ -249,4 +253,4 @@ Say "suggests" and "in the tagged sample", not "proves" or "all users". Written 
 
 ## 16. What's next
 
-See the end of [WALKTHROUGH.md](WALKTHROUGH.md) for the current roadmap. In short: raise keyword-screen recall (send more entries to the AI gate or screen with embeddings), grow the tagged sample, add semantic search to the agent, run the Part 2 interviews to validate findings (V9), and turn the findings into the Part 3 problem statement and Part 4 MVP.
+See the end of [WALKTHROUGH.md](WALKTHROUGH.md) for the current roadmap. In short: increase relevance-gate throughput (recall itself is now ~78%), grow the tagged sample, add semantic search to the agent, run the Part 2 interviews to validate findings (V9), and turn the findings into the Part 3 problem statement and Part 4 MVP.

@@ -6,7 +6,7 @@ on:
     inputs:
       stages:
         description: "comma-separated stages"
-        default: screen,relevance,tag,translation,crosscheck,stability,embed,themes,metrics
+        default: screen,rescreen,relevance,tag,translation,crosscheck,stability,embed,themes,metrics
       minutes:
         description: "time budget in minutes"
         default: "60"

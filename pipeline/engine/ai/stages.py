@@ -71,6 +71,7 @@ def _fetch(stage: str, fetch, n: int, deadline: float) -> list[dict]:
 SLICE_S = 300.0  # a lane gives each of its stages up to 5 minutes per turn
 # Keys whose counts mean "this stage did work" (as opposed to flags like stopped_daily_limit).
 _PROGRESS = {"tagged", "candidate_relevant", "candidate_not_relevant", "control_relevant", "control_not_relevant",
+             "promoted_relevant", "promoted_not_relevant", "scored",
              "passed", "failed_check", "crosschecked", "retagged", "failed_items", "unanswered"}
 _TERMINAL = {"stopped_daily_limit", "paused_rate_limit", "error", "skipped"}
 
@@ -321,7 +322,7 @@ def run_translation_check(store: Store, groq: GroqClient, deadline: float) -> di
 
 # ---------------------------------------------------------------- runner
 
-STAGES = ("screen", "relevance", "tag", "translation",           # phase A
+STAGES = ("screen", "rescreen", "relevance", "tag", "translation",  # phase A (+ learned screen)
           "embed", "crosscheck", "stability", "themes", "metrics")  # phase B
 
 
@@ -332,6 +333,9 @@ LANE = {
     "relevance": prompts.MODEL_RELEVANCE,
     "tag": prompts.MODEL_TAGGING, "stability": prompts.MODEL_TAGGING,
     "translation": prompts.MODEL_CHECK, "crosscheck": prompts.MODEL_CHECK,
+    # Not a Groq model: the learned screen runs on the runner's CPU, in parallel with the AI lanes,
+    # so the entries it promotes reach the relevance gate in the same run.
+    "rescreen": "local",
 }
 PRE = ("screen",)                      # before the lanes: decides what the AI stages see
 POST = ("embed", "themes", "metrics")  # after the lanes, in reserved time: need the new tags
@@ -341,6 +345,11 @@ def _run_one(stage: str, store: Any, groq: GroqClient | None, deadline: float) -
     try:
         if stage == "screen":
             return run_screen(store, deadline)
+        if stage == "rescreen":  # local classifier: no Groq needed
+            from .embed import Embedder
+            from .learned_screen import run_rescreen
+
+            return run_rescreen(store, Embedder(), deadline)
         if stage == "embed":  # local model: no Groq needed
             from .embed import Embedder, run_embedding
 

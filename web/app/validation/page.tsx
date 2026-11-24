@@ -103,9 +103,19 @@ async function Checks() {
         {m.v4_schema ? <Big>{pctStr(m.v4_schema.value)} of entries needed no correction</Big> : pending}
       </Check>
 
-      <Check id="V6" title="Coverage of the keyword pre-filter" m={m.v6_keyword_recall}
-             what="A random 5% of the entries the keyword screen skipped are also reviewed by the AI. The share of them judged relevant estimates how much relevant feedback the screen misses.">
-        {m.v6_keyword_recall ? (
+      <Check id="V6" title="How much relevant feedback reaches the AI" m={m.v6b_screen_recall ?? m.v6_keyword_recall}
+             what="A random 5% of the entries the keyword screen skipped are reviewed by the AI anyway. That control sample measures how much relevant feedback the screens miss.">
+        {m.v6b_screen_recall ? (
+          <>
+            <Big>about {pctStr(m.v6b_screen_recall.value)} with the learned screen</Big>
+            <p className="mt-1 text-muted">
+              Keywords alone: about {pctStr(m.v6b_screen_recall.details?.keyword_only as number)}. The learned screen (a classifier
+              trained on the AI gate&rsquo;s past decisions) catches {pctStr(m.v6b_screen_recall.details?.screen_recall_no_keyword as number)} of
+              the relevant entries keywords miss, at {pctStr(m.v6b_screen_recall.details?.screen_precision_no_keyword as number)} precision
+              (cross-validated on the control sample). Skipped entries scored so far: {pctStr(m.v6b_screen_recall.details?.coverage as number)}.
+            </p>
+          </>
+        ) : m.v6_keyword_recall ? (
           <>
             <Big>about {pctStr(m.v6_keyword_recall.value)} of relevant feedback captured</Big>
             <p className="mt-1 text-muted">

@@ -161,12 +161,22 @@ async function Pipeline() {
           <Metric label="Control sample" value={fmtInt(f.control_sample)} note="5% of non-candidates" />
           <Metric label="Hindi or Hinglish" value={fmtInt(f.non_english)} />
         </div>
+        <p className="mt-3 rounded-lg bg-bg p-3">
+          <span className="font-medium">Learned screen.</span> Keywords alone reach only part of the relevant feedback, so a small
+          classifier (trained on the AI gate&rsquo;s own past decisions, using gte-small embeddings; no AI tokens) also reads the
+          skipped entries and sends the likely relevant ones to the gate.
+          {f.scored ? <> So far {fmtInt(f.scored)} skipped entries scored, {fmtInt(f.promoted ?? 0)} sent on.</> : null}
+        </p>
       </Stage>
 
       <Stage n={3} id="ai" title="AI relevance gate" method="Model: gpt-oss-20b (via Groq). Decides whether each entry concerns what or why people buy, categories, discovery, trust, habits or information needs, rather than only delivery, payments or support.">
         <div className="flex flex-wrap gap-6">
           <Metric label="Candidates reviewed" value={fmtInt(f.candidates_checked)} note={`of ${fmtInt(f.candidates)}`} />
           <Metric label="Judged relevant" value={`${candRate}%`} note={`${fmtInt(f.candidates_relevant)} entries`} />
+          {f.promoted_checked ? (
+            <Metric label="Sent on by the learned screen" value={fmtInt(f.promoted_checked)}
+                    note={`${pct(f.promoted_relevant ?? 0, f.promoted_checked)}% relevant`} />
+          ) : null}
           <Metric label="Control entries reviewed" value={fmtInt(f.control_checked)}
                   note={f.control_checked ? `${pct(f.control_relevant, f.control_checked)}% relevant` : "pending"} />
         </div>

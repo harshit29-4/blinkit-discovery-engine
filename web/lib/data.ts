@@ -74,6 +74,8 @@ export type Funnel = {
   candidates_checked: number; candidates_relevant: number; control_checked: number; control_relevant: number;
   tagged: number; grounded: number; translated: number; translation_checked: number; translation_passed: number;
   non_english: number;
+  // Learned screen (migration 0016): skipped entries scored by the classifier and sent to the AI gate.
+  promoted?: number; promoted_checked?: number; promoted_relevant?: number; scored?: number;
 };
 export type AiUsage = { day: string; stage: string; model: string; calls: number; items: number;
   tokens_in: number; tokens_out: number; failed_calls: number };

@@ -7,6 +7,7 @@ Your reference guide to how this project works and why it's built this way. It's
 Blinkit wants more monthly active customers to buy from at least one **new category** each month. Before proposing anything, we built an engine that reads public user conversations (Play Store, App Store, Reddit). It tags them with an LLM (Groq), finds recurring themes, and has an **insight engine**: you ask a question (the 8 research questions are one click away) and an AI agent looks up the evidence and answers with checked numbers and cited quotes. It also measures how trustworthy those answers are, automatically, with no human in the loop.
 
 - **Interview preparation (every how / why / which API, with model answers): [INTERVIEW-QA.md](INTERVIEW-QA.md)**
+- Part 2 interview kit (hypotheses from the engine, screener, script, note template): [part2-interview-guide.md](part2-interview-guide.md)
 - Architecture and decisions: [part1-architecture.md](part1-architecture.md)
 - What we learned from other projects: [reference-review.md](reference-review.md)
 - Repo: https://github.com/harshit29-4/blinkit-discovery-engine
@@ -159,6 +160,24 @@ On GitHub, `.github/workflows/analyse.yml` runs this hourly at minute 40, time-b
 - `rel-v2`: v1 rejected product return/exchange complaints as "support only". Return policy is part of the risk of trying a new category, so it now counts as relevant (14 of 15 such entries flipped).
 - `tag-v2`: v1 guessed a funnel stage from generic praise ("good products" → repeat). Now "none" unless the text describes the stage.
 - `tag-v3` + `cross-v2`: the first cross-model scores for funnel stage and behaviour were weak (κ ≈ 0.2), partly because the cross-checker got shorter definitions than the tagger. Both prompts now share `core_field_rules()` verbatim, with explicit definitions for every behaviour and funnel-stage value. Migration 0009 makes the queues re-tag and re-check outdated entries first, and validation scores **only pairs on the current versions** (recorded in the metric's details), so the score measures the models, not the wording.
+
+### The learned screen (added 2026-11-24)
+
+**Problem.** The keyword pre-filter was measured (V6, control sample) to reach only **~28%** of relevant feedback: 37% of the entries it skipped were judged relevant by the AI gate, against 64% of the ones it kept. Keywords simply miss how people actually write.
+
+**Fix.** A small classifier learns what the AI gate considers relevant, and reads everything the keywords skipped (`engine/ai/learned_screen.py`, stage `rescreen`):
+1. Every run, it takes up to 4,000 entries the relevance gate has already judged (a random sample, read in pages because the database API returns at most 1,000 rows per call) and embeds them with **gte-small** (local, no API).
+2. It trains a **logistic regression** on those embeddings (relevant vs not), with balanced class weights.
+3. It measures itself with **5-fold cross-validation**, especially on the control sample (entries with no keyword hit), and stores the result in `ai_state.learned_screen`.
+4. It scores every skipped entry not yet scored; those at **0.5 or above** move from `excluded` to a new pool, **`promoted`**, which the relevance gate already reads. The control sample is never scored or moved, so it keeps measuring recall honestly.
+
+It uses **no AI tokens** (CPU only) and runs in its own lane, in parallel with the Groq lanes, so promoted entries can reach the gate in the same run. It stops after 40 minutes to leave CPU for embeddings and themes.
+
+**Experiment before building** (2,619 gate decisions): AUC **0.88**. On entries with no keyword hit, a 0.5 threshold sends 34% of them on, catching **71%** of the relevant ones at **77%** precision, better than the keywords' own 64%.
+
+**First run:** all **84,997** skipped entries scored in 19 minutes on a laptop; **20,928** promoted. Overall recall (V6b on the Validation page) rose from **28% to 78%**. Measured on the control sample: the screen catches 69% of relevant non-keyword entries at 74% precision.
+
+**Consequence to know:** the AI relevance gate is now the bottleneck (~18,000 keyword candidates plus ~21,000 promoted entries waiting, ~900 checked per day on the free tier). Entries are checked in a fixed random order across all pools, so the tagged set stays a random sample of everything relevant; it just grows gradually.
 
 ## 4. How tagging is used on the website
 
@@ -359,7 +378,8 @@ gh workflow run collect.yml -f mode=backfill -f source=all
 
 | Priority | Phase | Why | Effort |
 |---|---|---|---|
-| 1 | **Raise keyword-screen recall** (currently ~28%): send part of the "excluded" pool to the AI relevance gate each day, or screen with embeddings (similarity to known-relevant entries) instead of keywords | Most relevant feedback never reaches the AI today; this is the biggest quality gap | Medium |
+| ✅ | **Raise keyword-screen recall**: done 2026-11-24 with the learned screen (28% → 78%) | | |
+| 1 | **Relevance-gate throughput**: ~39,000 entries wait for the AI gate at ~900/day. Options: use the learned screen's high-confidence scores (≥ 0.9 or ≤ 0.1) to skip the gate for clear cases (needs a measured error rate first), or run the gate on Gemini's spare quota | The tagged sample grows slowly | Medium |
 | 2 | **Grow the tagged sample** using the Gemini quota for tagging on days the chat is quiet, or batch more entries per call | 442 tagged entries means ±4.7-point margins; segment and discovery questions need more | Small–medium |
 | 3 | **Part 2 interviews (V9)**: 5–6 users from the target segment, script built from the top themes; record agreement with each finding on the Validation page | Reviews barely cover discovery and segments; interviews close that gap and validate the AI | Not code |
 | 4 | **Semantic search for the Ask agent** (embeddings already exist for tagged entries; extend to all relevant ones) | Keyword search misses paraphrases ("stale", "not fresh", "old stock") | Medium |

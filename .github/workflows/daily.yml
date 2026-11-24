@@ -54,5 +54,5 @@ jobs:
       - name: Analyse
         run: >
           python -m engine analyse
-          --stages screen,relevance,tag,translation,crosscheck,stability,embed,themes,metrics
+          --stages screen,rescreen,relevance,tag,translation,crosscheck,stability,embed,themes,metrics
           --minutes 100 --trigger schedule
