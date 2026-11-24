@@ -6,6 +6,7 @@ Your reference guide to how this project works and why it's built this way. It's
 
 Blinkit wants more monthly active customers to buy from at least one **new category** each month. Before proposing anything, we built an engine that reads public user conversations (Play Store, App Store, Reddit). It tags them with an LLM (Groq), finds recurring themes, and has an **insight engine**: you ask a question (the 8 research questions are one click away) and an AI agent looks up the evidence and answers with checked numbers and cited quotes. It also measures how trustworthy those answers are, automatically, with no human in the loop.
 
+- **Interview preparation (every how / why / which API, with model answers): [INTERVIEW-QA.md](INTERVIEW-QA.md)**
 - Architecture and decisions: [part1-architecture.md](part1-architecture.md)
 - What we learned from other projects: [reference-review.md](reference-review.md)
 - Repo: https://github.com/harshit29-4/blinkit-discovery-engine
@@ -270,9 +271,14 @@ Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `n
 
 **Caching (this Next.js version is different):** with `cacheComponents` on, every data read must either be cached (`'use cache'` + `cacheLife`) or sit inside `<Suspense>`. All reads in `web/lib/data.ts` use `cacheLife('minutes')`: fresh within ~1 minute, which suits a pipeline that writes hourly. Even "today's date" for the 90-day chart is computed inside the cached function, because reading the clock during rendering is flagged by the framework. The production build prerenders Overview and Health (revalidated every minute) and streams Evidence results per search.
 
-**Brand colours:** the frame (yellow header, black/yellow active tab, green buttons and links) uses Blinkit's widely cited colours: yellow `#F8CB46`, green `#0C831F`, near-black `#1C1C1C`. These are third-party values; Blinkit publishes no official codes. Every pairing was chosen by measured contrast: black on yellow 11:1, green on white 4.9:1, a lightened green `#4CC962` in dark mode. Green text never goes on yellow (only 3.2:1). There's no Blinkit logo, and the header itself says the project isn't affiliated with Blinkit, because brand colours make a site look official.
+**Design (redesigned 2026-11-24 to follow Blinkit's app):** the palette was read from blinkit.com's live CSS: white and `#F8F8F8` panels, `#E8E8E8` borders, `#1F1F1F` / `#666666` text, green `#0C831F` for actions, yellow `#F8CB46` for the hero and highlights, pale blue `#EDF4FB` and pale green `#F7FFF9` tiles. Blinkit's font ("Okra") is proprietary, so the site uses Plus Jakarta Sans, the closest free match. Layout patterns borrowed from Blinkit:
+- a white sticky header with a big rounded **ask bar** (like Blinkit's "Search 'milk'"); it sends the question to the Ask page (`/ask?q=…`), which asks it once and then cleans the address;
+- a **tab strip** on desktop and a **bottom tab bar** on phones (Home, Ask, Themes, Evidence, Learn), like the Blinkit app;
+- Home: a yellow hero with the question box, the 8 research questions as **category-style tiles**, three coloured **banner cards** (Themes, Evidence, Validation) with live numbers, then "Data at a glance";
+- every page has a one-line header and a **"How this works →"** link; all explanations live on How it works (4-step summary, section links, evidence-search tips, how the checks work, glossary), so the working pages stay short;
+- Evidence: search bar first, the other filters folded under "More filters"; Themes: summary chips, two quotes per theme, "Ask about this theme".
 
-**Design choices:** chart colours stay on the Okabe–Ito palette (colour-blind safe, unlike yellow/green) and every chart also states its numbers in text; light and dark mode; no text under 14px; tested with no sideways scrolling at 375px phone width (the runs list is stacked rather than a wide table for that reason). The site says it's an independent project, not affiliated with Blinkit.
+There's no Blinkit logo (a yellow "D" badge instead), and the header and footer say it's an independent project, because brand colours make a site look official. Charts stay on the colour-blind-safe Okabe–Ito palette and state their numbers in text; light and dark mode; no text under 14px; checked at 375px phone width with no sideways scrolling.
 
 **Production hardening (2026-11-23), tested against `next build` + `next start`, 42/42 checks passing:**
 
@@ -348,3 +354,15 @@ gh workflow run collect.yml -f mode=backfill -f source=all
 - **Cross-model agreement**: two different AI models tag the same review without seeing each other's answer. Where they agree, the tag is more trustworthy; where they don't, it gets flagged.
 - **Cohen's κ (kappa)**: agreement between two taggers, corrected for chance. 0.6+ counts as substantial.
 - **Grounding**: checking that every quote the AI cites really exists in the source text.
+
+## Roadmap: what would make it better (as of 2026-11-24)
+
+| Priority | Phase | Why | Effort |
+|---|---|---|---|
+| 1 | **Raise keyword-screen recall** (currently ~28%): send part of the "excluded" pool to the AI relevance gate each day, or screen with embeddings (similarity to known-relevant entries) instead of keywords | Most relevant feedback never reaches the AI today; this is the biggest quality gap | Medium |
+| 2 | **Grow the tagged sample** using the Gemini quota for tagging on days the chat is quiet, or batch more entries per call | 442 tagged entries means ±4.7-point margins; segment and discovery questions need more | Small–medium |
+| 3 | **Part 2 interviews (V9)**: 5–6 users from the target segment, script built from the top themes; record agreement with each finding on the Validation page | Reviews barely cover discovery and segments; interviews close that gap and validate the AI | Not code |
+| 4 | **Semantic search for the Ask agent** (embeddings already exist for tagged entries; extend to all relevant ones) | Keyword search misses paraphrases ("stale", "not fresh", "old stock") | Medium |
+| 5 | **Fix weak tags**: rewrite funnel stage and category behaviour definitions with examples, or drop them in favour of reliable fields | κ 0.2–0.3: not usable for decisions | Small |
+| 6 | **Part 3 + Part 4**: problem statement from the findings, then the deployed MVP (e.g. a "try a new category, easy returns" experience) | The brief's remaining parts | Large |
+| Later | Forums / X / Instagram, competitor comparison (Zepto, Instamart), alerts when a theme grows week over week | Nice to have | Medium |

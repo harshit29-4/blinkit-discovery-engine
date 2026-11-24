@@ -6,5 +6,6 @@ An AI-powered research engine that analyses public user feedback about Blinkit a
 
 - Architecture: [docs/part1-architecture.md](docs/part1-architecture.md)
 - Walkthrough: [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md)
+- Interview guide: [docs/INTERVIEW-QA.md](docs/INTERVIEW-QA.md)
 
 Stack: Python · GitHub Actions · Groq · Supabase (Postgres + pgvector) · Next.js on Vercel. Free tiers only.
