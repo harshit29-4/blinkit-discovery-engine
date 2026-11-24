@@ -29,7 +29,7 @@ export default function HowItWorksPage() {
 }
 
 function Stage({ n, title, method, children, status = "live" }: {
-  n: number; title: string; method: string; children: ReactNode; status?: "live" | "planned";
+  n: number; title: string; method: string; children: ReactNode; status?: "live" | "planned" | "on_request";
 }) {
   return (
     <li className="relative rounded-xl border border-border bg-surface p-5">
@@ -37,8 +37,8 @@ function Stage({ n, title, method, children, status = "live" }: {
         <h2 className="font-semibold tracking-tight">
           <span className="mr-2 text-muted tabular-nums">{n}.</span>{title}
         </h2>
-        <span className={`rounded-full px-2 py-0.5 text-sm font-medium ${status === "live" ? "bg-accent-soft text-accent" : "bg-border text-text"}`}>
-          {status === "live" ? "Runs daily" : "In development"}
+        <span className={`rounded-full px-2 py-0.5 text-sm font-medium ${status === "planned" ? "bg-border text-text" : "bg-accent-soft text-accent"}`}>
+          {status === "live" ? "Runs daily" : status === "on_request" ? "On request" : "In development"}
         </span>
       </div>
       <p className="mt-1 text-sm text-muted">{method}</p>
@@ -124,11 +124,13 @@ async function Pipeline() {
       <Stage n={6} title="Embeddings and theme discovery" method="Each tagged entry is embedded with gte-small (run locally, no API). UMAP and HDBSCAN group similar entries; gpt-oss-120b names each group from its most representative verified quotes. Size, ratings, sentiment and trends are computed in code.">
         <p><Link href="/themes" className="text-accent underline underline-offset-2">See the current themes</Link></p>
       </Stage>
-      <Stage n={7} title="Insights for the eight research questions" status="planned" method="Statistics are computed in code; a model writes each finding with at least three cited entries. Findings are published only if grounding and faithfulness checks pass.">
-        <p className="text-muted">Builds on stages 4 and 6.</p>
-      </Stage>
-      <Stage n={8} title="Research agent" status="planned" method="A tool-using agent that searches and counts the tagged evidence to answer new questions, citing the entries it relied on.">
-        <p className="text-muted">Builds on stages 4 to 7.</p>
+      <Stage n={7} title="Insight engine (Ask)" status="on_request" method="Model: qwen3.8-27b (gpt-oss-20b when its allowance is used up), with tool calling. Instead of pre-written findings, the agent answers each question by calling read-only database tools: keyword search over all entries, counts and shares of tagged entries (computed in SQL), the current themes and the reliability results. It cites the entries it used.">
+        <p>
+          Each answer is checked before it is shown: citations must be entries the agent retrieved, every number must
+          appear in the retrieved data, and gpt-oss-20b scores whether the cited evidence supports the claims. The
+          eight research questions are offered as one-click questions.{" "}
+          <Link href="/ask" className="text-accent underline underline-offset-2">Ask a question</Link>
+        </p>
       </Stage>
 
       <li>

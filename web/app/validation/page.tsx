@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense, type ReactNode } from "react";
 import { Card, Skeleton } from "@/components/ui";
-import { getValidation, type Metric } from "@/lib/data";
+import { getChatQuality, getValidation, type Metric } from "@/lib/data";
 import { fmtDateTime, fmtInt } from "@/lib/format";
 import { kappaBand } from "@/lib/research";
 import { label } from "@/lib/taxonomy";
@@ -46,7 +46,7 @@ function Big({ children }: { children: ReactNode }) {
 }
 
 async function Checks() {
-  const rows = await getValidation();
+  const [rows, chat] = await Promise.all([getValidation(), getChatQuality()]);
   const m = Object.fromEntries(rows.map((r) => [r.metric, r])) as Record<string, Metric | undefined>;
   const pending = <p className="text-muted">Not computed yet. Results appear after the next scheduled analysis run.</p>;
   const v1 = [
@@ -139,6 +139,20 @@ async function Checks() {
       <Check id="V8" title="Translation fidelity" m={m.v8_translation}
              what="Hindi and Hinglish entries are translated by the tagging model and checked by a different model family. Failed translations are kept for counts but never shown or quoted.">
         {m.v8_translation ? <Big>{pctStr(m.v8_translation.value)} passed</Big> : pending}
+      </Check>
+
+      <Check id="V10" title="Answer checks (Ask page)"
+             what="Every answer from the insight engine is checked before it is shown: each citation must be an entry the agent retrieved, each number must appear in the data it retrieved (allowing for rounding), and a second model family (gpt-oss-20b) scores how far the cited evidence supports the claims. Answers that fail are rewritten once, and any remaining failure is shown with the answer.">
+        {chat && chat.answers > 0 ? (
+          <>
+            <Big>{pctStr(chat.numbers_verified_rate)} of answers had every number traced to the data</Big>
+            <p className="mt-2 text-muted">
+              Citations valid in {pctStr(chat.citations_valid_rate)} of answers · mean support score{" "}
+              {chat.mean_faithfulness === null ? "—" : pctStr(chat.mean_faithfulness)} · {fmtInt(chat.answers)} answers
+              checked ({fmtInt(chat.cached_answers)} more served from the 24-hour cache).
+            </p>
+          </>
+        ) : <p className="text-muted">Results appear once questions have been asked on the Ask page.</p>}
       </Check>
 
       <Check id="V9" title="Primary research"

@@ -34,11 +34,14 @@ function totalFrom(range: string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/** GET /rest/v1/<view>?<query>. With `count`, also returns the exact total row count. */
+/**
+ * GET /rest/v1/<view>?<query>. With `count`, also returns the total row count: exact, or with
+ * "estimated" the planner's estimate when the result is large (exact when it is small).
+ */
 export async function select<T>(
   view: string,
   query: Query = {},
-  opts: { count?: boolean } = {},
+  opts: { count?: boolean | "estimated" } = {},
 ): Promise<{ rows: T[]; total: number | null }> {
   const url = new URL(`${projectUrl()}/rest/v1/${view}`);
   for (const [k, v] of Object.entries(query)) {
@@ -46,7 +49,7 @@ export async function select<T>(
   }
   const headers: Record<string, string> = { apikey: key() };
   if (key().startsWith("eyJ")) headers.Authorization = `Bearer ${key()}`; // legacy anon JWT
-  if (opts.count) headers.Prefer = "count=exact";
+  if (opts.count) headers.Prefer = opts.count === "estimated" ? "count=estimated" : "count=exact";
 
   const res = await fetch(url, { headers });
   // 416 = asked for a page past the last row (e.g. ?page=999999): not an error, just empty.
@@ -61,4 +64,27 @@ export async function select<T>(
   }
   const rows = (await res.json()) as T[];
   return { rows, total: opts.count ? totalFrom(res.headers.get("content-range")) : null };
+}
+
+/**
+ * POST /rest/v1/rpc/<fn>. Read-only agent tools use the publishable key. The chat's guard, cache and
+ * log functions need `secret: true`: they run only in /api/ask on the server, with SUPABASE_SECRET_KEY
+ * (a server-only variable, never sent to the browser).
+ */
+export async function rpc<T>(fn: string, params: Record<string, unknown>, opts: { secret?: boolean } = {}): Promise<T> {
+  const k = opts.secret ? process.env.SUPABASE_SECRET_KEY : key();
+  if (!k) throw new Error("SUPABASE_SECRET_KEY is not set (web/.env.local or Vercel env)");
+  const headers: Record<string, string> = { apikey: k, "Content-Type": "application/json" };
+  if (k.startsWith("eyJ")) headers.Authorization = `Bearer ${k}`;
+  const res = await fetch(`${projectUrl()}/rest/v1/rpc/${fn}`, {
+    method: "POST", headers, body: JSON.stringify(params), cache: "no-store",
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    const detail = body.trimStart().startsWith("<") ? "(blocked by upstream firewall)" : body.slice(0, 200);
+    throw new UpstreamError(res.status, `rpc/${fn}`, detail);
+  }
+  const text = await res.text();
+  return (text ? JSON.parse(text) : null) as T;
 }

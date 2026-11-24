@@ -2,9 +2,9 @@ name: tests
 
 on:
   push:
-    paths: ["pipeline/**", ".github/workflows/tests.yml"]
+    paths: ["pipeline/**", "web/lib/agent/**", "web/tests/**", ".github/workflows/tests.yml"]
   pull_request:
-    paths: ["pipeline/**"]
+    paths: ["pipeline/**", "web/lib/agent/**", "web/tests/**"]
 
 jobs:
   pytest:
@@ -21,3 +21,16 @@ jobs:
           cache-dependency-path: pipeline/requirements-ai.txt
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest -q
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      # The answer-check tests have no dependencies: Node runs the TypeScript directly.
+      - run: npm test

@@ -42,7 +42,7 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
     theme: one(sp.theme),
   };
   // Only sources that actually hold data are offered as filters.
-  const [{ rows, total, blocked }, counts, { themes }] = await Promise.all([
+  const [{ rows, total, approximate, blocked }, counts, { themes }] = await Promise.all([
     searchEvidence(filters), getSourceCounts(), getThemes(),
   ]);
   const themeName = new Map(themes.map((t) => [t.theme_id, t.name]));
@@ -108,8 +108,9 @@ async function Results({ searchParams }: { searchParams: Promise<SP> }) {
       </form>
 
       <p className="text-sm text-muted" aria-live="polite">
-        {fmtInt(total ?? rows.length)} {total === 1 ? "result" : "results"}
-        {pages > 1 && page <= pages && ` · Page ${fmtInt(page)} of ${fmtInt(pages)}`}
+        {approximate ? "About " : ""}{fmtInt(total ?? rows.length)} {total === 1 ? "result" : "results"}
+        {pages > 1 && page <= pages && ` · Page ${fmtInt(page)} of ${approximate ? "about " : ""}${fmtInt(pages)}`}
+        {filters.q && " · Matches word forms (refund also finds refunds, refunded); use \"quotes\" for a phrase"}
       </p>
 
       {blocked ? (

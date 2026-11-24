@@ -107,6 +107,18 @@ export async function getValidation() {
   return (await select<Metric>("v_validation", { select: "*" })).rows;
 }
 
+export type ChatQuality = {
+  answers: number; citations_valid_rate: number | null; numbers_verified_rate: number | null;
+  mean_faithfulness: number | null; cached_answers: number;
+};
+
+/** Results of the automatic checks on Ask-page answers (no question or answer text is stored). */
+export async function getChatQuality() {
+  "use cache";
+  cacheLife("minutes");
+  return (await select<ChatQuality>("v_chat_quality", { select: "*" })).rows[0] ?? null;
+}
+
 export async function getFunnel() {
   "use cache";
   cacheLife("minutes");
@@ -166,29 +178,41 @@ export async function searchEvidence(f: EvidenceFilters) {
   "use cache";
   cacheLife("minutes");
   const page = Math.min(Math.max(1, Math.floor(f.page ?? 1)), 10_000);
-  // Whole-word match (Postgres regex \m…\M) allowing a plural: "pet" finds pet/pets, not "petty".
-  // Regex metacharacters are escaped; commas/parens would break PostgREST's filter syntax.
-  // Capped at 100 chars: bounds the regex work any single request can ask the database to do.
-  const q = (f.q ?? "").slice(0, 100).replace(/[,()]/g, " ").trim().replace(/[.*+?^${}|[\]\\]/g, "\\$&");
+  // Full-text search on the indexed fts column: English word forms ("refund" finds refunds/refunded),
+  // whole words only ("pet" does not match "petty"), "quoted phrases", OR and -exclusions.
+  // Commas/parens would break PostgREST's filter syntax; capped at 100 characters.
+  const q = (f.q ?? "").slice(0, 100).replace(/[,()]/g, " ").replace(/\s+/g, " ").trim();
   try {
     return { ...(await runSearch(q, f, page)), blocked: false };
   } catch (e) {
     // A search the upstream firewall refuses (e.g. SQL-injection-looking text) gets a calm
     // "couldn't run that search" instead of the whole page failing.
-    if (e instanceof UpstreamError && e.status === 403) return { rows: [] as Evidence[], total: 0, blocked: true };
+    if (e instanceof UpstreamError && e.status === 403) {
+      return { rows: [] as Evidence[], total: 0, approximate: false, blocked: true };
+    }
     throw e;
   }
 }
 
-function runSearch(q: string, f: EvidenceFilters, page: number) {
-  return select<Evidence>(
-    "v_evidence",
+// Every v_evidence column except the search vector, which is only used for filtering.
+const EVIDENCE_COLUMNS =
+  "source,source_id,title,text,rating,url,posted_at,lang_hint,subreddit,post_title,sentiment,categories," +
+  "category_behavior,barriers,funnel_stage,discovery_channels,info_needs,unmet_need,evidence_span,translation," +
+  "ai_tagged,theme_id";
+
+async function runSearch(q: string, f: EvidenceFilters, page: number) {
+  // With any AI-tag filter, search v_evidence_tagged, which starts from the few hundred tagged entries
+  // (in v_evidence the planner would walk every match looking for tagged ones).
+  const taggedOnly = f.tagged === "1" || isKey("barriers", f.barrier) || isKey("categories", f.category) ||
+    isKey("funnel_stage", f.stage) || (!!f.theme && /^\d{1,4}$/.test(f.theme));
+  const res = await select<Evidence>(
+    taggedOnly ? "v_evidence_tagged" : "v_evidence",
     {
-      select: "*",
+      select: EVIDENCE_COLUMNS,
       order: "posted_at.desc",
       limit: PAGE_SIZE,
       offset: (page - 1) * PAGE_SIZE,
-      text: q ? `imatch.\\m${q}(s|es)?\\M` : undefined,
+      fts: q ? `wfts(english).${q}` : undefined,
       source: f.source && SOURCES.includes(f.source as Source) ? `eq.${f.source}` : undefined,
       rating: f.rating && /^[1-5]$/.test(f.rating) ? `eq.${f.rating}` : undefined,
       // AI tag filters: only values from the shared taxonomy are ever sent to the database.
@@ -196,9 +220,10 @@ function runSearch(q: string, f: EvidenceFilters, page: number) {
       categories: isKey("categories", f.category) ? `cs.{${f.category}}` : undefined,
       funnel_stage: isKey("funnel_stage", f.stage) ? `eq.${f.stage}` : undefined,
       theme_id: f.theme && /^\d{1,4}$/.test(f.theme) ? `eq.${f.theme}` : undefined,
-      ai_tagged: f.tagged === "1" || isKey("barriers", f.barrier) || isKey("categories", f.category) || isKey("funnel_stage", f.stage)
-        ? "is.true" : undefined,
     },
-    { count: true },
+    // An exact count of a common word (30,000+ matches) takes seconds, so text-search totals are
+    // estimated by the planner when large (PostgREST counts exactly when the result is small).
+    { count: q ? "estimated" : true },
   );
+  return { ...res, approximate: !!q && (res.total ?? 0) >= 1000 };
 }

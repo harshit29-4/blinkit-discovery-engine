@@ -4,7 +4,7 @@ Your reference guide to how this project works and why it's built this way. It's
 
 ## 0. The project in one minute
 
-Blinkit wants more monthly active customers to buy from at least one **new category** each month. Before proposing anything, we built an engine that reads public user conversations (Play Store, App Store, Reddit). It tags them with an LLM (Groq), finds recurring themes, and answers 8 research questions with cited evidence. It also measures how trustworthy those answers are, automatically, with no human in the loop.
+Blinkit wants more monthly active customers to buy from at least one **new category** each month. Before proposing anything, we built an engine that reads public user conversations (Play Store, App Store, Reddit). It tags them with an LLM (Groq), finds recurring themes, and has an **insight engine**: you ask a question (the 8 research questions are one click away) and an AI agent looks up the evidence and answers with checked numbers and cited quotes. It also measures how trustworthy those answers are, automatically, with no human in the loop.
 
 - Architecture and decisions: [part1-architecture.md](part1-architecture.md)
 - What we learned from other projects: [reference-review.md](reference-review.md)
@@ -170,12 +170,45 @@ Code: `pipeline/engine/ai/embed.py`, `themes.py`. Daily workflow: `.github/workf
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| Stats views timed out right after migration 0010 | Adding the generated `fts` column rewrote `raw_items`, which reset the visibility map, so the covering indexes could no longer answer from the index alone | `VACUUM (ANALYZE) raw_items`: back to index-only scans. Do this after any migration that rewrites a big table |
+| Site build failed on `v_ai_funnel` (7 s) | The view scanned `item_screen` six times and `item_tags` five times | Migration 0014: one pass per table with `FILTER` (0.2 s) |
+| Evidence "AI-tagged only" + keyword timed out | `ai_tagged` is computed from a left join, so the planner walked every keyword match looking for the few tagged rows | `v_evidence_tagged` starts from the 344 tagged entries (0.2 s); used whenever a tag filter is set |
 | Vercel build failed: "statement timeout" | Dashboard views read every full review row (109k reviews + 368k ratings); public queries are limited to 3 s | Covering indexes (migration 0007): 3.4 s → 72 ms |
 | Hourly AI run did no work (HTTP 500 on queues) | Queue functions sorted the whole backlog (1.3–4.6 s idle), over the 8 s API limit under load | Migration 0008: pre-filter reads from a bookmark; relevance/tagging walk an index on a stored random key (all queues < 0.5 s) |
 | Whole tagging batch lost on "Failed to generate JSON" | gpt-oss-120b occasionally can't produce valid JSON for a batch | The batch is split in half and retried; only a half that fails again is penalised |
 | ~370 entries tagged per day | Groq free tier caps each model at ~200k tokens/day | Batches of 12 (tagging) / 30 (relevance) and shorter outputs; the tagged set is a random sample at every point, with its margin of error shown on How it works |
 
-## 6. How insights are generated _(phase C, not built yet)_
+## 6. How insights are generated: the insight engine (phase C)
+
+Decision (2026-11-24): **no pre-written answers to every question.** The site has an **Ask** page instead: a chat where an AI agent answers questions about the feedback. Plan and decisions: [phase-c-plan.md](phase-c-plan.md).
+
+**How one answer is made** (`web/lib/agent/`, `web/app/api/ask/route.ts`):
+
+1. The question goes to **qwen3.8-27b** on Groq with four **tools** it may call (tool calling). If qwen is busy or its daily allowance is spent, **gpt-oss-20b** takes over; the answer says which model wrote it.
+2. The tools are read-only database functions (migration 0010), callable with the public key:
+
+   | Tool | What it returns |
+   |---|---|
+   | `search_feedback` | Entries matching keywords (full-text index over all 109k entries) and/or AI-tag filters; tagged ones first. Each gets an id (E1, E2…) |
+   | `count_feedback` | Counts and shares of tagged entries grouped by a field (barrier, category, segment, month…), with filters. **All arithmetic happens in SQL** |
+   | `get_themes` | The current themes with statistics and one quote each |
+   | `get_reliability` | The validation results, so the agent can warn when a field is weak (e.g. funnel stage) |
+
+3. At most 4 rounds of tool calls (several tools per round), then the agent writes the answer, citing entries as `[E3]`.
+4. **Checks before it's shown** (`web/lib/agent/checks.ts`, unit-tested in `web/tests/`, run with `npm test` in `web/`):
+   - **Citations (code):** every cited id must be an entry a tool returned in this answer.
+   - **Numbers (code):** every number must appear in the retrieved data, allowing only for rounding (57% matches 0.5727; 197 matches only 197). Small whole numbers like "the top 3" are allowed as ordinary language.
+   - **Support (AI judge):** gpt-oss-20b, a different model family, scores 0–1 how far the cited quotes and counts support the claims, and lists unsupported claims.
+   - If a code check fails, the agent gets **one rewrite**; anything still failing is shown with the answer, never hidden.
+5. Results of every answer's checks (not the question or answer text) go to `chat_log`; the Validation page shows them as **V10**.
+
+**Protection of the free allowance:** each visitor can ask 8 questions per hour and the whole site 40 per day (`chat_guard`); identical single questions are answered from a 24-hour cache (`chat_cache`, only answers that passed the checks). The guard, cache and log functions accept only the **secret key**, which lives on Vercel as a server-only variable, so nobody can fill the cache with made-up answers. Visitors are identified by a salted hash of their IP; the IP itself is never stored.
+
+**Token budget per day (Groq free tier: 200K tokens per model):** the pipeline stops each model at a cap, counted over the last 24 hours from `ai_calls` (which the chat also writes to): gpt-oss-120b 150K (tagging), gpt-oss-20b 110K (relevance), qwen3.8-27b 60K (checks). That leaves ~140K tokens of qwen for the chat (an answer costs about 8–14K) and ~90K of gpt-oss-20b for the fallback and the judge. Only these three chat models exist on the account (checked via Groq's model list), so capacity comes from using fewer tokens, not more models.
+
+**Tested on research questions 2, 3 and 6 (2026-11-24):** answers in 6–7 s. Q6 passed all checks (7/7 citations, 9/9 numbers, 100% support). Q3 ("how do users discover products") showed why the rules matter: only 2 of 344 tagged entries name a discovery channel, and the first version of the prompt let the model say "mainly re-ordering" from those 2. The prompt now requires it to call such evidence thin and to describe searched entries as examples, not as shares. The judge's first version saw no counts (the themes output filled its input), which scored a correct answer 0; counts now go first.
+
+**Discussion-source quota:** Reddit entries were stuck behind 88,000 Play Store reviews in the AI queues (none tagged). Up to 40% of every relevance and tagging batch now comes from discussion sources (migrations 0010–0011), so questions about segments and discovery get Reddit evidence.
 
 ## 7. How quality is validated (phases A + B)
 
@@ -191,6 +224,7 @@ Code: `pipeline/engine/ai/validation.py`. Metrics are computed **in code** from 
 | V7 Stability | Weekly: production tagger re-tags a fixed 100-entry panel | Exact agreement (sentiment, funnel stage), barrier overlap |
 | V8 Translation | Second model family scores each translation | % passed |
 | V9 Human | Part 2 interviews | Planned |
+| V10 Answer checks | Every Ask answer: citations valid, numbers traced to the data, support score from a second model | % of answers passing, mean support score |
 
 **Cohen's κ in one line:** how much two raters agree beyond what they'd agree by chance (1 = perfect, 0 = chance). For list fields it's computed per label (present/absent) and averaged over labels with enough examples.
 
@@ -213,8 +247,9 @@ Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `n
 | Page | What it shows | Data (public views, `supabase/migrations/0003_public_views.sql`) |
 |---|---|---|
 | Overview `/` | Totals, source table, star-rating mix (incl. short reviews), the **written-reviews-skew-negative bias note**, daily volume (last 90 days) | `v_source_counts`, `v_rating_mix`, `v_daily_volume`, `pipeline_runs` |
-| Evidence `/evidence` | Every analysable item: whole-word search, source/rating filters, link to the original, 25 per page | `v_evidence` (no author info) |
-| Health `/health` | Every run with per-source results and recorded gaps; how far each source / subreddit has collected | `pipeline_runs`, `v_cursors` |
+| Ask `/ask` | The insight engine: chat with the eight research questions as one-click prompts; each answer shows cited entries, check results and the steps taken | `/api/ask` → agent tools (`search_feedback`, `count_feedback`, `v_themes`, `v_validation`) |
+| Evidence `/evidence` | Every analysable item: full-text search (word forms, "phrases"), source/rating/AI-tag filters, link to the original, 25 per page | `v_evidence`, or `v_evidence_tagged` when an AI-tag filter is set (no author info) |
+| Health `/health` | **Run the pipeline now** button (passcode + 3-hour cooldown), every run with per-source results and recorded gaps; how far each source / subreddit has collected | `/api/run` (GitHub API), `pipeline_runs`, `v_cursors` |
 
 **How it reads data:** server-side only, via Supabase's REST API with the *publishable* key (`web/lib/supabase.ts`). That key maps to the `anon` role, which can read only the public views and the run log. Raw rows and author hashes stay locked by Row Level Security.
 
@@ -238,7 +273,7 @@ Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `n
 | Performance | Warm pages 2–30 ms; first-load JS 174 KB gzipped (React/Next runtime; our own client code is just the nav); DB queries 0.3–30 ms at ~14k rows | Timed 5× per page; `EXPLAIN ANALYZE` on Supabase |
 | Freshness | Pages are cached and refresh in the background: new pipeline data appears within a few minutes | Watched run #3 appear on Health without a redeploy |
 
-**Search detail:** search is whole-word with an optional plural (`pet` finds pet/pets, not "petty"), using a Postgres regex (`\m…\M`) backed by a trigram index.
+**Search detail (since 2026-11-24):** search uses Postgres full-text search on an indexed `fts` column: English word forms (`refund` finds refunds/refunded), whole words only (`pet` doesn't match "petty"), `"quoted phrases"`, `OR` and `-exclusions`. It replaced a regex search that took 1.4 s for common words. An exact count of a common word (30,000+ matches) takes seconds, so large result totals are the planner's estimate, shown as "About 30,851 results".
 
 ## 8b. Deployment (Vercel)
 
@@ -246,7 +281,8 @@ Code: `web/` (Next.js 16.4.6, App Router, TypeScript, Tailwind). Run locally: `n
 - **Live URL: https://blinkit-discovery-engine-six.vercel.app**. The plain `blinkit-discovery-engine.vercel.app` belongs to someone else's project, so Vercel added `-six`.
 - Settings (set with the Vercel CLI): Root Directory `web`, framework Next.js, Node `24.x`.
 - **Function region `hnd1` (Tokyo)**, set in `web/vercel.json`. Vercel's default is Washington DC (`iad1`), but the database is in Tokyo, so every search crossed the Pacific twice. The search page took ~1.1 s live versus 30 ms locally. Running functions next to the database is Vercel's own recommendation; static parts are still served from the Mumbai edge.
-- Environment variables (Production + Preview): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`. They were piped from `.env` by the CLI and are stored as hidden secrets. The secret key and Groq key are **not** on Vercel; the website doesn't need them.
+- Environment variables (Production + Preview), piped from `.env` by the CLI and stored as hidden secrets: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (pages); since phase C also `GROQ_API_KEY` and `SUPABASE_SECRET_KEY` (the Ask API: model calls, rate guard, cache), and `REFRESH_PASSCODE` + `GITHUB_DISPATCH_TOKEN` (the run button). All are read on the server only; none reach the browser.
+- **Run button setup (one-time):** the passcode is generated into `.env` as `REFRESH_PASSCODE` (look it up there; it isn't in git). The GitHub token: github.com → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token. Repository access: **Only select repositories** → `blinkit-discovery-engine`. Permissions → Repository permissions → **Actions: Read and write** (Metadata: read-only is added automatically). Expiration: up to a year. Paste it into `.env` as `GITHUB_DISPATCH_TOKEN=…`; it is then piped to Vercel. When it expires, the button says "GitHub refused to start the run"; make a new token the same way.
 - Data freshness doesn't need redeploys: pages re-read Supabase in the background (about every minute, visible within a few minutes).
 - Useful commands (from `web/`, after `npx vercel login`):
   ```powershell

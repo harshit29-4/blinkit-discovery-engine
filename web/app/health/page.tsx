@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Card, Skeleton, StatusPill } from "@/components/ui";
+import { RunButton } from "@/components/run-button";
 import { SOURCE_LABEL, getCursors, getRuns, type SourceStats } from "@/lib/data";
 import { duration, fmtDateTime, fmtInt } from "@/lib/format";
 
@@ -16,6 +17,7 @@ export default function HealthPage() {
           Collection is fully automated; any gaps are logged and retried in the following run.
         </p>
       </div>
+      <RunButton />
       <Suspense fallback={<Skeleton h="h-80" />}>
         <Runs />
       </Suspense>

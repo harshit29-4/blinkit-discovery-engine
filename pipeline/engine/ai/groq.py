@@ -67,7 +67,7 @@ class CallResult:
 # logs its use to the same ai_calls table. Theme stages are exempt: they are small and run last.
 DAILY_CAPS = {
     "openai/gpt-oss-120b": 150_000,
-    "openai/gpt-oss-20b": 150_000,
+    "openai/gpt-oss-20b": 110_000,   # leaves room for the chat fallback and the answer judge
     "qwen/qwen3.8-27b": 60_000,
 }
 CAP_EXEMPT_STAGES = frozenset({"theme_naming", "theme_consolidation"})
