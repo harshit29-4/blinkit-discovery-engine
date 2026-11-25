@@ -25,3 +25,6 @@ out/
 Thumbs.db
 .vscode/
 .idea/
+
+# Personal interview-prep notes (kept local, not on GitHub)
+/docs/INTERVIEW-QA.md
