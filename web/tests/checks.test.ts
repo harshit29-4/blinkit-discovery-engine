@@ -1,7 +1,7 @@
 // Unit tests for the answer checks. Run: npm test  (Node's built-in runner; Node strips the types).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { answerNumbers, checkCitations, checkNumbers, citedIds, collectNumbers, questionKey } from "../lib/agent/checks.ts";
+import { answerNumbers, checkCitations, checkNumbers, citedIds, collectNumbers, normaliseCitations, questionKey } from "../lib/agent/checks.ts";
 
 test("citations: ids in order, grouped form, unknown ids flagged", () => {
   assert.deepEqual(citedIds("Quality [E3]. Refunds [E1][E3] and [E2, E4]."), ["E3", "E1", "E2", "E4"]);
@@ -49,4 +49,14 @@ test("a fabricated statistic is caught even when other numbers are right", () =>
 
 test("question key normalises case, punctuation and spaces", () => {
   assert.equal(questionKey("  What prevents users — from exploring?? "), "what prevents users from exploring");
+});
+
+test("citations written as (E1), (E1, E2) or a bare id become [E#], but only for ids a tool returned", () => {
+  const k = new Set(["E1", "E2", "E3", "E12"]);
+  assert.equal(normaliseCitations("One review (E1) says.", k), "One review [E1] says.");
+  assert.equal(normaliseCitations("Two (E1, E2) and (E2 and E3).", k), "Two [E1, E2] and [E2, E3].");
+  assert.equal(normaliseCitations("Review E2 notes x; see E12.", k), "Review [E2] notes x; see [E12].");
+  assert.equal(normaliseCitations("Already [E1, E2] and [E3][E12].", k), "Already [E1, E2] and [E3][E12].");
+  assert.equal(normaliseCitations("Unknown (E9) and E99 stay; E3E too.", k), "Unknown (E9) and E99 stay; E3E too.");
+  assert.deepEqual(checkCitations(normaliseCitations("Fake items (E1).", k), k).cited, ["E1"]);
 });

@@ -7,7 +7,7 @@
  */
 import { createHash } from "node:crypto";
 import { getSourceCounts } from "@/lib/data";
-import { answerQuestion, JUDGE_MODEL, ModelUnavailable, type Answer } from "@/lib/agent/run";
+import { answerQuestion, JUDGE_MODEL, ModelUnavailable, PROMPT_VERSION, type Answer } from "@/lib/agent/run";
 import { questionKey } from "@/lib/agent/checks";
 import { rpc } from "@/lib/supabase";
 
@@ -76,7 +76,8 @@ export async function POST(req: Request) {
   }
   const history = parseHistory(body.history);
 
-  const key = questionKey(question);
+  // Versioned, so answers cached under an older prompt are not served after the prompt changes.
+  const key = `v${PROMPT_VERSION}:${questionKey(question)}`;
   if (!history.length) {
     const hit = await rpc<Answer | null>("chat_cache_get", { p_key: key }, { secret: true }).catch(() => null);
     if (hit) {

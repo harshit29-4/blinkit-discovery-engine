@@ -21,6 +21,24 @@ export function citedIds(answer: string): string[] {
 }
 
 /**
+ * Rewrites citation ids the model wrote in another form ("(E1)", "(E1, E2)", "entry E3", "[E1][E2]" is
+ * already fine) into the bracket form the site renders. Only ids a tool returned are touched, so an
+ * ordinary word can't be turned into a citation. Weaker fallback models often cite this way, and the
+ * answer then lost all its evidence.
+ */
+export function normaliseCitations(answer: string, known: Set<string>): string {
+  const ids = (list: string) => list.split(/\s*(?:,|and|&)\s*/).map((s) => s.trim()).filter(Boolean);
+  const allKnown = (list: string) => ids(list).every((id) => known.has(id));
+  return answer
+    // (E1) / (E1, E2) / (E1 and E2) -> [E1, E2]
+    .replace(/\((E\d{1,3}(?:\s*(?:,|and|&)\s*E\d{1,3})*)\)/g, (m, list: string) => allKnown(list) ? `[${ids(list).join(", ")}]` : m)
+    // a bare id outside brackets, e.g. "review E2 says" -> "review [E2] says"; text inside [...] is left alone
+    .split(/(\[[^\]]*\])/)
+    .map((part, i) => i % 2 ? part : part.replace(/\b(E\d{1,3})\b/g, (m, id: string) => known.has(id) ? `[${id}]` : m))
+    .join("");
+}
+
+/**
  * Fails when an id was never returned by a tool, and also when the tools returned entries but the
  * answer cites none (claims about feedback must point at the feedback).
  */

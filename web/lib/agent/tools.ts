@@ -34,19 +34,45 @@ export const TOOL_DEFS = [
   {
     type: "function",
     function: {
+      name: "research_topic",
+      description:
+        "Start here for almost any question. One call returns three things at once: (1) a count of AI-tagged " +
+        "entries grouped by one field, with the filters applied; (2) quotes from AI-tagged entries matching " +
+        "the filters; (3) quotes from ALL collected entries matching the keywords. Ids (E1, E2…) are citable.",
+      parameters: {
+        type: "object",
+        properties: {
+          keywords: { type: "string", description: "Short keywords with synonyms joined by OR, e.g. " +
+            "'diaper OR diapers OR \"baby food\" OR formula'. Required." },
+          group_by: { type: "string", enum: [...Object.keys(GROUP_BY), "habit", "source", "rating", "theme"],
+            description: "What to count by (default: barrier)" },
+          category: FILTERS.category,
+          barrier: FILTERS.barrier,
+          source: FILTERS.source,
+        },
+        required: ["keywords"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "search_feedback",
       description:
         "Find customer feedback entries (app reviews, Reddit, and comments on YouTube videos about Blinkit). Keyword search over all collected entries; " +
         "AI-tagged entries are listed first. Returns entries with ids (E1, E2…) to cite. Use short keyword " +
-        "queries (e.g. 'expired milk', 'pet food', 'refund'), not full sentences.",
+        "queries, not sentences. All words must match, so put synonyms in one query with OR, e.g. " +
+        "'diaper OR diapers OR \"baby food\"', 'fake OR duplicate OR counterfeit'. Untagged entries are " +
+        "keyword matches and may be off-topic: cite only those actually about the question.",
       parameters: {
         type: "object",
         properties: {
           query: { type: "string", description: "Keywords; supports \"quoted phrases\", OR, and -exclusions" },
           ...FILTERS,
-          rating: { type: "integer", minimum: 1, maximum: 5, description: "Only reviews with this star rating" },
-          tagged_only: { type: "boolean", description: "Only entries the AI has tagged" },
-          limit: { type: "integer", minimum: 1, maximum: 8 },
+          // No minimum/maximum: Groq rejects the whole call (HTTP 400) when a model breaks one; values are clamped in code.
+          rating: { type: "integer", description: "Only reviews with this star rating (1-5)" },
+          tagged_only: { type: "boolean", description: "Only entries the AI has tagged (their tags are in ai_tags)" },
+          limit: { type: "integer", description: "How many entries (1-8, default 6)" },
         },
       },
     },
@@ -132,6 +158,7 @@ type CountRow = { value: string; entries: number; share: number; base: number };
 
 const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim().slice(0, 120) : null);
 const int = (v: unknown) => (Number.isInteger(v) ? (v as number) : typeof v === "string" && /^\d+$/.test(v) ? Number(v) : null);
+const rating = (v: unknown) => { const n = int(v); return n !== null && n >= 1 && n <= 5 ? n : null; };
 const oneOf = (v: unknown, allowed: string[]) => (typeof v === "string" && allowed.includes(v) ? v : null);
 
 function labelFor(group: string, value: string): string {
@@ -162,10 +189,48 @@ export async function runTool(name: string, rawArgs: string, reg: EvidenceRegist
     p_theme: int(a.theme_id),
   };
 
+  if (name === "research_topic") {
+    // The fallback models (gpt-oss on Groq) follow a multi-step search plan poorly: they run one narrow
+    // search and stop. This bundles the plan into one call so every answer gets a count, tagged quotes
+    // and a wide keyword search, whichever model writes it.
+    const keywords = str(a.keywords);
+    const tagFilter = { category: oneOf(a.category, keys("categories")), barrier: oneOf(a.barrier, keys("barriers")),
+      source: a.source };
+    const hasTag = !!(tagFilter.category || tagFilter.barrier);
+    let group = oneOf(a.group_by, [...Object.keys(GROUP_BY), "habit", "source", "rating", "theme"]) ?? "barrier";
+    // Grouping by the field you filter on only repeats the filter ("4 of 4 entries are about fakes").
+    if (group === "barrier" && tagFilter.barrier) group = tagFilter.category ? "sentiment" : "category";
+    if (group === "category" && tagFilter.category) group = "barrier";
+    const countArgs = { group_by: group, ...tagFilter, ...(hasTag ? {} : { query: keywords }) };
+    const [count, tagged, wide] = await Promise.all([
+      runTool("count_feedback", JSON.stringify(countArgs), reg),
+      hasTag
+        ? runTool("search_feedback", JSON.stringify({ ...tagFilter, tagged_only: true, limit: 5 }), reg)
+        : runTool("search_feedback", JSON.stringify({ query: keywords, source: a.source, tagged_only: true, limit: 5 }), reg),
+      keywords
+        ? runTool("search_feedback", JSON.stringify({ query: keywords, source: a.source, limit: 6 }), reg)
+        : Promise.resolve({ content: { entries: [] }, summary: "" }),
+    ]);
+    return {
+      content: {
+        count: { counted_by: group, filters: hasTag ? { category: tagFilter.category, barrier: tagFilter.barrier }
+          : { keywords }, ...(count.content as object) },
+        tagged_entries: (tagged.content as { entries: unknown[] }).entries,
+        keyword_entries: (wide.content as { entries: unknown[] }).entries,
+        note: "tagged_entries are examples from the counted set. keyword_entries only contain the keywords: " +
+          "they are not the entries counted above, and some may be off-topic. Cite only relevant ones.",
+        reading: "These entries are mostly complaints from people who DID buy. Write what goes wrong for buyers " +
+          "(e.g. 'buyers report poor freshness'). Do not write that people avoid or don't buy something " +
+          "because of it unless an entry says so itself.",
+      },
+      summary: `count (${count.summary}), ${tagged.summary} tagged, ${wide.summary || "no"} keyword matches`,
+    };
+  }
+
   if (name === "search_feedback") {
     const rows = await rpc<SearchRow[]>("search_feedback", {
-      q: str(a.query), ...filters, p_rating: int(a.rating), p_tagged_only: a.tagged_only === true,
-      k: Math.min(int(a.limit) ?? 6, 8),
+      q: str(a.query), ...filters, p_rating: rating(a.rating), p_tagged_only: a.tagged_only === true,
+      k: Math.min(Math.max(int(a.limit) ?? 6, 1), 8),
     });
     const entries = rows.map((r) => {
       const ev = reg.add({
@@ -192,9 +257,14 @@ export async function runTool(name: string, rawArgs: string, reg: EvidenceRegist
       group_by: group, ...filters, p_sentiment: oneOf(a.sentiment, keys("sentiment")), q: str(a.query),
     });
     const base = rows[0]?.base ?? 0;
+    const counted = rows.reduce((n, r) => n + r.entries, 0);
+    // Weak models ignore the prompt's small-base rule; a flag in the result itself is harder to miss.
+    const thin = base < 20 || counted < 20;
     return {
       content: {
         base, note: "base = AI-tagged entries matching the filters; an entry can have several values",
+        ...(thin ? { evidence: `THIN: only ${base < 20 ? `${base} tagged entries match` : `${counted} tag mentions in total`}. ` +
+          "Say the evidence is thin, give the counts, and do not generalise (no 'mainly', 'most', 'dominant')." } : {}),
         rows: rows.map((r) => ({ value: r.value, label: labelFor(group, r.value), entries: r.entries,
           percent: Math.round(r.share * 1000) / 10 })),
       },
