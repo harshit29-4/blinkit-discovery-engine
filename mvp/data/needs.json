@@ -1,0 +1,114 @@
+{
+ "model": "gemini-3.5-flash-lite",
+ "generated_at": "2026-11-25T14:46:10.244Z",
+ "needs": {
+  "envelope for paperwork tomorrow": {
+   "q": "Envelope for paperwork tomorrow",
+   "hits": [
+    {
+     "id": "envelope-a4",
+     "why": "Size: 32.4 × 22.9 cm (C4, fits A4 unfolded)"
+    },
+    {
+     "id": "envelope-dl",
+     "why": "Size: 22 × 11 cm (DL, fits A4 folded in three)"
+    },
+    {
+     "id": "envelope-cloth",
+     "why": "Cloth-lined envelopes"
+    }
+   ],
+   "note": null
+  },
+  "game for a train with my 8 year old": {
+   "q": "Game for a train with my 8-year-old",
+   "hits": [
+    {
+     "id": "cards-colour-match",
+     "why": "Players: 2–8; Age: 7+; Learn in: About 5 minutes; One game takes: 10–20 minutes"
+    },
+    {
+     "id": "travel-chess",
+     "why": "Players: 2; Age: 6+; In the box: Folding magnetic board and 32 pieces"
+    },
+    {
+     "id": "ludo-snakes",
+     "why": "Players: 2–4; Age: 4+; Learn in: About 2 minutes; One game takes: 20–30 minutes"
+    },
+    {
+     "id": "cards-classic",
+     "why": "Players: 2 or more; Age: 6+; In the box: 52 cards and 2 jokers"
+    }
+   ],
+   "note": null
+  },
+  "fast charger for a samsung galaxy a35": {
+   "q": "Fast charger for a Samsung Galaxy A35",
+   "hits": [
+    {
+     "id": "charger-33w",
+     "why": "Works with: Samsung Galaxy A and M series (Adaptive Fast Charging)"
+    },
+    {
+     "id": "charger-65w",
+     "why": "Works with: Samsung Super Fast Charging (25 W) phones"
+    },
+    {
+     "id": "charger-20w",
+     "why": "Works with: most USB-C phones at standard PD speed"
+    }
+   ],
+   "note": null
+  },
+  "tomatoes for dinner tonight": {
+   "q": "Tomatoes for dinner tonight",
+   "hits": [
+    {
+     "id": "tomato-ripe",
+     "why": "Use today or tomorrow"
+    },
+    {
+     "id": "tomato-mixed",
+     "why": "Mix of red and orange-red"
+    },
+    {
+     "id": "tomato-hybrid",
+     "why": "Tomatoes, hybrid"
+    }
+   ],
+   "note": null
+  },
+  "food for my adult cat chicken flavour": {
+   "q": "Food for my adult cat, chicken flavour",
+   "hits": [
+    {
+     "id": "cat-chicken-gravy-box",
+     "why": "Flavour: Chicken in gravy; Life stage: Adult (1+ years)"
+    },
+    {
+     "id": "cat-chicken-gravy",
+     "why": "Flavour: Chicken in gravy; Life stage: Adult (1+ years)"
+    }
+   ],
+   "note": null
+  },
+  "kettle that s easy to clean inside": {
+   "q": "Kettle that's easy to clean inside",
+   "hits": [
+    {
+     "id": "kettle-1l",
+     "why": "Wide mouth, about 9 cm across: a hand fits in to clean"
+    },
+    {
+     "id": "kettle-1-5l",
+     "why": "Inside: Stainless steel"
+    },
+    {
+     "id": "kettle-glass",
+     "why": "Narrow, about 6 cm: needs a bottle brush to clean"
+    }
+   ],
+   "note": null
+  }
+ }
+}

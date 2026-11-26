@@ -1,0 +1,37 @@
+{
+ "run_at": "2026-11-26T15:03:26.527Z",
+ "passed": 5,
+ "total": 5,
+ "results": [
+  {
+   "id": "A2",
+   "test": "every item has a checked card (54/54)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "A7",
+   "test": "answer-first format holds on every card",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "A6",
+   "test": "better picks are same-category yes cards (22 picks)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "D3",
+   "test": "text contrast meets WCAG AA on 22 token pairs",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "G3",
+   "test": "no real brand names in the catalogue",
+   "pass": true,
+   "detail": ""
+  }
+ ]
+}

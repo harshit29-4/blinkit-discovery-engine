@@ -1,0 +1,37 @@
+{
+ "run_at": "2026-11-26T14:52:41.829Z",
+ "passed": 5,
+ "total": 5,
+ "results": [
+  {
+   "id": "F9",
+   "test": "public key cannot read mvp_events",
+   "pass": true,
+   "detail": "401"
+  },
+  {
+   "id": "F9",
+   "test": "public key cannot read mvp_baskets",
+   "pass": true,
+   "detail": "401"
+  },
+  {
+   "id": "F9",
+   "test": "public key cannot write mvp_events",
+   "pass": true,
+   "detail": "401"
+  },
+  {
+   "id": "F9",
+   "test": "public key cannot call mvp_basket_set",
+   "pass": true,
+   "detail": "401"
+  },
+  {
+   "id": "G1",
+   "test": "card_check events hold no typed text (7 checked)",
+   "pass": true,
+   "detail": ""
+  }
+ ]
+}

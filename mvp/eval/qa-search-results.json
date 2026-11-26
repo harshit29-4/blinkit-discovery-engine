@@ -1,0 +1,150 @@
+{
+ "base": "https://will-it-suit-me.vercel.app",
+ "run_at": "2026-11-26T15:01:13.763Z",
+ "passed": 12,
+ "total": 12,
+ "rows": [
+  {
+   "q": "something to keep my cat's tray clean",
+   "want": "pet",
+   "pass": true,
+   "ai": true,
+   "ms": 2711,
+   "results": [
+    "litter-clumping",
+    "litter-lavender"
+   ]
+  },
+  {
+   "q": "charger for my Pixel phone",
+   "want": "phone",
+   "pass": true,
+   "ai": true,
+   "ms": 2121,
+   "results": [
+    "charger-20w",
+    "charger-33w",
+    "charger-65w"
+   ]
+  },
+  {
+   "q": "fruit that's ready to eat today",
+   "want": "produce",
+   "pass": true,
+   "ai": true,
+   "ms": 2201,
+   "results": [
+    "tomato-ripe",
+    "tomato-mixed",
+    "mango-alphonso",
+    "banana-robusta",
+    "avocado"
+   ]
+  },
+  {
+   "q": "slippers I can wear at home",
+   "want": "footwear",
+   "pass": true,
+   "ai": true,
+   "ms": 1720,
+   "results": [
+    "slippers-cloud",
+    "flipflops-classic",
+    "sliders-sport",
+    "slippers-kids",
+    "slippers-mens-leather"
+   ]
+  },
+  {
+   "q": "need to post a certificate flat",
+   "want": "stationery",
+   "pass": true,
+   "ai": true,
+   "ms": 2843,
+   "results": [
+    "envelope-a4",
+    "envelope-cloth"
+   ]
+  },
+  {
+   "q": "game for four people after dinner",
+   "want": "games",
+   "pass": true,
+   "ai": true,
+   "ms": 2364,
+   "results": [
+    "strategy-board",
+    "ludo-snakes",
+    "cards-colour-match",
+    "cards-classic"
+   ]
+  },
+  {
+   "q": "boil water quickly for tea",
+   "want": "appliances",
+   "pass": true,
+   "ai": true,
+   "ms": 7713,
+   "results": [
+    "kettle-glass",
+    "kettle-1-5l",
+    "kettle-1l"
+   ]
+  },
+  {
+   "q": "earphones for a phone without a headphone jack",
+   "want": "phone",
+   "pass": true,
+   "ai": true,
+   "ms": 3427,
+   "results": [
+    "earphones-typec"
+   ]
+  },
+  {
+   "q": "kitten food",
+   "want": "pet",
+   "pass": true,
+   "ai": true,
+   "ms": 2235,
+   "results": [
+    "kitten-chicken"
+   ]
+  },
+  {
+   "q": "write on a whiteboard in class",
+   "want": "stationery",
+   "pass": true,
+   "ai": true,
+   "ms": 3823,
+   "results": [
+    "marker-whiteboard"
+   ]
+  },
+  {
+   "q": "iron my shirts before work",
+   "want": "appliances",
+   "pass": true,
+   "ai": true,
+   "ms": 2637,
+   "results": [
+    "iron-dry",
+    "iron-steam"
+   ]
+  },
+  {
+   "q": "salad tonight",
+   "want": "produce",
+   "pass": true,
+   "ai": true,
+   "ms": 4792,
+   "results": [
+    "salad-mix",
+    "lettuce-iceberg",
+    "tomato-ripe",
+    "tomato-mixed",
+    "tomato-hybrid"
+   ]
+  }
+ ]
+}

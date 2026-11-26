@@ -1,0 +1,182 @@
+{
+ "base": "https://will-it-suit-me.vercel.app",
+ "run_at": "2026-11-26T15:05:04.207Z",
+ "passed": 29,
+ "total": 29,
+ "results": [
+  {
+   "id": "F1",
+   "test": "all 69 routes return 200",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "H1",
+   "test": "static pages: median server time < 1 s",
+   "pass": true,
+   "detail": "median 502 ms, max 1574 ms"
+  },
+  {
+   "id": "F1",
+   "test": "/p/does-not-exist → 404",
+   "pass": true,
+   "detail": "404"
+  },
+  {
+   "id": "F1",
+   "test": "/c/nope → 404",
+   "pass": true,
+   "detail": "404"
+  },
+  {
+   "id": "E9",
+   "test": "unknown shared-cart code renders (handled in the page)",
+   "pass": true,
+   "detail": "200"
+  },
+  {
+   "id": "F2",
+   "test": "/api/card bad JSON → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F2",
+   "test": "/api/card missing id → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F2",
+   "test": "/api/card unknown id → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F2",
+   "test": "/api/card empty shopper → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F3",
+   "test": "/api/basket GET bad code → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F3",
+   "test": "/api/basket unknown item → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F3",
+   "test": "/api/basket qty 0 → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F3",
+   "test": "/api/basket qty 21 → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F3",
+   "test": "/api/basket 41 lines → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F3",
+   "test": "/api/basket lines not a list → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F4",
+   "test": "/api/event unknown kind → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F4",
+   "test": "/api/event bad session → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F4",
+   "test": "/api/event not JSON → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F5",
+   "test": "/api/scan text data URL → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F5",
+   "test": "/api/scan gif type → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F5",
+   "test": "/api/scan not a data URL → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F5",
+   "test": "/api/scan too large → 400",
+   "pass": true,
+   "detail": "400"
+  },
+  {
+   "id": "F7",
+   "test": "Content-Security-Policy present",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "F7",
+   "test": "X-Frame-Options DENY",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "F7",
+   "test": "X-Content-Type-Options nosniff",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "F7",
+   "test": "Referrer-Policy present",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "F10",
+   "test": "robots noindex in HTML",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "F8",
+   "test": "no secret in 10 client scripts (4 keys compared)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "H2",
+   "test": "home JavaScript < 220 KB gzipped",
+   "pass": true,
+   "detail": "185 KB gzip"
+  }
+ ]
+}

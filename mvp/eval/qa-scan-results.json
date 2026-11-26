@@ -1,0 +1,88 @@
+{
+ "base": "https://will-it-suit-me.vercel.app",
+ "run_at": "2026-11-26T15:05:38.310Z",
+ "passed": 4,
+ "total": 4,
+ "rows": [
+  {
+   "name": "exact pack (Purrfect Bowl, chicken in gravy, adult)",
+   "status": 200,
+   "ms": 4062,
+   "pass": true,
+   "result": {
+    "read": {
+     "brand": "Purrfect Bowl",
+     "product": "Cat food",
+     "variant": "Chicken in gravy, Adult 1+ years",
+     "size": "85 g pouch"
+    },
+    "match": "exact",
+    "id": "cat-chicken-gravy",
+    "alternatives": [
+     "cat-chicken-gravy-box",
+     "cat-tuna-jelly",
+     "kitten-chicken"
+    ],
+    "note": null
+   }
+  },
+  {
+   "name": "same brand, flavour not stocked (salmon)",
+   "status": 200,
+   "ms": 3087,
+   "pass": true,
+   "result": {
+    "read": {
+     "brand": "Purrfect Bowl",
+     "product": "Cat food",
+     "variant": "Salmon in gravy",
+     "size": "85 g pouch"
+    },
+    "match": "similar",
+    "id": null,
+    "alternatives": [
+     "cat-chicken-gravy",
+     "cat-tuna-jelly",
+     "cat-ocean-fish"
+    ],
+    "note": "Same brand and size, but flavour is salmon in gravy which is not available in the catalogue (catalogue has chicken in gravy, tuna in jelly, and ocean fish)."
+   }
+  },
+  {
+   "name": "not a product (a landscape)",
+   "status": 200,
+   "ms": 1901,
+   "pass": true,
+   "result": {
+    "read": {
+     "brand": null,
+     "product": null,
+     "variant": null,
+     "size": null
+    },
+    "match": "none",
+    "id": null,
+    "alternatives": [],
+    "note": "The image shows a digital graphic of a landscape with a pyramid, sun, sky, and ground, not a product pack."
+   }
+  },
+  {
+   "name": "blank photo",
+   "status": 200,
+   "ms": 4851,
+   "pass": true,
+   "result": {
+    "read": {
+     "brand": null,
+     "product": null,
+     "variant": null,
+     "size": null
+    },
+    "match": "none",
+    "id": null,
+    "alternatives": [],
+    "note": "The provided image is blank."
+   }
+  }
+ ]
+}

@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/*
+ * Blinkit-style app palette (light only, like the real app). Values follow blinkit.com's public palette
+ * (yellow #F8CB46, green #0C831F, ink #1F1F1F, grey #666666, panels #F8F8F8, borders #E8E8E8), with small changes.
+ * Pairings by measured WCAG contrast: ink on yellow 11:1, white on green 4.9:1, green on white 4.9:1.
+ * Green text never goes on yellow (3.2:1). Verdicts always pair colour with a word and a symbol.
+ */
+:root {
+  --brand-yellow: #f8cb46;
+  --brand-yellow-soft: #fff6d6;
+  --brand-ink: #1c1c1c;
+  --brand-ink-muted: #4a3f12;
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --border: #e8e8e8;
+  --text: #1f1f1f;
+  --muted: #666666;
+  --accent: #0c831f;
+  --accent-ink: #ffffff;
+  --accent-soft: #eaf7ec;
+  --tile: #edf4fb;
+  --tile-2: #f7fff9;
+  --info: #1f5fc7;        /* blue tags: 6.2:1 on white */
+  --info-soft: #e8f0fd;
+  --warn: #8a5100;        /* 6.0:1 on white, 5.4:1 on warn-soft */
+  --warn-soft: #fdf1dc;
+  --bad: #a3271f;
+  --bad-soft: #fae3e1;
+  --frame: #1b1b1b;
+  --desk: #e9ebf0;
+}
+
+@theme inline {
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-yellow-soft: var(--brand-yellow-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-muted: var(--brand-ink-muted);
+  --color-tile: var(--tile);
+  --color-tile-2: var(--tile-2);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-frame: var(--frame);
+  --color-desk: var(--desk);
+  --font-sans: var(--font-brand);
+}
+
+html {
+  font-size: 16px;
+  color-scheme: only light; /* opt out of browsers' automatic dark mode */
+}
+
+body {
+  background: var(--desk);
+  color: var(--text);
+  font-family: var(--font-brand), system-ui, sans-serif;
+}
+
+/* Never smaller than 14px anywhere (readability, and the deck's font rule). */
+small,
+.text-xs {
+  font-size: 0.875rem;
+}
+
+/* Hide horizontal scrollbars on product rails while keeping them scrollable. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Clear keyboard focus (the browser default was a faint 0.8 px ring). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}

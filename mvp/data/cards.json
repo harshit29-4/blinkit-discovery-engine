@@ -1,0 +1,1843 @@
+{
+ "version": "card-v4",
+ "generated_at": "2026-11-26T14:41:47.059Z",
+ "tokens": 117975,
+ "repaired": 4,
+ "models": {
+  "tomato-ripe": "openai/gpt-oss-120b",
+  "tomato-mixed": "openai/gpt-oss-120b",
+  "tomato-hybrid": "openai/gpt-oss-120b",
+  "mango-alphonso": "openai/gpt-oss-120b",
+  "mango-banganapalli": "openai/gpt-oss-120b",
+  "banana-robusta": "openai/gpt-oss-120b",
+  "avocado": "openai/gpt-oss-120b",
+  "lettuce-iceberg": "openai/gpt-oss-120b",
+  "salad-mix": "openai/gpt-oss-120b",
+  "charger-20w": "openai/gpt-oss-120b",
+  "charger-33w": "openai/gpt-oss-120b",
+  "charger-65w": "openai/gpt-oss-120b",
+  "charger-basic": "openai/gpt-oss-120b",
+  "cable-c-c": "openai/gpt-oss-120b",
+  "cable-lightning": "openai/gpt-oss-120b",
+  "earphones-typec": "openai/gpt-oss-120b",
+  "earphones-jack": "openai/gpt-oss-120b",
+  "watch-charger": "openai/gpt-oss-120b",
+  "slippers-cloud": "openai/gpt-oss-120b",
+  "flipflops-classic": "openai/gpt-oss-120b",
+  "sliders-sport": "openai/gpt-oss-120b",
+  "slippers-mens-leather": "openai/gpt-oss-120b",
+  "slippers-kids": "openai/gpt-oss-120b",
+  "cat-chicken-gravy": "openai/gpt-oss-120b",
+  "cat-chicken-gravy-box": "openai/gpt-oss-120b",
+  "cat-tuna-jelly": "openai/gpt-oss-120b",
+  "kitten-chicken": "openai/gpt-oss-120b",
+  "cat-ocean-fish": "openai/gpt-oss-120b",
+  "cat-dry-salmon": "openai/gpt-oss-120b",
+  "litter-clumping": "openai/gpt-oss-120b",
+  "litter-lavender": "openai/gpt-oss-120b",
+  "dog-chicken": "openai/gpt-oss-120b",
+  "envelope-a4": "openai/gpt-oss-120b",
+  "envelope-dl": "openai/gpt-oss-120b",
+  "envelope-cloth": "openai/gpt-oss-120b",
+  "marker-permanent": "openai/gpt-oss-120b",
+  "cards-colour-match": "gemini-3.5-flash-lite",
+  "strategy-board": "gemini-3.5-flash-lite",
+  "travel-chess": "gemini-3.5-flash-lite",
+  "ludo-snakes": "gemini-3.5-flash-lite",
+  "word-cards": "gemini-3.5-flash-lite",
+  "puzzle-500": "gemini-3.5-flash-lite",
+  "kettle-1l": "gemini-3.5-flash-lite",
+  "kettle-1-5l": "gemini-3.5-flash-lite",
+  "kettle-glass": "gemini-3.5-flash-lite",
+  "iron-dry": "gemini-3.5-flash-lite",
+  "iron-steam": "gemini-3.5-flash-lite",
+  "hand-blender": "gemini-3.5-flash-lite",
+  "sandwich-maker": "gemini-3.5-flash-lite",
+  "marker-whiteboard": "gemini-3.5-flash-lite",
+  "marker-black-2": "gemini-3.5-flash-lite",
+  "sticky-notes": "gemini-3.5-flash-lite",
+  "a4-paper": "gemini-3.5-flash-lite",
+  "cards-classic": "gemini-3.5-flash-lite"
+ },
+ "cards": {
+  "tomato-ripe": {
+   "question": "Is it ready to eat today or tomorrow?",
+   "verdict": "yes",
+   "answer": "The tomatoes are fully ripe and can be eaten today or tomorrow as stated.",
+   "cites": [
+    "ripeness",
+    "ready_in"
+   ],
+   "missing": [],
+   "headline": "Ready to eat today, fully ripe",
+   "good": [
+    {
+     "text": "Fully ripe, red",
+     "cite": "ripeness"
+    },
+    {
+     "text": "Use today or tomorrow",
+     "cite": "ready_in"
+    },
+    {
+     "text": "Packed this morning",
+     "cite": "packed_on"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "tomato-mixed": {
+   "question": "Will the tomatoes be ready to eat today?",
+   "verdict": "partly",
+   "answer": "About half the tomatoes are ready to eat today, while the rest will ripen in 2–3 days. You’ll get some immediate use and the remainder later.",
+   "cites": [
+    "ready_in"
+   ],
+   "missing": [],
+   "headline": "Half the tomatoes are ready today, others in 2–3 days",
+   "good": [
+    {
+     "text": "1 kg (12–16 pieces)",
+     "cite": "weight"
+    },
+    {
+     "text": "Mix of red and orange‑red",
+     "cite": "ripeness"
+    },
+    {
+     "text": "From Nashik, Maharashtra",
+     "cite": "origin"
+    }
+   ],
+   "tip": "Only half are ready today; buy extra if you need all now",
+   "ask": null,
+   "also": []
+  },
+  "tomato-hybrid": {
+   "question": "Is it ripe now or will it be ready soon?",
+   "verdict": "not_stated",
+   "answer": "The listing does not state whether the tomatoes are ripe or ready to eat at purchase.",
+   "cites": [
+    "weight",
+    "origin"
+   ],
+   "missing": [
+    "ripeness",
+    "ready_in"
+   ],
+   "headline": "Ripeness not specified",
+   "good": [
+    {
+     "text": "500 g pack",
+     "cite": "weight"
+    },
+    {
+     "text": "Grown in Nashik, Maharashtra",
+     "cite": "origin"
+    }
+   ],
+   "tip": "Ask the seller if the tomatoes are ripe or ready to eat now",
+   "ask": null,
+   "also": []
+  },
+  "mango-alphonso": {
+   "question": "Will the mangoes be ripe when I need them?",
+   "verdict": "yes",
+   "answer": "The 6‑piece pack contains firm mangoes; 2 will be ready to eat in 1‑2 days and the other 4 will ripen in 4‑5 days.",
+   "cites": [
+    "ripeness",
+    "ready_in"
+   ],
+   "missing": [],
+   "headline": "2 mangoes ready in 1‑2 days, 4 in 4‑5 days",
+   "good": [
+    {
+     "text": "Firm, naturally ripening",
+     "cite": "ripeness"
+    },
+    {
+     "text": "2 ready in 1–2 days",
+     "cite": "ready_in"
+    },
+    {
+     "text": "4 ready in 4–5 days",
+     "cite": "ready_in"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "mango-banganapalli": {
+   "question": "Is the mango ripe now or will it need time to ripen?",
+   "verdict": "not_stated",
+   "answer": "The listing only provides weight (1 kg, about 3–4 pieces) and origin (Andhra Pradesh). It does not state how ripe the mangoes are or when they’ll be ready to eat.",
+   "cites": [
+    "weight",
+    "origin"
+   ],
+   "missing": [
+    "ripeness",
+    "ready_in"
+   ],
+   "headline": "Fresh mangoes, 1 kg (3–4 pieces) from Andhra Pradesh",
+   "good": [
+    {
+     "text": "1 kg (3–4 pieces)",
+     "cite": "weight"
+    },
+    {
+     "text": "Origin: Andhra Pradesh",
+     "cite": "origin"
+    }
+   ],
+   "tip": "Ripeness isn’t listed, so check with seller or plan extra days for ripening.",
+   "ask": null,
+   "also": []
+  },
+  "banana-robusta": {
+   "question": "Will the bananas be ready to eat today?",
+   "verdict": "no",
+   "answer": "These bananas are yellow with green tips and will become ready to eat in one day, so they aren't ripe today.",
+   "cites": [
+    "ripeness",
+    "ready_in",
+    "pieces"
+   ],
+   "missing": [],
+   "headline": "Not ready today, ripe in 1 day",
+   "good": [
+    {
+     "text": "Yellow with green tips",
+     "cite": "ripeness"
+    },
+    {
+     "text": "Ready in 1 day",
+     "cite": "ready_in"
+    },
+    {
+     "text": "6 pieces per pack",
+     "cite": "pieces"
+    }
+   ],
+   "tip": "If you need bananas today, choose a pre‑ripe batch or another fruit.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Will they stay ripe through the week?",
+     "verdict": "not_stated",
+     "answer": "The listing doesn’t say how long the bananas remain ripe after the 1‑day ready period.",
+     "cites": [],
+     "missing": [
+      "shelf_life"
+     ]
+    }
+   ]
+  },
+  "avocado": {
+   "question": "Will the avocados be ready to eat today?",
+   "verdict": "no",
+   "answer": "The avocados are firm now and will become ready to eat after 3–4 days at room temperature.",
+   "cites": [
+    "ripeness",
+    "ready_in"
+   ],
+   "missing": [],
+   "headline": "Not ready today; ripen in 3–4 days",
+   "good": [
+    {
+     "text": "Firm texture",
+     "cite": "ripeness"
+    },
+    {
+     "text": "Ready in 3–4 days at room temperature",
+     "cite": "ready_in"
+    }
+   ],
+   "tip": "If you need them sooner, buy already ripe avocados or let these sit 3‑4 days.",
+   "ask": null,
+   "also": []
+  },
+  "lettuce-iceberg": {
+   "question": "Is the lettuce fresh enough for today?",
+   "verdict": "yes",
+   "answer": "The lettuce was packed yesterday, so it will be fresh for use today.",
+   "cites": [
+    "packed_on",
+    "weight"
+   ],
+   "missing": [],
+   "headline": "Freshly packed yesterday, ready today",
+   "good": [
+    {
+     "text": "Packed yesterday",
+     "cite": "packed_on"
+    },
+    {
+     "text": "Weight about 400 g",
+     "cite": "weight"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Will it stay fresh for several days?",
+     "verdict": "not_stated",
+     "answer": "The listing doesn’t state how long the lettuce stays fresh after packing.",
+     "cites": [],
+     "missing": [
+      "shelf_life"
+     ]
+    }
+   ]
+  },
+  "salad-mix": {
+   "question": "Is the salad mix ready now or will it stay fresh for a week?",
+   "verdict": "not_stated",
+   "answer": "The listing tells you the mix weighs 150 g and comes from a hydroponic farm in Pune, but it doesn't state when it was packed or its shelf life, so you can't know if it's ready now or will stay fresh for a week.",
+   "cites": [
+    "weight",
+    "origin"
+   ],
+   "missing": [
+    "packed_on"
+   ],
+   "headline": "Hydroponic mix from Pune, 150 g pack",
+   "good": [
+    {
+     "text": "150 g pack",
+     "cite": "weight"
+    },
+    {
+     "text": "Hydroponic farm, Pune origin",
+     "cite": "origin"
+    }
+   ],
+   "tip": "Check the packed‑on date when it arrives to gauge freshness.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Is a best‑before date listed?",
+     "verdict": "not_stated",
+     "answer": "No best‑before date is provided in the listing.",
+     "cites": [],
+     "missing": [
+      "best_before"
+     ]
+    },
+    {
+     "question": "Are the leaves pre‑washed and ready to eat?",
+     "verdict": "not_stated",
+     "answer": "The listing doesn't say whether the mix is pre‑washed.",
+     "cites": [],
+     "missing": [
+      "pre_washed"
+     ]
+    }
+   ]
+  },
+  "charger-20w": {
+   "question": "Will it fast‑charge my phone?",
+   "verdict": "ask",
+   "answer": "The charger delivers 20 W via USB‑C PD 3.0 and is compatible with iPhone 12 and later (with a USB‑C to Lightning cable) and most USB‑C phones, but you need to confirm it matches your phone’s fast‑charge protocol.",
+   "cites": [
+    "wattage",
+    "fast_charge",
+    "works_with"
+   ],
+   "missing": [],
+   "headline": "Fast‑charging with compatible USB‑C phones",
+   "good": [
+    {
+     "text": "20 W power output",
+     "cite": "wattage"
+    },
+    {
+     "text": "USB Power Delivery PD 3.0",
+     "cite": "fast_charge"
+    },
+    {
+     "text": "Works with iPhone 12+ and most USB‑C phones",
+     "cite": "works_with"
+    }
+   ],
+   "tip": "Check your phone’s charging standard (USB‑C PD) to confirm compatibility.",
+   "ask": "Which phone model do you have?",
+   "also": [
+    {
+     "question": "Is a cable included?",
+     "verdict": "no",
+     "answer": "No cable is included; you’ll need your own USB‑C to Lightning or USB‑C cable.",
+     "cites": [
+      "cable_included"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "charger-33w": {
+   "question": "Will it fast‑charge my phone?",
+   "verdict": "ask",
+   "answer": "The charger supports USB‑PD 3.0 and Quick Charge 3.0 and is compatible with Samsung Galaxy A/M series, Pixel phones and iPhone 12 or newer. Compatibility with other phones isn’t stated.",
+   "cites": [
+    "fast_charge",
+    "works_with"
+   ],
+   "missing": [],
+   "headline": "Fast‑charges Samsung, Pixel, iPhone 12+ phones",
+   "good": [
+    {
+     "text": "USB PD 3.0 and Quick Charge 3.0",
+     "cite": "fast_charge"
+    },
+    {
+     "text": "Works with Samsung Galaxy A/M, Pixel, iPhone 12+",
+     "cite": "works_with"
+    },
+    {
+     "text": "Includes 1 m USB‑C to USB‑C cable",
+     "cite": "cable_included"
+    }
+   ],
+   "tip": "Check if your phone model is listed among the compatible devices",
+   "ask": "Which phone model do you have?",
+   "also": []
+  },
+  "charger-65w": {
+   "question": "Will it fast‑charge my phone?",
+   "verdict": "ask",
+   "answer": "The charger delivers up to 65 W and supports USB‑PD 3.0 with PPS. It fast‑charges Samsung Super Fast phones, iPhone and Pixel devices, but you need to confirm your phone model’s compatibility.",
+   "cites": [
+    "fast_charge",
+    "works_with",
+    "wattage"
+   ],
+   "missing": [],
+   "headline": "Fast‑charging supported for Samsung, iPhone, Pixel",
+   "good": [
+    {
+     "text": "65 W total power",
+     "cite": "wattage"
+    },
+    {
+     "text": "USB‑PD 3.0 with PPS",
+     "cite": "fast_charge"
+    },
+    {
+     "text": "2 × USB‑C, 1 × USB‑A ports",
+     "cite": "connector"
+    }
+   ],
+   "tip": "Check if your phone is listed under ‘Works with’ for fast charging",
+   "ask": "Which phone model are you using?",
+   "also": [
+    {
+     "question": "Is a charging cable included?",
+     "verdict": "no",
+     "answer": "No cable is included with the adapter.",
+     "cites": [
+      "cable_included"
+     ],
+     "missing": []
+    },
+    {
+     "question": "Can it charge laptops via USB‑C?",
+     "verdict": "yes",
+     "answer": "Yes, it can charge laptops that support USB‑C charging.",
+     "cites": [
+      "works_with"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "charger-basic": {
+   "question": "Will it fast‑charge my phone?",
+   "verdict": "not_stated",
+   "answer": "The charger supplies 12 W via a USB‑A port, but the listing does not state whether it supports fast‑charging for any phone model. You’ll need to verify compatibility with your device’s fast‑charge requirements.",
+   "cites": [
+    "connector",
+    "wattage"
+   ],
+   "missing": [
+    "fast_charge"
+   ],
+   "headline": "12 W USB‑A charger, fast‑charge info not listed",
+   "good": [
+    {
+     "text": "USB‑A port",
+     "cite": "connector"
+    },
+    {
+     "text": "12 W power output",
+     "cite": "wattage"
+    },
+    {
+     "text": "Adapter only, no cable included",
+     "cite": "cable_included"
+    }
+   ],
+   "tip": "Check your phone’s required fast‑charge specs before buying",
+   "ask": null,
+   "also": [
+    {
+     "question": "Does it include a cable?",
+     "verdict": "yes",
+     "answer": "No cable is included; you’ll need your own USB‑A cable.",
+     "cites": [
+      "cable_included"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "cable-c-c": {
+   "question": "Will it fast‑charge my USB‑C phone?",
+   "verdict": "yes",
+   "answer": "The cable is designed for USB‑C devices and can deliver up to 60 W, so it will fast‑charge any USB‑C phone that supports that power level.",
+   "cites": [
+    "connector",
+    "wattage",
+    "works_with"
+   ],
+   "missing": [],
+   "headline": "Fast‑charges USB‑C phones up to 60 W",
+   "good": [
+    {
+     "text": "USB‑C to USB‑C connector",
+     "cite": "connector"
+    },
+    {
+     "text": "Up to 60 W power delivery",
+     "cite": "wattage"
+    },
+    {
+     "text": "Works with USB‑C phones, tablets and laptops",
+     "cite": "works_with"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "cable-lightning": {
+   "question": "Will it fast‑charge my iPhone?",
+   "verdict": "yes",
+   "answer": "The cable has a USB‑C to Lightning connector, is 1 m long, and supports fast charging on iPhone 5‑14 when used with a 20 W or higher Power Delivery adapter. Includes a 6‑month warranty.",
+   "cites": [
+    "connector",
+    "length",
+    "fast_charge",
+    "works_with",
+    "warranty"
+   ],
+   "missing": [],
+   "headline": "Fast‑charges iPhone 5‑14 with 20 W PD adapter",
+   "good": [
+    {
+     "text": "USB‑C to Lightning connector",
+     "cite": "connector"
+    },
+    {
+     "text": "1 m length",
+     "cite": "length"
+    },
+    {
+     "text": "Supports fast charging with 20 W PD adapter",
+     "cite": "fast_charge"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Will it work with iPhone 15?",
+     "verdict": "no",
+     "answer": "Listing only covers iPhone 5 to iPhone 14.",
+     "cites": [
+      "works_with"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "earphones-typec": {
+   "question": "Will it work with my phone?",
+   "verdict": "ask",
+   "answer": "The earphones have a USB‑C plug and are listed for phones with a USB‑C port and no headphone jack, such as Samsung Galaxy S and Pixel. They will work if your phone meets those specs.",
+   "cites": [
+    "works_with",
+    "connector"
+   ],
+   "missing": [],
+   "headline": "Works with USB‑C phones without a headphone jack",
+   "good": [
+    {
+     "text": "USB‑C plug connector",
+     "cite": "connector"
+    },
+    {
+     "text": "1.2 m cable length",
+     "cite": "length"
+    },
+    {
+     "text": "6‑month warranty",
+     "cite": "warranty"
+    }
+   ],
+   "tip": "Check if your phone has a USB‑C port and no headphone jack",
+   "ask": "Does your phone have a USB‑C port and no headphone jack?",
+   "also": []
+  },
+  "earphones-jack": {
+   "question": "Will it work with my phone’s headphone jack?",
+   "verdict": "ask",
+   "answer": "The earphones have a 3.5 mm plug and are compatible with phones and laptops that feature a 3.5 mm headphone jack. If your phone lacks this port, they won’t work without an adapter.",
+   "cites": [
+    "connector",
+    "works_with",
+    "length"
+   ],
+   "missing": [],
+   "headline": "Works with devices that have a 3.5 mm jack",
+   "good": [
+    {
+     "text": "3.5 mm jack connector",
+     "cite": "connector"
+    },
+    {
+     "text": "Compatible with phones and laptops with 3.5 mm jack",
+     "cite": "works_with"
+    },
+    {
+     "text": "Cable length 1.2 m",
+     "cite": "length"
+    }
+   ],
+   "tip": "Check if your phone includes a 3.5 mm headphone jack",
+   "ask": "Does your phone have a 3.5 mm jack?",
+   "also": [
+    {
+     "question": "Is the 1.2 m cable length enough for you?",
+     "verdict": "yes",
+     "answer": "The earphones come with a 1.2 m cable, which is typical for on‑the‑go use.",
+     "cites": [
+      "length"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "watch-charger": {
+   "question": "Will it work with my smartwatch?",
+   "verdict": "not_stated",
+   "answer": "The cable features a magnetic puck connector and a 1 m USB‑A cable, but the listing does not state which smartwatches it works with.",
+   "cites": [
+    "connector",
+    "length"
+   ],
+   "missing": [
+    "works_with"
+   ],
+   "headline": "Magnetic puck cable, 1 m length",
+   "good": [
+    {
+     "text": "Magnetic puck to USB‑A connector",
+     "cite": "connector"
+    },
+    {
+     "text": "1 m cable length",
+     "cite": "length"
+    }
+   ],
+   "tip": "Check the cable’s compatibility with your smartwatch model before buying.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Does it support fast charging for my smartwatch?",
+     "verdict": "not_stated",
+     "answer": "Fast‑charging capability isn’t mentioned.",
+     "cites": [],
+     "missing": [
+      "works_with"
+     ]
+    }
+   ]
+  },
+  "slippers-cloud": {
+   "question": "Will the slippers fit my foot?",
+   "verdict": "ask",
+   "answer": "The slippers are offered in UK sizes 6‑10 and run true to size; the guide shows UK 8 fits a foot 26‑26.5 cm long. Choose the size that matches your foot measurement.",
+   "cites": [
+    "size_guide",
+    "sizes"
+   ],
+   "missing": [],
+   "headline": "Sizes UK 6‑10, true‑to‑size fit",
+   "good": [
+    {
+     "text": "UK 6‑10 sizes",
+     "cite": "sizes"
+    },
+    {
+     "text": "Runs true to size (UK 8 fits 26‑26.5 cm)",
+     "cite": "size_guide"
+    },
+    {
+     "text": "Cushioned EVA non‑slip sole",
+     "cite": "sole"
+    }
+   ],
+   "tip": "Measure your foot length and compare to the size guide (UK 8 fits 26‑26.5 cm).",
+   "ask": "What is your foot length in cm?",
+   "also": [
+    {
+     "question": "Can I exchange if they don't fit?",
+     "verdict": "yes",
+     "answer": "Exchange for another size within 7 days if worn indoors only, with tags on.",
+     "cites": [
+      "exchange"
+     ],
+     "missing": []
+    },
+    {
+     "question": "Are they good for outdoor walks?",
+     "verdict": "partly",
+     "answer": "Listed as best for indoors and short walks, not full outdoor use.",
+     "cites": [
+      "use"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "flipflops-classic": {
+   "question": "Will these flip‑flops fit my foot size?",
+   "verdict": "ask",
+   "answer": "The flip‑flops come in UK sizes 5 to 11, but the listing doesn’t provide a size guide, so you need to know your exact UK size to be sure they’ll fit.",
+   "cites": [
+    "sizes"
+   ],
+   "missing": [
+    "size_guide"
+   ],
+   "headline": "Available in UK sizes 5–11",
+   "good": [
+    {
+     "text": "Rubber V‑strap between the toes",
+     "cite": "strap"
+    },
+    {
+     "text": "Rubber sole",
+     "cite": "sole"
+    },
+    {
+     "text": "Best for bathroom and indoors",
+     "cite": "use"
+    }
+   ],
+   "tip": "Check your UK shoe size and choose the matching size from the range.",
+   "ask": "What UK shoe size do you wear?",
+   "also": [
+    {
+     "question": "Can I exchange these if they don’t fit?",
+     "verdict": "no",
+     "answer": "The listing states there is no exchange or return on footwear unless damaged.",
+     "cites": [
+      "exchange"
+     ],
+     "missing": []
+    },
+    {
+     "question": "Are they suitable for outdoor wear?",
+     "verdict": "no",
+     "answer": "They are listed as best for bathroom and indoor use only.",
+     "cites": [
+      "use"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "sliders-sport": {
+   "question": "Will these sliders fit my foot?",
+   "verdict": "not_stated",
+   "answer": "The listing gives a size range (UK 6–10) but doesn’t include a size guide, so you can’t confirm the exact fit for your foot.",
+   "cites": [
+    "sizes"
+   ],
+   "missing": [
+    "size_guide"
+   ],
+   "headline": "Fit unknown – no size guide provided",
+   "good": [
+    {
+     "text": "UK 6–10 size range",
+     "cite": "sizes"
+    },
+    {
+     "text": "Contoured footbed",
+     "cite": "sole"
+    },
+    {
+     "text": "Suitable for indoors and outdoors",
+     "cite": "use"
+    }
+   ],
+   "tip": "No size guide is listed, so compare your foot measurement to typical UK sizes or order your usual size.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Can I exchange these if they don’t fit?",
+     "verdict": "not_stated",
+     "answer": "Exchange policy isn’t listed in the product details.",
+     "cites": [],
+     "missing": [
+      "exchange"
+     ]
+    }
+   ]
+  },
+  "slippers-mens-leather": {
+   "question": "Will it fit and can I exchange if size is wrong?",
+   "verdict": "ask",
+   "answer": "The slippers come in UK sizes 7‑10 and run half a size small, so you should choose one size larger than your normal size. If the size is wrong, you can exchange them within 3 days as long as they’re unworn.",
+   "cites": [
+    "sizes",
+    "size_guide",
+    "exchange"
+   ],
+   "missing": [],
+   "headline": "Size exchange within 3 days, unworn",
+   "good": [
+    {
+     "text": "UK sizes 7‑10 available",
+     "cite": "sizes"
+    },
+    {
+     "text": "Runs half a size small; pick one up",
+     "cite": "size_guide"
+    },
+    {
+     "text": "Size exchange within 3 days, unworn",
+     "cite": "exchange"
+    }
+   ],
+   "tip": "Check your usual UK shoe size and order one size up as advised.",
+   "ask": "What UK shoe size do you normally wear?",
+   "also": []
+  },
+  "slippers-kids": {
+   "question": "Will these slippers fit my child?",
+   "verdict": "ask",
+   "answer": "The listing provides sizes Kids 10–13 (UK 1–3) and a guide that Kids 12 fits a foot 18.5 cm long. You need your child's foot length to confirm the correct size.",
+   "cites": [
+    "sizes",
+    "size_guide"
+   ],
+   "missing": [],
+   "headline": "Slippers available in Kids 10–13 (UK 1–3) sizes",
+   "good": [
+    {
+     "text": "Velcro strap",
+     "cite": "strap"
+    },
+    {
+     "text": "Soft, non-slip sole",
+     "cite": "sole"
+    },
+    {
+     "text": "Best for indoor use",
+     "cite": "use"
+    }
+   ],
+   "tip": "Check your child's foot length and match to the size guide.",
+   "ask": "What foot length does your child need?",
+   "also": [
+    {
+     "question": "Is exchange possible if they don't fit?",
+     "verdict": "not_stated",
+     "answer": "Exchange information is not provided in the listing.",
+     "cites": [],
+     "missing": [
+      "exchange"
+     ]
+    },
+    {
+     "question": "Can these slippers be used outdoors?",
+     "verdict": "no",
+     "answer": "The listing says they are best for indoor use only.",
+     "cites": [
+      "use"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "cat-chicken-gravy": {
+   "question": "Is this chicken-in-gravy adult cat food the right flavour and life stage for my cat?",
+   "verdict": "yes",
+   "answer": "The pouch is formulated for adult cats (1+ years) and comes in chicken in gravy flavor, matching the listed preferences.",
+   "cites": [
+    "flavour",
+    "life_stage"
+   ],
+   "missing": [],
+   "headline": "Matches adult cats, chicken-in-gravy flavour",
+   "good": [
+    {
+     "text": "Chicken in gravy flavour",
+     "cite": "flavour"
+    },
+    {
+     "text": "For adult cats (1+ years)",
+     "cite": "life_stage"
+    },
+    {
+     "text": "Chunks in gravy texture",
+     "cite": "texture"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "cat-chicken-gravy-box": {
+   "question": "Is this the right flavour and life stage for my cat?",
+   "verdict": "yes",
+   "answer": "The product is formulated for adult cats and comes in a chicken in gravy flavour, matching the listed life stage and taste. It should suit an adult cat that eats chicken.",
+   "cites": [
+    "flavour",
+    "life_stage"
+   ],
+   "missing": [],
+   "headline": "Suitable adult cat food, chicken in gravy",
+   "good": [
+    {
+     "text": "Chicken in gravy flavour",
+     "cite": "flavour"
+    },
+    {
+     "text": "Adult (1+ years) life stage",
+     "cite": "life_stage"
+    },
+    {
+     "text": "Chunks in gravy texture",
+     "cite": "texture"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "cat-tuna-jelly": {
+   "question": "Is this the exact flavour and life stage my cat needs?",
+   "verdict": "yes",
+   "answer": "The pouch is formulated for adult cats (1 year and older) and provides a tuna‑in‑jelly flavour with chunk texture, matching the typical adult cat diet.",
+   "cites": [
+    "flavour",
+    "life_stage",
+    "texture"
+   ],
+   "missing": [],
+   "headline": "Adult cat, tuna‑in‑jelly flavour matches",
+   "good": [
+    {
+     "text": "Tuna in jelly flavour",
+     "cite": "flavour"
+    },
+    {
+     "text": "For adult cats (1+ years)",
+     "cite": "life_stage"
+    },
+    {
+     "text": "Chunks in jelly texture",
+     "cite": "texture"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "kitten-chicken": {
+   "question": "Is this the exact flavour and life stage my kitten needs?",
+   "verdict": "yes",
+   "answer": "The pouch is chicken‑in‑gravy mousse, formulated specifically for kittens aged 2–12 months, so it matches the flavour and life‑stage you need.",
+   "cites": [
+    "flavour",
+    "life_stage",
+    "texture"
+   ],
+   "missing": [],
+   "headline": "Chicken‑in‑gravy mousse for kittens 2–12 months",
+   "good": [
+    {
+     "text": "Chicken in gravy flavour",
+     "cite": "flavour"
+    },
+    {
+     "text": "Kitten life stage (2–12 months)",
+     "cite": "life_stage"
+    },
+    {
+     "text": "Mousse texture",
+     "cite": "texture"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Is the 85 g pouch enough for my kitten's daily meals?",
+     "verdict": "not_stated",
+     "answer": "Pack size is 85 g, but daily feeding amount isn’t listed, so you’ll need to estimate based on your kitten’s needs.",
+     "cites": [
+      "pack"
+     ],
+     "missing": [
+      "feeding_recommendation"
+     ]
+    }
+   ]
+  },
+  "cat-ocean-fish": {
+   "question": "Is this the correct life stage for my cat?",
+   "verdict": "not_stated",
+   "answer": "The pouch contains ocean‑fish flavored cat food, but the seller hasn't specified which life stage (kitten, adult, senior) it's intended for.",
+   "cites": [
+    "flavour",
+    "pack"
+   ],
+   "missing": [
+    "life_stage"
+   ],
+   "headline": "Ocean fish flavour, life stage not listed",
+   "good": [
+    {
+     "text": "Flavour: Ocean fish",
+     "cite": "flavour"
+    },
+    {
+     "text": "Pack: 1 pouch, 80 g",
+     "cite": "pack"
+    }
+   ],
+   "tip": "Check the product details or contact seller to confirm suitable life stage",
+   "ask": null,
+   "also": []
+  },
+  "cat-dry-salmon": {
+   "question": "Is this the exact flavour and life stage my cat needs?",
+   "verdict": "yes",
+   "answer": "The food is a dry kibble for cats, flavored with salmon and formulated for adult cats (1+ years).",
+   "cites": [
+    "flavour",
+    "life_stage"
+   ],
+   "missing": [],
+   "headline": "Salmon flavour, adult cat formula",
+   "good": [
+    {
+     "text": "Salmon flavour",
+     "cite": "flavour"
+    },
+    {
+     "text": "Adult (1+ years) life stage",
+     "cite": "life_stage"
+    },
+    {
+     "text": "Dry kibble texture",
+     "cite": "texture"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Is the 1.2 kg pack size appropriate for my cat's needs?",
+     "verdict": "not_stated",
+     "answer": "The listing doesn't provide feeding guidelines or how long the bag will last for an adult cat.",
+     "cites": [],
+     "missing": [
+      "feeding guidelines"
+     ]
+    }
+   ]
+  },
+  "litter-clumping": {
+   "question": "Is this clumping, unscented litter suitable for my cat?",
+   "verdict": "yes",
+   "answer": "The product is a grey, unscented, bentonite clumping litter for cats, so it matches typical cat preferences for clumping and scent‑free litter.",
+   "cites": [
+    "litter_type",
+    "scent",
+    "pack"
+   ],
+   "missing": [],
+   "headline": "Clumping, unscented grey litter – suitable for cats",
+   "good": [
+    {
+     "text": "Clumping (Bentonite)",
+     "cite": "litter_type"
+    },
+    {
+     "text": "Unscented",
+     "cite": "scent"
+    },
+    {
+     "text": "5 kg pack",
+     "cite": "pack"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Is the litter low‑dust?",
+     "verdict": "not_stated",
+     "answer": "The listing does not specify dust level.",
+     "cites": [],
+     "missing": [
+      "dust_level"
+     ]
+    }
+   ]
+  },
+  "litter-lavender": {
+   "question": "Is this clumping lavender litter suitable for my cat?",
+   "verdict": "yes",
+   "answer": "The product is a clumping bentonite cat litter scented with lavender, matching the type many cats use.",
+   "cites": [
+    "litter_type",
+    "scent"
+   ],
+   "missing": [],
+   "headline": "Clumping bentonite litter with lavender scent",
+   "good": [
+    {
+     "text": "Clumping bentonite litter",
+     "cite": "litter_type"
+    },
+    {
+     "text": "Lavender scent",
+     "cite": "scent"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "dog-chicken": {
+   "question": "Is this the right flavour and life stage for my dog?",
+   "verdict": "ask",
+   "answer": "The product is a dry kibble flavored chicken and rice, formulated for adult dogs of any breed. If your dog is a puppy or senior, you may need a different formula.",
+   "cites": [
+    "flavour",
+    "life_stage",
+    "texture"
+   ],
+   "missing": [
+    "dog_age"
+   ],
+   "headline": "Chicken & rice dry kibble for adult dogs",
+   "good": [
+    {
+     "text": "Chicken and rice flavour",
+     "cite": "flavour"
+    },
+    {
+     "text": "Dry kibble texture",
+     "cite": "texture"
+    },
+    {
+     "text": "For adult dogs of all breeds",
+     "cite": "life_stage"
+    }
+   ],
+   "tip": "Check your dog's age; this food is for adult dogs only.",
+   "ask": "Is your dog an adult dog?",
+   "also": []
+  },
+  "envelope-a4": {
+   "question": "Will the envelope fit an unfolded A4 sheet?",
+   "verdict": "yes",
+   "answer": "The envelope is sized C4 (32.4 × 22.9 cm) and is stated to fit an unfolded A4 sheet, so it will hold your documents without folding.",
+   "cites": [
+    "size"
+   ],
+   "missing": [],
+   "headline": "Fits A4 sheets unfolded",
+   "good": [
+    {
+     "text": "C4 size fits A4 unfolded",
+     "cite": "size"
+    },
+    {
+     "text": "100 gsm kraft paper",
+     "cite": "paper"
+    },
+    {
+     "text": "Peel‑and‑seal closure",
+     "cite": "seal"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "envelope-dl": {
+   "question": "Will it fit an A4 sheet?",
+   "verdict": "yes",
+   "answer": "The envelope measures 22 × 11 cm (DL), which is made to hold an A4 page folded into three sections, so it will accommodate standard A4 documents.",
+   "cites": [
+    "size",
+    "paper",
+    "seal"
+   ],
+   "missing": [],
+   "headline": "Fits A4 papers folded in three",
+   "good": [
+    {
+     "text": "DL size fits A4 folded in thirds",
+     "cite": "size"
+    },
+    {
+     "text": "80 gsm paper for sturdy feel",
+     "cite": "paper"
+    },
+    {
+     "text": "Gummed seal for secure closure",
+     "cite": "seal"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Do you need a self‑adhesive seal?",
+     "verdict": "no",
+     "answer": "The envelope uses a gummed seal, not a peel‑and‑stick adhesive.",
+     "cites": [
+      "seal"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "envelope-cloth": {
+   "question": "Will the envelopes fit standard A4 papers?",
+   "verdict": "not_stated",
+   "answer": "The listing says the envelopes are gummed and come in a pack of five, but it doesn’t specify their dimensions, so we can’t confirm they fit A4 paper.",
+   "cites": [
+    "count",
+    "seal"
+   ],
+   "missing": [
+    "size"
+   ],
+   "headline": "Gummed seal, pack of 5 envelopes",
+   "good": [
+    {
+     "text": "5 envelopes in pack",
+     "cite": "count"
+    },
+    {
+     "text": "Gummed seal",
+     "cite": "seal"
+    }
+   ],
+   "tip": "Size isn’t listed, so check if they’re A4‑compatible before buying.",
+   "ask": null,
+   "also": []
+  },
+  "marker-permanent": {
+   "question": "Will it work on a whiteboard?",
+   "verdict": "no",
+   "answer": "These markers are permanent and cannot be erased from whiteboards; they are meant for permanent labeling on paper or other porous surfaces.",
+   "cites": [
+    "marker_type",
+    "tip",
+    "colours"
+   ],
+   "missing": [],
+   "headline": "Permanent marker: won't wipe off a whiteboard",
+   "good": [
+    {
+     "text": "Permanent, does not wipe off",
+     "cite": "marker_type"
+    },
+    {
+     "text": "Bullet tip, 2 mm",
+     "cite": "tip"
+    },
+    {
+     "text": "4 colours: black, blue, red, green",
+     "cite": "colours"
+    }
+   ],
+   "tip": "Use a dry‑erase marker for whiteboard writing",
+   "ask": null,
+   "also": []
+  },
+  "cards-colour-match": {
+   "question": "Can our group play it, and how fast can we learn it?",
+   "verdict": "yes",
+   "answer": "The game supports 2 to 8 players and takes about 5 minutes to learn, making it quick to pick up for groups. One game lasts 10 to 20 minutes.",
+   "cites": [
+    "players",
+    "learn_in"
+   ],
+   "missing": [],
+   "headline": "Plays up to 8 players and learns in 5 minutes",
+   "good": [
+    {
+     "text": "2–8 players",
+     "cite": "players"
+    },
+    {
+     "text": "Learn in About 5 minutes",
+     "cite": "learn_in"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "strategy-board": {
+   "question": "can our group play it, and how fast can we learn it?",
+   "verdict": "yes",
+   "answer": "This game is designed for 3 to 4 players and takes about 20 minutes to learn. One game takes 60–90 minutes.",
+   "cites": [
+    "players",
+    "learn_in",
+    "game_length"
+   ],
+   "missing": [],
+   "headline": "Plays 3 to 4 people and learns in about 20 minutes",
+   "good": [
+    {
+     "text": "3–4 players",
+     "cite": "players"
+    },
+    {
+     "text": "Learn in about 20 minutes",
+     "cite": "learn_in"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "How long does one game take?",
+     "verdict": "yes",
+     "answer": "One game takes 60–90 minutes as stated in the listing.",
+     "cites": [
+      "game_length"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "travel-chess": {
+   "question": "Can our group play it, and how fast can we learn it?",
+   "verdict": "yes",
+   "answer": "This set is built for 2 players and takes 15 to 45 minutes per game. It includes a folding magnetic board and 32 pieces, suitable for ages 6 and up.",
+   "cites": [
+    "players",
+    "game_length",
+    "age",
+    "contents"
+   ],
+   "missing": [],
+   "headline": "2-player game with 15 to 45 minute rounds",
+   "good": [
+    {
+     "text": "2 players",
+     "cite": "players"
+    },
+    {
+     "text": "15 to 45 minutes per game",
+     "cite": "game_length"
+    },
+    {
+     "text": "Ages 6 and above",
+     "cite": "age"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Is it easy to travel with?",
+     "verdict": "yes",
+     "answer": "It features a folding magnetic board that helps keep pieces in place during travel.",
+     "cites": [
+      "contents"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "ludo-snakes": {
+   "question": "Can our group play it, and how fast can we learn it?",
+   "verdict": "yes",
+   "answer": "This set accommodates 2 to 4 players and takes about 2 minutes to learn, with each game lasting 20 to 30 minutes. The box includes a double-sided board, 16 tokens, and 1 die.",
+   "cites": [
+    "players",
+    "learn_in",
+    "game_length",
+    "contents"
+   ],
+   "missing": [],
+   "headline": "2 to 4 players, learns in about 2 minutes",
+   "good": [
+    {
+     "text": "2–4 players",
+     "cite": "players"
+    },
+    {
+     "text": "Learn in about 2 minutes",
+     "cite": "learn_in"
+    },
+    {
+     "text": "One game takes 20–30 minutes",
+     "cite": "game_length"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "word-cards": {
+   "question": "Can our group play it, and how fast can we learn it?",
+   "verdict": "not_stated",
+   "answer": "The listing does not state the number of players or how fast the game is to learn. It comes with 200 word cards and a sand timer in English.",
+   "cites": [
+    "contents",
+    "language"
+   ],
+   "missing": [
+    "players",
+    "learn_in"
+   ],
+   "headline": "Includes 200 word cards and a sand timer",
+   "good": [
+    {
+     "text": "200 word cards",
+     "cite": "contents"
+    },
+    {
+     "text": "Sand timer",
+     "cite": "contents"
+    },
+    {
+     "text": "English language",
+     "cite": "language"
+    }
+   ],
+   "tip": "The player count and rules are not listed, so check the box details when it arrives to see how many people can play.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Is it suitable for younger players?",
+     "verdict": "yes",
+     "answer": "The age label states 12+.",
+     "cites": [
+      "age"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "puzzle-500": {
+   "question": "Can our group play it, and how fast can we learn it?",
+   "verdict": "yes",
+   "answer": "This jigsaw puzzle is suitable for solo play or groups with 1 or more players. It contains 500 pieces and has a finished size of 48 × 34 cm.",
+   "cites": [
+    "players",
+    "age",
+    "contents"
+   ],
+   "missing": [],
+   "headline": "Plays with 1 or more people, 500 pieces",
+   "good": [
+    {
+     "text": "For 1 or more players",
+     "cite": "players"
+    },
+    {
+     "text": "Recommended age 10+",
+     "cite": "age"
+    },
+    {
+     "text": "500 pieces",
+     "cite": "contents"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "kettle-1l": {
+   "question": "Can I get a hand inside the kettle to clean it?",
+   "verdict": "yes",
+   "answer": "The kettle features a wide mouth opening of about 9 cm across, which allows you to easily fit your hand inside for cleaning. It also includes a stainless steel interior with no exposed element.",
+   "cites": [
+    "opening",
+    "inside"
+   ],
+   "missing": [],
+   "headline": "Wide mouth opening lets your hand fit inside to clean",
+   "good": [
+    {
+     "text": "Wide mouth, about 9 cm across",
+     "cite": "opening"
+    },
+    {
+     "text": "Stainless steel, no exposed element",
+     "cite": "inside"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Will the cord length reach your socket?",
+     "verdict": "yes",
+     "answer": "The cord length is 0.75 m with a 360° base.",
+     "cites": [
+      "cord"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "kettle-1-5l": {
+   "question": "Can I get a hand inside the kettle to clean it?",
+   "verdict": "not_stated",
+   "answer": "The listing gives the capacity as 1.5 litres and states the inside is stainless steel, but it does not mention the size of the mouth opening.",
+   "cites": [
+    "capacity",
+    "inside"
+   ],
+   "missing": [
+    "opening"
+   ],
+   "headline": "1.5L stainless steel kettle with auto shut-off",
+   "good": [
+    {
+     "text": "1.5 litres capacity",
+     "cite": "capacity"
+    },
+    {
+     "text": "Stainless steel inside",
+     "cite": "inside"
+    },
+    {
+     "text": "Auto shut-off included",
+     "cite": "auto_off"
+    }
+   ],
+   "tip": "Check the lid opening when it arrives to see if your hand fits inside for cleaning.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Will the cord reach the counter socket?",
+     "verdict": "yes",
+     "answer": "The cord is 0.75 m long with a 360° base.",
+     "cites": [
+      "cord"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "kettle-glass": {
+   "question": "Can I get a hand inside the kettle to clean it?",
+   "verdict": "no",
+   "answer": "The listing states the mouth opening is narrow at about 6 cm, so you cannot fit a hand inside and will need a bottle brush to clean it.",
+   "cites": [
+    "opening"
+   ],
+   "missing": [],
+   "headline": "Narrow mouth opening: requires a bottle brush",
+   "good": [
+    {
+     "text": "1.7 litres capacity",
+     "cite": "capacity"
+    },
+    {
+     "text": "Borosilicate glass with LED light",
+     "cite": "inside"
+    }
+   ],
+   "tip": "Since the mouth is narrow, use a bottle brush rather than a hand to clean the inside.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Does it switch off automatically?",
+     "verdict": "yes",
+     "answer": "Yes, it features auto shut-off.",
+     "cites": [
+      "auto_off"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "iron-dry": {
+   "question": "Can I get inside to clean or descale it?",
+   "verdict": "not_stated",
+   "answer": "The listing details power, cord length, and warranty, but does not state if the interior is accessible for cleaning or descaling.",
+   "cites": [],
+   "missing": [
+    "cleaning"
+   ],
+   "headline": "Dry iron with 1.8 m cord and 2 years warranty",
+   "good": [
+    {
+     "text": "1000 W power",
+     "cite": "power"
+    },
+    {
+     "text": "1.8 m cord length",
+     "cite": "cord"
+    },
+    {
+     "text": "2 years warranty",
+     "cite": "warranty"
+    }
+   ],
+   "tip": "Check the product manual upon delivery to see if cleaning instructions are provided.",
+   "ask": null,
+   "also": []
+  },
+  "iron-steam": {
+   "question": "Can I check the soleplate and water tank easily?",
+   "verdict": "yes",
+   "answer": "The listing provides photos of the front, side, soleplate, and tank filling, allowing you to check the design before buying.",
+   "cites": [
+    "photos"
+   ],
+   "missing": [],
+   "headline": "Photos show front, side, soleplate, and tank filling",
+   "good": [
+    {
+     "text": "Photos show front, side, soleplate, and tank filling",
+     "cite": "photos"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": [
+    {
+     "question": "Does it have safety auto shut-off?",
+     "verdict": "yes",
+     "answer": "It includes an auto shut-off feature that activates after 8 minutes.",
+     "cites": [
+      "auto_off"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "hand-blender": {
+   "question": "what will I live with every day (e.g. can I clean it easily)?",
+   "verdict": "not_stated",
+   "answer": "The listing gives the power and cord length, but does not state how the blender comes apart for daily cleaning.",
+   "cites": [
+    "power",
+    "cord"
+   ],
+   "missing": [
+    "warranty"
+   ],
+   "headline": "400 W power with a 1.2 m cord",
+   "good": [
+    {
+     "text": "400 W power rating",
+     "cite": "power"
+    },
+    {
+     "text": "1.2 m cord length",
+     "cite": "cord"
+    }
+   ],
+   "tip": "Check the detachable parts when it arrives to see how easily it can be cleaned.",
+   "ask": null,
+   "also": []
+  },
+  "sandwich-maker": {
+   "question": "Can I easily get inside to clean the sandwich maker?",
+   "verdict": "partly",
+   "answer": "The plates are non-stick, which helps food release easily, but because they are fixed you cannot take them out to wash in the sink.",
+   "cites": [
+    "inside"
+   ],
+   "missing": [],
+   "headline": "Non-stick plates, but fixed and not removable",
+   "good": [
+    {
+     "text": "Non-stick plates",
+     "cite": "inside"
+    },
+    {
+     "text": "750 W power",
+     "cite": "power"
+    }
+   ],
+   "tip": "Wipe the fixed plates carefully with a damp cloth while they are still slightly warm after use.",
+   "ask": null,
+   "also": [
+    {
+     "question": "Will it toast sandwiches quickly?",
+     "verdict": "yes",
+     "answer": "It features a 750 W heating element for daily sandwich toasting.",
+     "cites": [
+      "power"
+     ],
+     "missing": []
+    }
+   ]
+  },
+  "marker-whiteboard": {
+   "question": "Is it the right type for a whiteboard?",
+   "verdict": "yes",
+   "answer": "These are whiteboard dry-erase markers that wipe off easily. The pack includes 4 colours with a 2 mm bullet tip.",
+   "cites": [
+    "marker_type",
+    "colours",
+    "count",
+    "tip"
+   ],
+   "missing": [],
+   "headline": "Dry-erase whiteboard markers",
+   "good": [
+    {
+     "text": "Wipes off cleanly",
+     "cite": "marker_type"
+    },
+    {
+     "text": "Pack of 4 colours",
+     "cite": "colours"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "marker-black-2": {
+   "question": "Are these whiteboard or permanent markers?",
+   "verdict": "not_stated",
+   "answer": "The listing states they are black markers with a chisel tip, but it does not specify whether they are whiteboard or permanent markers.",
+   "cites": [
+    "count",
+    "colours",
+    "tip"
+   ],
+   "missing": [
+    "marker_type"
+   ],
+   "headline": "Black chisel-tip markers, pack of 2",
+   "good": [
+    {
+     "text": "Pack of 2",
+     "cite": "count"
+    },
+    {
+     "text": "Chisel tip",
+     "cite": "tip"
+    }
+   ],
+   "tip": "Check the packaging or test on a scrap surface when they arrive to see if they are permanent or erasable.",
+   "ask": null,
+   "also": []
+  },
+  "sticky-notes": {
+   "question": "Are these sticky notes the right size for quick reminder notes?",
+   "verdict": "yes",
+   "answer": "These 7.6 × 7.6 cm sticky notes come in a pack of 4 pads with 400 sheets total across four colours, making them well-suited for everyday reminders and messages.",
+   "cites": [
+    "size",
+    "count",
+    "colours"
+   ],
+   "missing": [],
+   "headline": "7.6 × 7.6 cm pads, ideal for quick daily notes",
+   "good": [
+    {
+     "text": "7.6 × 7.6 cm square size",
+     "cite": "size"
+    },
+    {
+     "text": "400 sheets in total",
+     "cite": "count"
+    },
+    {
+     "text": "Yellow, pink, green, blue colours",
+     "cite": "colours"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "a4-paper": {
+   "question": "Does this paper fit A4 size without folding?",
+   "verdict": "yes",
+   "answer": "The paper is A4 size measuring 21 by 29.7 cm, so standard A4 documents will fit without folding. It comes in a pack of 500 sheets at 75 gsm.",
+   "cites": [
+    "size",
+    "count"
+   ],
+   "missing": [],
+   "headline": "Fits A4 papers without folding",
+   "good": [
+    {
+     "text": "A4, 21 × 29.7 cm",
+     "cite": "size"
+    },
+    {
+     "text": "500 sheets",
+     "cite": "count"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  },
+  "cards-classic": {
+   "question": "Can our group play it, and how fast can we learn it?",
+   "verdict": "yes",
+   "answer": "This classic deck supports 2 or more players starting from age 6. The rules depend entirely on the specific game you choose to play.",
+   "cites": [
+    "players",
+    "age",
+    "language"
+   ],
+   "missing": [],
+   "headline": "Suitable for 2 or more players with no text",
+   "good": [
+    {
+     "text": "2 or more players",
+     "cite": "players"
+    },
+    {
+     "text": "Ages 6+",
+     "cite": "age"
+    },
+    {
+     "text": "No text language",
+     "cite": "language"
+    }
+   ],
+   "tip": null,
+   "ask": null,
+   "also": []
+  }
+ },
+ "failures": {}
+}
