@@ -24,7 +24,7 @@
   --muted: #666666;       /* 5.7:1 on white, 5.4:1 on --bg */
   --accent: #0c831f;      /* Blinkit green: 4.9:1 on white, 4.6:1 on --bg */
   --accent-ink: #ffffff;  /* text on green buttons: 4.9:1 */
-  --accent-soft: #eaf7ec; /* green text on it: 4.3:1 (large/bold labels only) and badges */
+  --accent-soft: #f0faf1; /* green text on it: 4.6:1, enough for small text (check chips, citation pills) */
   --tile: #edf4fb;        /* Blinkit-style category tiles (pale blue) */
   --tile-2: #f7fff9;      /* pale green tiles */
   --warn: #9a5b00;
@@ -126,4 +126,11 @@ body {
 small,
 .text-xs {
   font-size: 0.875rem;
+}
+
+/* Keyboard focus: a clear ring on every control (the browser default was a thin 1px outline). Mouse
+   clicks don't show it (:focus-visible); inputs that set focus:outline-none keep their border change. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px; /* the outline follows each element's own rounded corners */
 }

@@ -10,7 +10,7 @@
  * large per-minute limit. qwen allows only 8K tokens/minute and each agent round costs ~4K, so it cannot
  * carry a multi-round answer; one judge call (~3K) fits its minute.
  */
-import { checkCitations, checkNumbers, collectNumbers, normaliseCitations, type CitationCheck, type NumberCheck } from "./checks";
+import { checkCitations, checkFraming, checkNumbers, collectNumbers, normaliseCitations, type CitationCheck, type NumberCheck } from "./checks";
 import { EvidenceRegistry, runTool, TOOL_DEFS, type Evidence } from "./tools";
 
 export const GEMINI_MODEL = "gemini-3.5-flash-lite"; // Google AI Studio free tier (pinned, not "-latest")
@@ -62,7 +62,7 @@ class Busy extends Error {
 const skipUntil = new Map<string, number>();
 
 /** Bump when the prompt or tools change: cached answers from an older version are not reused. */
-export const PROMPT_VERSION = 2;
+export const PROMPT_VERSION = 3;
 
 function system(overview: string): string {
   return `You are the insight engine for a product research project on Blinkit, an Indian quick-commerce app.
@@ -72,7 +72,9 @@ You answer questions using ONLY the collected customer feedback, which you read 
 Data: ${overview}
 
 Step 1, understand the question. People type casually ("do ppl buy veggies here?"). Work out which topic
-it is about (see "Where to look") and which tag values fit. Questions about Zepto, Instamart or other apps
+it is about (see "Where to look") and which tag values fit. If the message is too vague to research
+("thoughts?", "hi", "help"), call no tools: in two sentences, say what you can answer and give two
+example questions. Questions about Zepto, Instamart or other apps
 are in scope only as far as the feedback mentions them.
 
 Step 2, gather evidence. Start with research_topic: it returns a count, quotes from tagged entries and
@@ -86,24 +88,28 @@ Every number you state must come from a count result.
 Step 3, write the answer:
 - Start with a one-sentence direct answer to the question as asked.
 - Give numbers with their base, copied from a count result, e.g. "33 of 50 tagged entries (66%)".
-  Never compute, add up or estimate numbers yourself.
+  When the base is the filtered set itself, write "6 tagged entries are about pet products", never
+  "6 of 6". Never compute, add up or estimate numbers yourself.
 - If a count result says the evidence is THIN (fewer than 20 entries), say so plainly in the first or
   second sentence ("Only 3 of 442 tagged entries mention this") and do not generalise: no "mainly",
   "most", "dominant", "people". Describe what those few entries say, as examples.
 - keyword_entries are not the counted entries: never call them "the entries that mention X" unless
-  their own text shows it.
+  their own text shows it. When a count was filtered by keywords, describe its base as the result
+  states it ("38 tagged entries containing Zepto, switch or similar words"), not as a topic.
 - If counts exist but are small, report them: that is the answer. Only say "The collected feedback
   doesn't cover this." when the counts and two searches found nothing relevant, and then say what it
   does cover.
 - Cite 2–4 entries right after the claim they support, as [E3] or [E3, E5]: square brackets, ids exactly
-  as the tools returned them. Cite only entries that are actually about the question and about Blinkit
+  as the tools returned them, never a range like E1–E5. An entry may only be cited for a sentence its
+  own text supports; a count sentence needs no citation. Cite only entries that are actually about the question and about Blinkit
   (keyword matches can be off-topic: a YouTube comment about something else, a travel post). Numbers
   need no citation. Never put tool names in brackets.
 - Reviews are mostly written by people who already bought something and are complaining about it. They
   show what goes wrong for buyers. Do not present them as the reasons other people avoid a category
   unless the entry says so ("I stopped buying", "never order X here", "won't buy"). For "why don't people
   buy X" questions, say what the feedback shows about X and note this limit in one sentence.
-- Say which sources the evidence comes from only from a source count or the cited entries' source field.
+- Say which sources the evidence comes from only from the count's "sources" breakdown or the cited
+  entries' source field, with the numbers ("41 of the 50 are Play Store reviews"); never "primarily".
 - Discovery channels, segments and the information people need before trying something are rarely
   written in reviews. When the tagged counts for these are thin, add one sentence: "The Part 2 user
   interviews (Validation page, check V9) cover this in more depth."
@@ -289,10 +295,13 @@ export async function answerQuestion(question: string, history: { role: "user" |
   const sources = [...collectNumbers(toolOutputs), ...collectNumbers(question), ...collectNumbers(history.map((h) => h.content))];
   let cit = checkCitations(draft, reg.ids());
   let num = checkNumbers(draft, sources);
+  const framing = checkFraming(draft);
   let repaired = false;
 
-  if (!cit.ok || !num.ok) {
+  if (!cit.ok || !num.ok || framing) {
     const problems = [
+      framing ? `it says "${framing}", but the entries are complaints from people who bought: say what buyers ` +
+        "report instead, unless a cited entry itself says the person avoids or stopped buying" : "",
       cit.unknown.length ? `it cites ids no tool returned: ${cit.unknown.join(", ")}` : "",
       cit.missing ? "it cites no entries although the tools returned some: cite the relevant ones as [E#]" : "",
       num.unverified.length ? `these numbers are not in any tool result: ${num.unverified.join(", ")}` : "",
@@ -334,11 +343,12 @@ async function judge(question: string, answer: string, cited: Evidence[], toolOu
     `Counts and statistics the answer may use:\n${JSON.stringify(stats).slice(0, 9000)}`;
   const sys = `You check whether an answer is supported by its evidence. For each claim in the answer, decide if the
 cited entries or the counts support it. Quotes support what they literally say; counts support numbers and
-shares (a percent in the answer is supported if a count result shows it). A claim about which sources
+shares (a percent in the answer is supported if a count result shows it; "most" or "primarily" is
+supported when a count shows a clear majority, e.g. 123 of 130). A claim about which sources
 the feedback comes from needs a source count or the cited entries. A claim that people avoid or don't buy
 something is unsupported unless an entry says so: complaints from buyers don't show why others stay away.
 Ignore the fixed sentence pointing to the Part 2 user interviews; it is a pointer, not a claim. Return JSON: {"score": <share of claims supported, 0 to 1>, "unsupported": [<short description of each
-unsupported claim, at most 3>]}.`;
+unsupported claim in under 25 words, at most 3>]}.`;
   const msgs: Msg[] = [{ role: "system", content: sys }, { role: "user", content: user }];
   const r = await groq(JUDGE_MODEL, msgs, { tools: false, json: true, maxTokens: 600 }).catch(async (e) => {
     if (!(e instanceof Busy)) throw e; // a per-minute limit: wait once
@@ -348,5 +358,9 @@ unsupported claim, at most 3>]}.`;
   tokens.judge += r.tin + r.tout;
   const j = JSON.parse(r.message.content ?? "{}");
   const score = typeof j.score === "number" ? Math.max(0, Math.min(1, j.score)) : null;
-  return { score, unsupported: Array.isArray(j.unsupported) ? j.unsupported.slice(0, 3).map(String) : [] };
+  // Kept short: a judge sometimes "thinks aloud" in this field, and it is shown under the answer.
+  return { score, unsupported: Array.isArray(j.unsupported) ? j.unsupported.slice(0, 3).map((u: unknown) => {
+    const t = String(u);
+    return t.length > 240 ? `${t.slice(0, 237)}…` : t;
+  }) : [] };
 }

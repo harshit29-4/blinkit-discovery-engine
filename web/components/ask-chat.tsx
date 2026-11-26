@@ -21,7 +21,7 @@ type Answer = {
     repaired: boolean;
   };
 };
-type Turn = { id: number; question: string; answer?: Answer; error?: string };
+type Turn = { id: number; question: string; answer?: Answer; error?: string; limited?: boolean };
 
 const SOURCE: Record<string, { label: string; color: string }> = {
   play_store: { label: "Play Store", color: "var(--src-play)" },
@@ -31,6 +31,7 @@ const SOURCE: Record<string, { label: string; color: string }> = {
   youtube_comment: { label: "YouTube comment", color: "var(--src-youtube)" },
 };
 const TOOL: Record<string, string> = {
+  research_topic: "Researched the topic (a count, tagged quotes and a keyword search)",
   search_feedback: "Searched the feedback",
   count_feedback: "Counted tagged entries",
   get_themes: "Read the themes",
@@ -70,7 +71,7 @@ function inline(text: string, onCite: (id: string) => void): ReactNode[] {
 
 function AnswerText({ text: raw, onCite }: { text: string; onCite: (id: string) => void }) {
   // Models sometimes cite a tool by name ("[count_feedback]"); the numbers are checked anyway, so hide it.
-  const text = raw.replace(/\s?\[(?:count_feedback|search_feedback|get_themes|get_reliability)\]/g, "");
+  const text = raw.replace(/\s?\[(?:research_topic|count_feedback|search_feedback|get_themes|get_reliability)\]/g, "");
   const blocks: ReactNode[] = [];
   let bullets: string[] = [];
   const flush = () => {
@@ -89,7 +90,8 @@ function AnswerText({ text: raw, onCite }: { text: string; onCite: (id: string) 
     }
   }
   flush();
-  return <div className="space-y-3 leading-relaxed">{blocks}</div>;
+  // [overflow-wrap:anywhere]: a long URL or unbroken word in an answer must not push past the card on phones.
+  return <div className="space-y-3 leading-relaxed [overflow-wrap:anywhere]">{blocks}</div>;
 }
 
 function Check({ ok, label, detail }: { ok: boolean | null; label: string; detail?: string }) {
@@ -144,7 +146,9 @@ function AnswerCard({ t }: { t: Turn & { answer: Answer } }) {
   const [active, setActive] = useState<string | null>(null);
   const cite = (id: string) => {
     setActive(id);
-    document.getElementById(`cite-${t.id}-${id}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const el = document.getElementById(`cite-${t.id}-${id}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    el?.focus({ preventScroll: true }); // keyboard and screen-reader users land on the entry too
   };
   return (
     <article className="space-y-4 rounded-xl border border-border bg-surface p-5">
@@ -157,7 +161,7 @@ function AnswerCard({ t }: { t: Turn & { answer: Answer } }) {
             {a.citations.map((e) => {
               const s = SOURCE[e.source] ?? { label: e.source, color: "var(--muted)" };
               return (
-                <li key={e.id} id={`cite-${t.id}-${e.id}`}
+                <li key={e.id} id={`cite-${t.id}-${e.id}`} tabIndex={-1}
                   className={`rounded-lg border p-3 text-sm transition-colors ${active === e.id ? "border-accent" : "border-border"}`}>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted">
                     <span className="font-semibold text-text">{e.id}</span>
@@ -239,13 +243,19 @@ export function AskChat({ suggestions }: { suggestions: string[] }) {
     try {
       const res = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, history }) });
       const data = await res.json().catch(() => ({ error: "The engine returned an unreadable response." }));
-      setTurns((ts) => ts.map((t) => (t.id === id ? (res.ok ? { ...t, answer: data } : { ...t, error: data.error ?? `Request failed (${res.status}).` }) : t)));
+      setTurns((ts) => ts.map((t) => (t.id === id ? (res.ok ? { ...t, answer: data }
+        : { ...t, error: data.error ?? `Request failed (${res.status}).`, limited: res.status === 429 }) : t)));
       if (res.ok && typeof data.remaining === "number") setRemaining(data.remaining);
     } catch {
       setTurns((ts) => ts.map((t) => (t.id === id ? { ...t, error: "Could not reach the engine. Check your connection and try again." } : t)));
     } finally {
       setBusy(false);
     }
+  }
+
+  function retry(t: Turn) {
+    setTurns((ts) => ts.filter((x) => x.id !== t.id));
+    void ask(t.question);
   }
 
   return (
@@ -272,7 +282,16 @@ export function AskChat({ suggestions }: { suggestions: string[] }) {
           <div key={t.id} className="space-y-3">
             <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-brand-yellow px-4 py-2 font-semibold text-brand-ink">{t.question}</p>
             {t.answer ? <AnswerCard t={t as Turn & { answer: Answer }} />
-              : t.error ? <p role="alert" className="rounded-xl bg-bad-soft px-4 py-3 text-bad">{t.error}</p>
+              : t.error ? (
+                <div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-bad-soft px-4 py-3 text-bad">
+                  <span>{t.error}</span>
+                  {/* Retry without retyping; not offered for limits that won't clear in seconds. */}
+                  {!t.limited && (
+                    <button type="button" disabled={busy} onClick={() => retry(t)}
+                      className="rounded-lg border border-bad px-3 py-1 text-sm font-semibold disabled:opacity-50">Try again</button>
+                  )}
+                </div>
+              )
               : (
                 <p className="rounded-xl border border-border bg-surface px-4 py-3 text-muted">
                   Reading the feedback and checking the answer… {elapsed > 1 ? `${elapsed} s` : ""}

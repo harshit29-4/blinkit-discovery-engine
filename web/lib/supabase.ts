@@ -35,6 +35,22 @@ function totalFrom(range: string | null): number | null {
 }
 
 /**
+ * A read that hits a passing slowdown is retried: twice, after 1.5 s and 4 s. A Vercel build pre-renders
+ * every page, and one statement timeout (Postgres 57014, e.g. while the daily pipeline writes) failed a
+ * whole deploy on 2026-11-26 although the same view answered in under a second a minute later. Only
+ * GETs are retried, so nothing is written twice.
+ */
+async function getWithRetry(url: URL, headers: Record<string, string>): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, { headers });
+    const transient = res.status === 502 || res.status === 503 || res.status === 504 ||
+      (res.status === 500 && (await res.clone().text()).includes("57014"));
+    if (!transient || attempt === 2) return res;
+    await new Promise((r) => setTimeout(r, attempt === 0 ? 1500 : 4000));
+  }
+}
+
+/**
  * GET /rest/v1/<view>?<query>. With `count`, also returns the total row count: exact, or with
  * "estimated" the planner's estimate when the result is large (exact when it is small).
  */
@@ -51,7 +67,7 @@ export async function select<T>(
   if (key().startsWith("eyJ")) headers.Authorization = `Bearer ${key()}`; // legacy anon JWT
   if (opts.count) headers.Prefer = opts.count === "estimated" ? "count=estimated" : "count=exact";
 
-  const res = await fetch(url, { headers });
+  const res = await getWithRetry(url, headers);
   // 416 = asked for a page past the last row (e.g. ?page=999999): not an error, just empty.
   if (res.status === 416) {
     return { rows: [], total: totalFrom(res.headers.get("content-range")) };

@@ -32,7 +32,7 @@ function AskBar() {
       <label htmlFor="ask-bar" className="sr-only">Ask the engine a question</label>
       <div className="flex items-center gap-2 rounded-xl border border-border bg-bg px-3 focus-within:border-accent">
         <IconSearch className="h-5 w-5 shrink-0 text-muted" />
-        <input id="ask-bar" name="q" maxLength={500} autoComplete="off"
+        <input id="ask-bar" name="q" maxLength={500} required minLength={3} autoComplete="off"
           placeholder="Ask about Blinkit shoppers…"
           className="w-full bg-transparent py-2.5 text-base placeholder:text-muted focus:outline-none" />
       </div>

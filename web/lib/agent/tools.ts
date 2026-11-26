@@ -202,8 +202,11 @@ export async function runTool(name: string, rawArgs: string, reg: EvidenceRegist
     if (group === "barrier" && tagFilter.barrier) group = tagFilter.category ? "sentiment" : "category";
     if (group === "category" && tagFilter.category) group = "barrier";
     const countArgs = { group_by: group, ...tagFilter, ...(hasTag ? {} : { query: keywords }) };
-    const [count, tagged, wide] = await Promise.all([
+    const [count, bySource, tagged, wide] = await Promise.all([
       runTool("count_feedback", JSON.stringify(countArgs), reg),
+      // The same set by source, so "these come from Play Store reviews" has a number behind it.
+      group === "source" ? Promise.resolve(null)
+        : runTool("count_feedback", JSON.stringify({ ...countArgs, group_by: "source" }), reg),
       hasTag
         ? runTool("search_feedback", JSON.stringify({ ...tagFilter, tagged_only: true, limit: 5 }), reg)
         : runTool("search_feedback", JSON.stringify({ query: keywords, source: a.source, tagged_only: true, limit: 5 }), reg),
@@ -213,8 +216,16 @@ export async function runTool(name: string, rawArgs: string, reg: EvidenceRegist
     ]);
     return {
       content: {
-        count: { counted_by: group, filters: hasTag ? { category: tagFilter.category, barrier: tagFilter.barrier }
-          : { keywords }, ...(count.content as object) },
+        count: {
+          counted_by: group,
+          base_is: hasTag
+            ? `tagged entries with ${[tagFilter.category && `category ${tagFilter.category}`, tagFilter.barrier && `barrier ${tagFilter.barrier}`].filter(Boolean).join(" and ")}`
+            : `tagged entries containing any of these words: ${keywords}`,
+          ...(count.content as object),
+          ...(bySource ? { sources: (bySource.content as { rows?: { label: string; entries: number }[] }).rows
+            ?.map((r) => `${r.entries} ${r.label}`).join(", ") } : {}),
+          small_values: "A value with fewer than 10 entries is a handful: say 'a few' or give the number, never 'many' or 'often'.",
+        },
         tagged_entries: (tagged.content as { entries: unknown[] }).entries,
         keyword_entries: (wide.content as { entries: unknown[] }).entries,
         note: "tagged_entries are examples from the counted set. keyword_entries only contain the keywords: " +

@@ -1,7 +1,7 @@
 // Unit tests for the answer checks. Run: npm test  (Node's built-in runner; Node strips the types).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { answerNumbers, checkCitations, checkNumbers, citedIds, collectNumbers, normaliseCitations, questionKey } from "../lib/agent/checks.ts";
+import { answerNumbers, checkCitations, checkFraming, checkNumbers, citedIds, collectNumbers, normaliseCitations, questionKey } from "../lib/agent/checks.ts";
 
 test("citations: ids in order, grouped form, unknown ids flagged", () => {
   assert.deepEqual(citedIds("Quality [E3]. Refunds [E1][E3] and [E2, E4]."), ["E3", "E1", "E2", "E4"]);
@@ -59,4 +59,26 @@ test("citations written as (E1), (E1, E2) or a bare id become [E#], but only for
   assert.equal(normaliseCitations("Already [E1, E2] and [E3][E12].", k), "Already [E1, E2] and [E3][E12].");
   assert.equal(normaliseCitations("Unknown (E9) and E99 stay; E3E too.", k), "Unknown (E9) and E99 stay; E3E too.");
   assert.deepEqual(checkCitations(normaliseCitations("Fake items (E1).", k), k).cited, ["E1"]);
+});
+
+test("citation ranges are expanded and tool names written as citations are dropped", () => {
+  const k = new Set(["E1", "E2", "E3", "E4", "E5"]);
+  assert.equal(normaliseCitations("Doubts [E1–E3].", k), "Doubts [E1, E2, E3].");
+  assert.equal(normaliseCitations("Doubts (E2-E4).", k), "Doubts [E2, E3, E4].");
+  assert.equal(normaliseCitations("Too far [E1–E40] stays.", k), "Too far [E1–E40] stays.");
+  assert.equal(normaliseCitations("36 entries (57.1%) [count_feedback].", k), "36 entries (57.1%).");
+});
+
+test("framing: buyer complaints must not be turned into reasons people stay away", () => {
+  assert.ok(checkFraming("Customers who choose not to buy fruits point to freshness."));
+  assert.ok(checkFraming("People avoid buying vegetables because of quality."));
+  assert.ok(checkFraming("Users rarely buy electronics here."));
+  assert.equal(checkFraming("Buyers report poor freshness in 36 of 63 entries."), null);
+  assert.equal(checkFraming("One reviewer says they will never order fruit again [E2]."), null);
+});
+
+test("framing: a disclaimer about why people avoid something is not flagged", () => {
+  assert.equal(checkFraming("These are complaints from buyers rather than direct reasons why people avoid the category."), null);
+  assert.equal(checkFraming("The feedback can't show the reasons people stay away."), null);
+  assert.equal(checkFraming("rather than why potential users avoid the category."), null);
 });

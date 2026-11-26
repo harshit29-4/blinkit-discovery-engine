@@ -29,13 +29,34 @@ export function citedIds(answer: string): string[] {
 export function normaliseCitations(answer: string, known: Set<string>): string {
   const ids = (list: string) => list.split(/\s*(?:,|and|&)\s*/).map((s) => s.trim()).filter(Boolean);
   const allKnown = (list: string) => ids(list).every((id) => known.has(id));
+  // E1–E5 / E1-E5 / E1 to E5 -> E1, E2, E3, E4, E5 (short ranges of returned ids only)
+  const expand = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => `E${a + i}`);
   return answer
+    // A tool name written as a citation ("[count_feedback]") says nothing: drop it.
+    .replace(/\s?\[(?:research_topic|count_feedback|search_feedback|get_themes|get_reliability)\]/g, "")
+    .replace(/\bE(\d{1,3})\s*(?:–|—|-|to)\s*E(\d{1,3})\b/g, (m, a: string, b: string) => {
+      const list = Number(b) > Number(a) && Number(b) - Number(a) < 8 ? expand(Number(a), Number(b)) : [];
+      return list.length && list.every((id) => known.has(id)) ? list.join(", ") : m;
+    })
     // (E1) / (E1, E2) / (E1 and E2) -> [E1, E2]
     .replace(/\((E\d{1,3}(?:\s*(?:,|and|&)\s*E\d{1,3})*)\)/g, (m, list: string) => allKnown(list) ? `[${ids(list).join(", ")}]` : m)
     // a bare id outside brackets, e.g. "review E2 says" -> "review [E2] says"; text inside [...] is left alone
     .split(/(\[[^\]]*\])/)
     .map((part, i) => i % 2 ? part : part.replace(/\b(E\d{1,3})\b/g, (m, id: string) => known.has(id) ? `[${id}]` : m))
     .join("");
+}
+
+/**
+ * C4 framing: reviews come mostly from people who bought something and complain about it, so they show
+ * what goes wrong for buyers, not why other people stay away. Answers kept slipping into "customers
+ * who choose not to buy X point to…" (the mistake the Part 2 interviews found in the engine's H1/H3),
+ * whatever the prompt said. Returns the offending phrase, or null; the agent then gets one rewrite.
+ */
+// Not after "why" or "reasons" (one word may sit between): "...rather than why potential users avoid the
+// category" is the disclaimer we want.
+const AVOID_CLAIM = /(?<!\b(?:why|reasons?)\s(?:\w+\s)?)\b(?:people|users|customers|shoppers|buyers|consumers|they)\s+(?:who\s+)?(?:\w+\s+){0,2}?(?:avoid(?:s|ing)?|rarely (?:buy|order)|don.?t (?:buy|order)|do not (?:buy|order)|choose not to|chose not to|decide not to|stay away|are reluctant|hesitate)\b/i;
+export function checkFraming(answer: string): string | null {
+  return answer.match(AVOID_CLAIM)?.[0] ?? null;
 }
 
 /**
