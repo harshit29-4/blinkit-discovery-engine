@@ -37,6 +37,15 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false, // don't advertise the framework/version
+  experimental: {
+    // Pre-rendering every page at once sent a burst of heavy view queries to Supabase, which cancels
+    // anything over 3 s for the public key; two deploys on 2026-11-26 failed on that while the same
+    // views answered in under a second on their own. One worker, two pages at a time, and a failed
+    // page is retried before the build gives up.
+    cpus: 1,
+    staticGenerationMaxConcurrency: 2,
+    staticGenerationRetryCount: 2,
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
